@@ -25,49 +25,11 @@ Animation.prototype.drawReimuStillFrame = function (tick, ctx, x, y) {
     yindex = Math.floor(frame / this.sheetWidth);
     
     ctx.drawImage(this.spriteSheet,
-                 xindex * this.frameWidth, yindex * this.frameHeight,  // source from sheet
-                 this.frameWidth, this.frameHeight,
-                 x, y,
-                 this.frameWidth * this.scale,
-                 this.frameHeight * this.scale);
-};
-
-Animation.prototype.drawReimuMoveRightFrame = function (tick, ctx, x, y) {
-    this.elapsedTime += tick;
-    if (this.isDone()) {
-        if (this.loop) this.elapsedTime = 0;
-    }
-    var frame = this.currentFrame();
-    var xindex = 0;
-    var yindex = 0;
-    xindex = frame % this.sheetWidth + 2;
-    yindex = Math.floor(frame / this.sheetWidth) + 2;
-    
-    ctx.drawImage(this.spriteSheet,
-                 xindex * this.frameWidth, yindex * this.frameHeight,  // source from sheet
-                 this.frameWidth, this.frameHeight,
-                 x, y,
-                 this.frameWidth * this.scale,
-                 this.frameHeight * this.scale);
-};
-
-Animation.prototype.drawReimuMoveLeftFrame = function (tick, ctx, x, y) {
-    this.elapsedTime += tick;
-    if (this.isDone()) {
-        if (this.loop) this.elapsedTime = 0;
-    }
-    var frame = this.currentFrame();
-    var xindex = 0;
-    var yindex = 0;
-    xindex = frame % this.sheetWidth + 1;
-    yindex = Math.floor(frame / this.sheetWidth) + 1;
-    
-    ctx.drawImage(this.spriteSheet,
-                 xindex * this.frameWidth, yindex * this.frameHeight,  // source from sheet
-                 this.frameWidth, this.frameHeight,
-                 x, y,
-                 this.frameWidth * this.scale,
-                 this.frameHeight * this.scale);
+                 xindex * this.frameWidth, yindex * this.frameHeight,  // (x,y) source from sheet
+                 this.frameWidth, this.frameHeight, // (x,y) size of sprite.
+                 x, y, // sprite position on screen.
+                 this.frameWidth * this.scale, // sprite scale; x
+                 this.frameHeight * this.scale); // sprite scale; y
 };
 
 Animation.prototype.drawBulletFrame = function (tick, ctx, x, y) {
@@ -77,17 +39,15 @@ Animation.prototype.drawBulletFrame = function (tick, ctx, x, y) {
     }
     
     var frame = this.currentFrame();
-    var xindex = 0;
+    var xindex = 83;
     var yindex = 203;
-    xindex = frame % (this.frameWidth * 4);
-    yindex = 203;
-    
+
     ctx.drawImage(this.spriteSheet,
-    		xindex * this.frameWidth+83, yindex,  // source from sheet
-                 this.frameWidth, this.frameHeight,
-                 x, y,
-                 this.frameWidth * this.scale,
-                 this.frameHeight * this.scale);
+    		xindex, yindex,  // (x,y) source from sheet
+            15, 12, // (x,y) size of sprite.
+            x, y, // position on screen.
+            15 * this.scale, // sprite scale; x
+            12 * this.scale); // sprite scale; y
 };
 
 Animation.prototype.currentFrame = function () {
@@ -126,8 +86,11 @@ Background.prototype.draw = function () {
 };
 
 function Reimu(game, spritesheet) {
-	this.animation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5);
+	this.animation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates the Reimu animation.
+	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .1, 4, false, 1.5); // Create's the Bullet animation for Reimu.
     this.speed = 185;
+    this.bulletSpeed = 230;
+    this.isShooting = false;
     this.ctx = game.ctx;
     Entity.call(this, game, 400, 550);
 }
@@ -136,42 +99,27 @@ Reimu.prototype = new Entity();
 Reimu.prototype.constructor = Reimu;
 
 Reimu.prototype.update = function () {
+	if(this.game.space) { // If the space key is pressed.
+		this.isShooting = true;
+		this.y = 550;
+	}
+	if(this.isShooting){
+		if(this.bulletAnimation.isDone()){
+			this.bulletAnimation.elapsedTime = 0;
+			this.isShooting = false;
+		}
+		this.y -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
+	}
+	Entity.prototype.update.call(this);
 };
 
 Reimu.prototype.draw = function () {
-	
-    this.animation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, this.y);
-    Entity.prototype.draw.call(this);
-};
-
-Reimu.prototype.drawLeft = function () {
-    this.animation.drawReimuLeftFrame(this.game.clockTick, this.ctx, this.x, this.y);
-    Entity.prototype.draw.call(this);
-};
-
-Reimu.prototype.drawRight = function () {
-    this.animation.drawReimuRightFrame(this.game.clockTick, this.ctx, this.x, this.y);
-    Entity.prototype.draw.call(this);
-};
-
-function Bullet(game, spritesheet) {
-	this.animation = new Animation(spritesheet, 15, 12, 261, .1, 4, true, 1.5);
-    this.speed = 230;
-    this.ctx = game.ctx;
-    Entity.call(this, game, 414, 550);
-}
-
-Bullet.prototype = new Entity();
-Bullet.prototype.constructor = Bullet;
-
-Bullet.prototype.update = function () {
-	this.y -= this.game.clockTick * this.speed;
-	if(this.y < 50) this.y = 550;
-};
-
-Bullet.prototype.draw = function () {
-	
-    this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	if(this.isShooting){
+		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+15, this.y); // Draws bullet onto the canvas.
+		this.animation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, 550); // Draws Reimu onto canvas in a static position. Need to shange once we get Reimu moving around screen.
+	}else {
+		this.animation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	}
     Entity.prototype.draw.call(this);
 };
 
@@ -188,8 +136,6 @@ AM.downloadAll(function () {
 
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/desert_background.jpg")));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
-    gameEngine.addEntity(new Bullet(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
-    //gameEngine.addEntity(new drawReimuMoveRightFrame(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
     
     console.log("All Done!");
 });
