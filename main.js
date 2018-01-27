@@ -88,9 +88,15 @@ Background.prototype.draw = function () {
 function Reimu(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .1, 4, false, 1.5); // Create's the Bullet animation for Reimu.
+	this.rightAnimation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates the Reimu's move right animation.
+	this.leftAnimation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates the Reimu's move left animation.
     this.speed = 185;
     this.bulletSpeed = 230;
     this.isShooting = false;
+    this.moveRight = false;
+    this.moveLeft = false;
+    this.moveUp = false;
+    this.moveDown = false;
     this.ctx = game.ctx;
     Entity.call(this, game, 400, 550);
 }
@@ -99,17 +105,44 @@ Reimu.prototype = new Entity();
 Reimu.prototype.constructor = Reimu;
 
 Reimu.prototype.update = function () {
+	
 	if(this.game.space) { // If the space key is pressed.
 		this.isShooting = true;
 		this.y = 550;
+		
+	}else if(this.game.left) { // If the left arrow key is pressed.
+		this.moveLeft = true;
+	}else if(this.game.right) { // If the right arrow key is pressed.
+		this.moveRight = true;
+	}else if(this.game.up) { // If the up arrow key is pressed.
+		this.moveUp = true;
+	}else if(this.game.down) { // If the down arrow key is pressed.
+		this.moveDown = true;
 	}
+	
 	if(this.isShooting){
 		if(this.bulletAnimation.isDone()){
 			this.bulletAnimation.elapsedTime = 0;
 			this.isShooting = false;
 		}
 		this.y -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
+	}else if(this.moveRight){
+		this.x += this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
+		this.moveRight = false;
+		
+	}else if(this.moveLeft){
+		this.x -= this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
+		this.moveLeft = false;
+		
+	}else if(this.moveUp){
+		this.y -= this.game.clockTick * this.speed; // Reimu moves towards the top of the screen
+		this.moveUp = false;
+		
+	}else if(this.moveDown){
+		this.y += this.game.clockTick * this.speed; // Reimu moves towards the top of the screen
+		this.moveDown = false;
 	}
+	
 	Entity.prototype.update.call(this);
 };
 
@@ -117,9 +150,20 @@ Reimu.prototype.draw = function () {
 	if(this.isShooting){
 		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+15, this.y); // Draws bullet onto the canvas.
 		this.animation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, 550); // Draws Reimu onto canvas in a static position. Need to shange once we get Reimu moving around screen.
+		
+	}
+	if(this.moveRight){
+		
+		this.rightAnimation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, this.y); // Draws Reimu onto canvas in a static position. Need to shange once we get Reimu moving around screen.
+	
+	}
+	if(this.moveLeft){
+		this.leftAnimation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, this.y); // Draws Reimu onto canvas in a static position. Need to shange once we get Reimu moving around screen.
 	}else {
+		
 		this.animation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, this.y);
 	}
+	
     Entity.prototype.draw.call(this);
 };
 

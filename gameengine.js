@@ -44,11 +44,35 @@ GameEngine.prototype.startInput = function () {
     
     var that = this;
 
-    this.ctx.canvas.addEventListener("keydown", function (e) {
+    this.ctx.canvas.addEventListener("keypress", function (e) {
         if (String.fromCharCode(e.which) === ' ') that.space = true;
-        // console.log(e); // shows which key is pressed on keyboard (for debugging key presses).
+        console.log(e); // shows which key is pressed on keyboard (for debugging key presses).
         e.preventDefault();
     }, false);
+    
+    this.ctx.canvas.addEventListener("keypress", function (e) {
+        if (String.fromCharCode(e.which) === 's') that.down = true;
+        e.preventDefault();
+    }, false);
+    
+    this.ctx.canvas.addEventListener("keypress", function (e) {
+    	if (String.fromCharCode(e.which) === 'a') {
+    		that.left = true;
+    		console.log("Pressed left key");
+    	}
+        e.preventDefault();
+    }, false);
+    
+    this.ctx.canvas.addEventListener("keypress", function (e) {
+        if (String.fromCharCode(e.which) === 'd') that.right = true;
+        e.preventDefault();
+    }, false);
+    
+    this.ctx.canvas.addEventListener("keypress", function (e) {
+        if (String.fromCharCode(e.which) === 'w') that.up = true;
+        e.preventDefault();
+    }, false);
+    
 
     console.log('Input started');
 }
@@ -82,6 +106,10 @@ GameEngine.prototype.loop = function () {
     this.update();
     this.draw();
     this.space = false;
+    this.left = false;
+    this.right = false;
+    this.down = false;
+    this.up = false;
 }
 
 function Timer() {
