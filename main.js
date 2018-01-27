@@ -127,7 +127,7 @@ Reimu.prototype.update = function () {
 	
 	if(this.game.left) { // If the left arrow key is pressed.
 		this.moveLeft = true;
-}
+	}
 	if(this.game.right) { // If the right arrow key is pressed.
 		this.moveRight = true;
 	}if(this.game.up) { // If the up arrow key is pressed.
@@ -172,7 +172,7 @@ Reimu.prototype.draw = function () {
 
 	if(this.isShooting){
 		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+15, this.bulletY); // Draws bullet onto the canvas.
-		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
 		
 	}else if(this.moveRight){
 		
@@ -186,8 +186,28 @@ Reimu.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
+function Enemy(game, spritesheet){
+	this.animation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates an Enemy animation.
+	this.speed = 185;
+	
+};
+
+Enemy.prototype = new Entity();
+Enemy.prototype.constructor = Enemy;
+
+Enemy.prototype.update = function () {
+	
+}
+
+Enemy.prototype.draw = function () {
+
+    Entity.prototype.draw.call(this);
+};
+
+
 AM.queueDownload("./img/desert_background.jpg");
 AM.queueDownload("./img/reimu_hakurei.png");
+AM.queueDownload("./img/enemies.png")
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
@@ -199,6 +219,7 @@ AM.downloadAll(function () {
 
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/desert_background.jpg")));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
+    gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemies.png")));
     
     console.log("All Done!");
 });

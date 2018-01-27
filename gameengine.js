@@ -139,7 +139,7 @@ GameEngine.prototype.update = function () {
 GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
-    this.draw()
+    this.draw();
 }
 
 function Timer() {
