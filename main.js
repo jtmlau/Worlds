@@ -60,6 +60,35 @@ Animation.prototype.drawBulletFrame = function (tick, ctx, x, y) {
             12 * this.scale); // sprite scale; y
 };
 
+Animation.prototype.drawEnemyFrame = function (tick, ctx, x, y, left, right) {
+    this.elapsedTime += tick;
+    if (this.isDone()) {
+        if (this.loop) this.elapsedTime = 0;
+    }
+    
+    
+    var frame = this.currentFrame();
+    var xindex = 0;
+    var yindex = 0;
+    
+    if(left){
+    	yindex = Math.floor(frame / this.sheetWidth)+1;
+    } else if(right){
+    	yindex = Math.floor(frame / this.sheetWidth)+2;
+    } else {
+    	yindex = Math.floor(frame / this.sheetWidth);
+    }
+    
+    xindex = frame % this.sheetWidth;
+    
+    ctx.drawImage(this.spriteSheet,
+                 xindex * this.frameWidth, yindex * this.frameHeight,  // (x,y) source from sheet
+                 this.frameWidth, this.frameHeight, // (x,y) size of sprite.
+                 x, y, // sprite position on screen.
+                 this.frameWidth * this.scale, // sprite scale; x
+                 this.frameHeight * this.scale); // sprite scale; y
+};
+
 Animation.prototype.currentFrame = function () {
     return Math.floor(this.elapsedTime / this.frameDuration);
 };
