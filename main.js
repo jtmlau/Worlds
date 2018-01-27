@@ -13,16 +13,26 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.scale = scale;
 }
 
-Animation.prototype.drawReimuStillFrame = function (tick, ctx, x, y) {
+Animation.prototype.drawReimuFrame = function (tick, ctx, x, y, left, right) {
     this.elapsedTime += tick;
     if (this.isDone()) {
         if (this.loop) this.elapsedTime = 0;
     }
+    
+    
     var frame = this.currentFrame();
     var xindex = 0;
     var yindex = 0;
+    
+    if(left){
+    	yindex = Math.floor(frame / this.sheetWidth)+1;
+    } else if(right){
+    	yindex = Math.floor(frame / this.sheetWidth)+2;
+    } else {
+    	yindex = Math.floor(frame / this.sheetWidth);
+    }
+    
     xindex = frame % this.sheetWidth;
-    yindex = Math.floor(frame / this.sheetWidth);
     
     ctx.drawImage(this.spriteSheet,
                  xindex * this.frameWidth, yindex * this.frameHeight,  // (x,y) source from sheet
@@ -92,6 +102,7 @@ function Reimu(game, spritesheet) {
 	this.leftAnimation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates the Reimu's move left animation.
     this.speed = 185;
     this.bulletSpeed = 230;
+    this.bulletY = this.y;
     this.isShooting = false;
     this.moveRight = false;
     this.moveLeft = false;
@@ -108,7 +119,7 @@ Reimu.prototype.update = function () {
 	
 	if(this.game.space) { // If the space key is pressed.
 		this.isShooting = true;
-		this.y = 550;
+		this.bulletY = this.y;
 		
 	}
 	
@@ -156,23 +167,20 @@ Reimu.prototype.update = function () {
 };
 
 Reimu.prototype.draw = function () {
+
 	if(this.isShooting){
-		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+15, this.y); // Draws bullet onto the canvas.
-		this.animation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, 550); // Draws Reimu onto canvas in a static position. Need to shange once we get Reimu moving around screen.
+		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+15, this.bulletY); // Draws bullet onto the canvas.
+		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y);
 		
-	}
-	if(this.moveRight){
+	}else if(this.moveRight){
 		
-		this.rightAnimation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, this.y); // Draws Reimu onto canvas in a static position. Need to shange once we get Reimu moving around screen.
+		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
 	
-	}
-	if(this.moveLeft){
-		this.leftAnimation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, this.y); // Draws Reimu onto canvas in a static position. Need to shange once we get Reimu moving around screen.
+	}else if(this.moveLeft){
+		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
 	}else {
-		
-		this.animation.drawReimuStillFrame(this.game.clockTick, this.ctx, this.x, this.y);
+		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
 	}
-	
     Entity.prototype.draw.call(this);
 };
 
