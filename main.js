@@ -117,9 +117,11 @@ Reimu.prototype.constructor = Reimu;
 
 Reimu.prototype.update = function () {
 	
+	var that = this;
+	
 	if(this.game.space) { // If the space key is pressed.
 		this.isShooting = true;
-		this.bulletY = this.y;
+		this.bulletY = that.y;
 		
 	}
 	
@@ -139,7 +141,7 @@ Reimu.prototype.update = function () {
 			this.bulletAnimation.elapsedTime = 0;
 			this.isShooting = false;
 		}
-		this.y -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
+		this.bulletY -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
 	}if(this.moveRight){
 		this.x += this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
 		
