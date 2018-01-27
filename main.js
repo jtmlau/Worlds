@@ -139,10 +139,10 @@ function Reimu(game, spritesheet) {
     Entity.call(this, game, 400, 550);
 }
 
-Bullet.prototype = new Entity();
-Bullet.prototype.constructor = Bullet;
+ReimuBullet.prototype = new Entity();
+ReimuBullet.prototype.constructor = ReimuBullet;
 
-function Bullet(game, spritesheet) {
+function ReimuBullet(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
 	this.speed = 450;
 	this.X;
@@ -151,22 +151,48 @@ function Bullet(game, spritesheet) {
 	Entity.call(this, game, 400, 550);
 }
 
-Bullet.prototype.update = function() {
+ReimuBullet.prototype.update = function() {
     this.y -= this.game.clockTick * this.speed;
     
     Entity.prototype.update.call(this);
 }
 
-Bullet.prototype.draw = function () {
+ReimuBullet.prototype.draw = function () {
     this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, this.y);
     
     Entity.prototype.draw.call(this);
 };
 
+EnemyBullet.prototype = new Entity();
+EnemyBullet.prototype.constructor = EnemyBullet;
+
+function EnemyBullet(game, spritesheet) {
+	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
+	this.speed = 450;
+	this.X;
+	this.Y;
+	this.ctx = game.ctx;
+	Entity.call(this, game, 400, 550);
+}
+
+EnemyBullet.prototype.Enemyupdate = function() {
+	this.y += this.game.clockTick * 230;
+    
+    Entity.prototype.update.call(this);
+}
+
+EnemyBullet.prototype.draw = function () {
+    this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    
+    Entity.prototype.draw.call(this);
+};
+
+
 Reimu.prototype = new Entity();
 Reimu.prototype.constructor = Reimu;
 
 b = [];
+bEnemy = [];
 
 Reimu.prototype.update = function () {
 	
@@ -198,7 +224,7 @@ Reimu.prototype.update = function () {
 		
 		//loop?
 		
-		this.bulletY -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
+		//this.bulletY -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
 	}if(this.moveRight){
 		this.x += this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
 		
@@ -230,14 +256,16 @@ Reimu.prototype.update = function () {
 		element.draw();
 	});
 	
+
+	
 	Entity.prototype.update.call(this);
 };
 
 Reimu.prototype.draw = function () {
 
 	if(this.isShooting){		
-		temp = new Bullet(this.game, AM.getAsset("./img/reimu_hakurei.png"));
-		temp2 = new Bullet(this.game, AM.getAsset("./img/reimu_hakurei.png"));
+		temp = new ReimuBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"));
+		temp2 = new ReimuBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"));
 		
 		temp.x = this.x+5;
 		temp.y = this.bulletY;
@@ -259,11 +287,11 @@ Reimu.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
-function Enemy(game, spritesheet){
-	this.animation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates an Enemy animation.
-	this.speed = 185;
-	
-};
+//function Enemy(game, spritesheet){
+//	this.animation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates an Enemy animation.
+//	this.speed = 185;
+//	
+//};
 
 function Enemy(game, spritesheet){
 	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation.
@@ -284,7 +312,7 @@ Enemy.prototype.constructor = Enemy;
 Enemy.prototype.update = function () {
 	
 	if(this.shoot){
-		this.bulletY += this.game.clockTick * this.bulletSpped;
+		this.bulletY += this.game.clockTick * this.bulletSpeed;
 	}
 	
 	if(this.x <= 0 ){
@@ -304,11 +332,18 @@ Enemy.prototype.update = function () {
 	if(this.moveRight){
 		this.x += this.game.clockTick * this.speed;
 	}
-	if (this.x === 400){
+	if (this.x > 400 && this.x < 600){
 		this.shoot = true;
 	}else{
 		this.shoot = false;
 	}
+	
+	bEnemy.forEach(function(element)
+	{
+		element.Enemyupdate();
+		element.draw();
+		//console.log("update");
+	});
 	
 	Entity.prototype.update.call(this);
 }
@@ -317,7 +352,18 @@ Enemy.prototype.draw = function () {
 
 	this.animation.drawEnemyFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
 	
-	if(this.shoot) this.bulletAnimation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, this.bulletY);
+	if(this.shoot) {
+		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"));
+		tempEnemy.x = this.x+15;
+		tempEnemy.y = 50;
+		this.game.addEntity(tempEnemy);
+		
+		
+		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, 50);
+		bEnemy.push(tempEnemy);
+		
+		//console.log("shooting");
+	}
 	
     Entity.prototype.draw.call(this);
 };
@@ -339,7 +385,6 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
     gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png")));
 
-    gameEngine.addEntity(new Bullet(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
     
     console.log("All Done!");
 });
