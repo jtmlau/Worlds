@@ -117,7 +117,7 @@ Bullet.prototype.constructor = Bullet;
 
 function Bullet(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-	this.speed = 200;
+	this.speed = 450;
 	this.X;
 	this.Y;
 	this.ctx = game.ctx;
@@ -217,15 +217,22 @@ Reimu.prototype.draw = function () {
 		
 		
 		temp = new Bullet(this.game, AM.getAsset("./img/reimu_hakurei.png"));
+		temp2 = new Bullet(this.game, AM.getAsset("./img/reimu_hakurei.png"));
 		
-		temp.x = this.x+15;
+		temp.x = this.x+5;
 		temp.y = this.bulletY;
 		
+		temp2.x = this.x+25;
+		temp2.y = this.bulletY;
+		
 		this.game.addEntity(temp);
+		this.game.addEntity(temp2);
 		
 		
-		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+15, this.bulletY); // Draws bullet onto the canvas.
-		b.push(temp)
+		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+5, this.bulletY); // Draws bullet onto the canvas.
+		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+25, this.bulletY); 
+		b.push(temp);
+		b.push(temp2);
 	}
 		
 	this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y)
