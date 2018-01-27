@@ -185,6 +185,26 @@ Reimu.prototype.draw = function () {
 	}
     Entity.prototype.draw.call(this);
 };
+function BadBullet(game, spritesheet, x, y) {
+	this.animation = new Animation(spritesheet, 100,100, 100, 1, 1, true, 1);
+	this.speed = 100;
+	this.ctx = game.ctx;
+	Entity.call(this, game, x, 0);
+	//this.angle = angle;
+	this.x = x;
+	this.y = y;
+}
+BadBullet.prototype = new Entity();
+BadBullet.prototype.constructor = BadBullet;
+BadBullet.prototype.update = function() {
+	this.y += this.game.clockTick * this.bulletSpeed;//move down
+	//add angle later
+}
+BadBullet.prototype.draw = function () {
+	this.animation.drawBadBullet(this.game.clockTick, this.ctx, this.x, this.y);
+	Entity.prototype.draw.call(this);
+	
+};
 
 AM.queueDownload("./img/desert_background.jpg");
 AM.queueDownload("./img/reimu_hakurei.png");
@@ -196,7 +216,7 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     gameEngine.start();
-
+	gameEngine.addEntity(new BadBullet(gameEngine, AM.getAsset("./img/battle.png"), 100, 0));
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/desert_background.jpg")));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
     
