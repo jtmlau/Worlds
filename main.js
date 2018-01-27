@@ -96,8 +96,8 @@ Background.prototype.draw = function () {
 };
 
 function Reimu(game, spritesheet) {
-	this.animation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates the Reimu animation.
-	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .1, 4, false, 1.5); // Create's the Bullet animation for Reimu.
+	this.animation = new Animation(spritesheet, 32, 47, 261, .75, 8, true, 1.5); // Creates the Reimu animation.
+	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
 	this.rightAnimation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates the Reimu's move right animation.
 	this.leftAnimation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates the Reimu's move left animation.
     this.speed = 185;
@@ -112,8 +112,36 @@ function Reimu(game, spritesheet) {
     Entity.call(this, game, 400, 550);
 }
 
+Bullet.prototype = new Entity();
+Bullet.prototype.constructor = Bullet;
+
+function Bullet(game, spritesheet) {
+	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
+	this.speed = 200;
+	this.X;
+	this.Y;
+	this.ctx = game.ctx;
+	Entity.call(this, game, 400, 550);
+}
+
+Bullet.prototype.update = function() {
+    //console.log("bullet update");
+    this.y -= this.game.clockTick * this.speed;
+    
+    Entity.prototype.update.call(this);
+}
+
+Bullet.prototype.draw = function () {
+    //console.log("bullet draw func");
+    this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    
+    Entity.prototype.draw.call(this);
+};
+
 Reimu.prototype = new Entity();
 Reimu.prototype.constructor = Reimu;
+
+b = [];
 
 Reimu.prototype.update = function () {
 	
@@ -122,7 +150,6 @@ Reimu.prototype.update = function () {
 	if(this.game.space) { // If the space key is pressed.
 		this.isShooting = true;
 		this.bulletY = that.y;
-		
 	}
 	
 	if(this.game.left) { // If the left arrow key is pressed.
@@ -141,6 +168,11 @@ Reimu.prototype.update = function () {
 			this.bulletAnimation.elapsedTime = 0;
 			this.isShooting = false;
 		}
+		
+		
+		
+		//loop?
+		
 		this.bulletY -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
 	}if(this.moveRight){
 		this.x += this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
@@ -163,7 +195,17 @@ Reimu.prototype.update = function () {
 		this.moveUp = false;
 	}if(!this.game.down) { // If the down arrow key is pressed.
 		this.moveDown = false;
+	}if(!this.game.space) {
+		this.isShooting = false;
 	}
+	
+	b.forEach(function(element)
+	{
+		element.update();
+		element.draw();
+	});
+	
+	//console.log(b);
 	
 	Entity.prototype.update.call(this);
 };
@@ -171,18 +213,20 @@ Reimu.prototype.update = function () {
 Reimu.prototype.draw = function () {
 
 	if(this.isShooting){
+		
+		temp = new Bullet(this.game, AM.getAsset("./img/reimu_hakurei.png"));
+		
+		temp.x = this.x+15;
+		temp.y = this.bulletY;
+		
+		this.game.addEntity(temp);
+		
+		
 		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+15, this.bulletY); // Draws bullet onto the canvas.
-		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		
-	}else if(this.moveRight){
-		
-		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
-	
-	}else if(this.moveLeft){
-		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
-	}else {
-		this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
+		b.push(temp)
 	}
+		
+	this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y)
     Entity.prototype.draw.call(this);
 };
 
@@ -199,6 +243,7 @@ AM.downloadAll(function () {
 
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/desert_background.jpg")));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
+    gameEngine.addEntity(new Bullet(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
     
     console.log("All Done!");
 });
