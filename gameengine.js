@@ -43,38 +43,74 @@ GameEngine.prototype.startInput = function () {
     console.log('Starting input');
     
     var that = this;
-
-    this.ctx.canvas.addEventListener("keypress", function (e) {
-        if (String.fromCharCode(e.which) === ' ') that.space = true;
-        console.log(e); // shows which key is pressed on keyboard (for debugging key presses).
-        e.preventDefault();
     }, false);
     
-    this.ctx.canvas.addEventListener("keypress", function (e) {
-        if (String.fromCharCode(e.which) === 's') that.down = true;
-        e.preventDefault();
-    }, false);
-    
-    this.ctx.canvas.addEventListener("keypress", function (e) {
-    	if (String.fromCharCode(e.which) === 'a') {
+    this.ctx.canvas.addEventListener("keydown", function (e)
+	{
+//    	if (e.IsRepeat)
+//		{
+//			// Ignore key repeats...let the timer handle that
+//    		return;
+//		}
+    	
+    	switch(e.code)
+    	{
+    	case "Space":
+    		that.space = true;
+    		break;
+    		
+    	case "KeyW":
+    		that.up = true;
+    		break;
+    		
+    	case "KeyA":
     		that.left = true;
-    		console.log("Pressed left key");
+    		break;
+    		
+    	case "KeyS":
+    		that.down = true;
+    		break;
+    		
+    	case "KeyD":
+    		that.right = true;
+    		break;
     	}
-        e.preventDefault();
-    }, false);
+    	
+    	e.preventDefault();
+    	
+    	
+	}, false);
     
-    this.ctx.canvas.addEventListener("keypress", function (e) {
-        if (String.fromCharCode(e.which) === 'd') that.right = true;
-        e.preventDefault();
-    }, false);
-    
-    this.ctx.canvas.addEventListener("keypress", function (e) {
-        if (String.fromCharCode(e.which) === 'w') that.up = true;
-        e.preventDefault();
-    }, false);
+    this.ctx.canvas.addEventListener("keyup", function(e)
+	{
+    	switch(e.code)
+    	{
+    	case "Space":
+    		that.space = false;
+    		break;
+    		
+    	case "KeyW":
+    		that.up = false;
+    		break;
+    		
+    	case "KeyA":
+    		that.left = false;
+    		break;
+    		
+    	case "KeyS":
+    		that.down = false;
+    		break;
+    		
+    	case "KeyD":
+    		that.right = false;
+    		break;
+    	}
+    	
+    	e.preventDefault();
+	}, false);
     
 
-    console.log('Input started');
+    
 }
 
 GameEngine.prototype.addEntity = function (entity) {
@@ -104,12 +140,7 @@ GameEngine.prototype.update = function () {
 GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
-    this.draw();
-    this.space = false;
-    this.left = false;
-    this.right = false;
-    this.down = false;
-    this.up = false;
+    this.draw()
 }
 
 function Timer() {

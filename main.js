@@ -110,13 +110,16 @@ Reimu.prototype.update = function () {
 		this.isShooting = true;
 		this.y = 550;
 		
-	}else if(this.game.left) { // If the left arrow key is pressed.
+	}
+	
+	if(this.game.left) { // If the left arrow key is pressed.
 		this.moveLeft = true;
-	}else if(this.game.right) { // If the right arrow key is pressed.
+}
+	if(this.game.right) { // If the right arrow key is pressed.
 		this.moveRight = true;
-	}else if(this.game.up) { // If the up arrow key is pressed.
+	}if(this.game.up) { // If the up arrow key is pressed.
 		this.moveUp = true;
-	}else if(this.game.down) { // If the down arrow key is pressed.
+	}if(this.game.down) { // If the down arrow key is pressed.
 		this.moveDown = true;
 	}
 	
@@ -126,20 +129,26 @@ Reimu.prototype.update = function () {
 			this.isShooting = false;
 		}
 		this.y -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
-	}else if(this.moveRight){
+	}if(this.moveRight){
 		this.x += this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
-		this.moveRight = false;
 		
-	}else if(this.moveLeft){
+	}if(this.moveLeft){
 		this.x -= this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
-		this.moveLeft = false;
-		
-	}else if(this.moveUp){
+	}if(this.moveUp){
 		this.y -= this.game.clockTick * this.speed; // Reimu moves towards the top of the screen
-		this.moveUp = false;
 		
-	}else if(this.moveDown){
-		this.y += this.game.clockTick * this.speed; // Reimu moves towards the top of the screen
+	}if(this.moveDown){
+		this.y += this.game.clockTick * this.speed; // Reimu moves towards the top of the 
+	}
+	
+	if(!this.game.left) { // If the left arrow key is pressed.
+		this.moveLeft = false;
+}
+	if(!this.game.right) { // If the right arrow key is pressed.
+		this.moveRight = false;
+	}if(!this.game.up) { // If the up arrow key is pressed.
+		this.moveUp = false;
+	}if(!this.game.down) { // If the down arrow key is pressed.
 		this.moveDown = false;
 	}
 	
