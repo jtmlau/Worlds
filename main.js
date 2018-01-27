@@ -125,7 +125,7 @@ Background.prototype.draw = function () {
 };
 
 function Reimu(game, spritesheet) {
-	this.animation = new Animation(spritesheet, 32, 47, 261, .75, 8, true, 1.5); // Creates the Reimu animation.
+	this.animation = new Animation(spritesheet, 32, 47, 261, .2, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
     this.speed = 185;
     this.bulletSpeed = 230;
