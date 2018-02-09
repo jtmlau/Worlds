@@ -1,3 +1,4 @@
+
 var AM = new AssetManager();
 
 function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale) {
@@ -104,7 +105,7 @@ function Background(game, spritesheet) {
 	this.y = 0;
 	this.spritesheet = spritesheet;
 	this.game = game;
-	this.speed = 0;
+	this.speed = 2;
     this.ctx = game.ctx;
     Entity.call(this, game, 0, 0);
 };
@@ -112,20 +113,23 @@ function Background(game, spritesheet) {
 Background.prototype = new Entity();
 Background.prototype.constructor = Background;
 
-Background.prototype.update = function () {
-	this.y += this.game.clockTick * this.speed;
-    if (this.y > 0) this.y = -500;
-    Entity.prototype.update.call(this);
+Background.prototype.update = function () {	
 };
 
+$(document).ready(function() {
+	var x = 0;
+    setInterval(function(){
+        x+=1;
+        $('canvas').css('background-position','0 ' + x + 'px');
+    }, 1);
+});
+
+
 Background.prototype.draw = function () {
-	this.ctx.drawImage(this.spritesheet, 0, 0
-			, 189, 634,
-            this.x, this.y, 189 * 4.25, 634*2);
 };
 
 function Reimu(game, spritesheet) {
-	this.animation = new Animation(spritesheet, 32, 47, 261, .1, 8, true, 1.5); // Creates the Reimu animation.
+	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
     this.speed = 185;
     this.bulletSpeed = 230;
@@ -234,7 +238,7 @@ Reimu.prototype.update = function () {
 		this.y -= this.game.clockTick * this.speed; // Reimu moves towards the top of the screen
 		
 	}if(this.moveDown){
-		this.y += this.game.clockTick * this.speed; // Reimu moves towards the top of the 
+		this.y += this.game.clockTick * this.speed; // Reimu moves towards the bottom of the screen
 	}
 	
 	if(!this.game.left) { // If the left arrow key is pressed.
@@ -283,7 +287,7 @@ Reimu.prototype.draw = function () {
 		b.push(temp2);
 	}
 		
-	this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y)
+	this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
     Entity.prototype.draw.call(this);
 };
 
