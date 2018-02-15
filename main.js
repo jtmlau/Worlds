@@ -60,7 +60,14 @@ Animation.prototype.drawBulletFrame = function (tick, ctx, x, y) {
             15 * this.scale, // sprite scale; x
             12 * this.scale); // sprite scale; y
 };
-
+Animation.prototype.drawEnemyCircle = function (tick, ctx,x, y) {
+	this.elapsedTime += tick;
+	var frame = this.currentFrame();
+	ctx.drawImage(this.spriteSheet,
+	0, 0, 90, 90, x, y, 
+	15 * this.scale, 15 * this.scale);
+	
+};
 Animation.prototype.drawEnemyFrame = function (tick, ctx, x, y, left, right) {
     this.elapsedTime += tick;
     if (this.isDone()) {
@@ -192,7 +199,7 @@ EnemyBullet.prototype.Enemyupdate = function() {
 }
 
 EnemyBullet.prototype.draw = function () {
-    this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, this.y);
+    this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, this.y);
     
     Entity.prototype.draw.call(this);
 };
@@ -336,7 +343,7 @@ function Enemy(game, spritesheet, x, y){
 	this.x = x;
 	this.y = y;
 	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation.
-	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
+	this.bulletAnimation = new Animation("./img/battle.png", 90, 90, 90, 90, 1, true, .1);
 	this.moveRight = true;
 	this.moveLeft = false;
 	this.speed = 185;
@@ -395,13 +402,13 @@ Enemy.prototype.draw = function () {
 	this.animation.drawEnemyFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
 	
 	if(this.shoot) {
-		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"), this.x, this.y + this.bulletY);
+		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
 		tempEnemy.x = this.x+15;
 		tempEnemy.y = this.y+50;
 		this.game.addEntity(tempEnemy);
 		this.shoot = false;
 		
-		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, 50);
+		this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
 		bEnemy.push(tempEnemy);
 		
 		
@@ -416,6 +423,7 @@ AM.queueDownload("./img/desert_background.jpg");
 AM.queueDownload("./img/reimu_hakurei.png");
 AM.queueDownload("./img/enemy.png")
 AM.queueDownload("./img/mini.png")
+AM.queueDownload("./img/battle.png")
 
 
 AM.downloadAll(function () {
