@@ -185,7 +185,7 @@ EnemyBullet.prototype.constructor = EnemyBullet;
 
 function EnemyBullet(game, spritesheet, x, y) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-	this.speed = 45;
+	this.speed = Math.floor((Math.random() * 10) * 10)+ 25;
 	this.x = x;
 	this.y = y;
 	this.ctx = game.ctx;
@@ -380,7 +380,14 @@ Enemy.prototype.update = function () {
 	if(this.moveRight){
 		this.x += this.game.clockTick * this.speed;
 	}
-	if (this.x > 400 && this.x < 600){
+	/*firestart = Math.floor((Math.random() * 8) * 100);
+	if (this.x === firestart) {
+		this.shoot = true;
+	if ((this.x > firestart + 200) ||(this.x < firestart - 200)) {
+		this.shoot = false;
+	}*/
+	//if (this.x > 400 && this.x < 600){
+	if (Math.floor(Math.random() * 100)> 90) {
 		this.shoot = true;
 	}else{
 		this.shoot = false;
