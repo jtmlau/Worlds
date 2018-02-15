@@ -199,7 +199,7 @@ b = [];
 bEnemy = [];
 
 Reimu.prototype.update = function () {
-	
+		
 	var that = this;
 	
 	if(this.game.space) { // If the space key is pressed.
@@ -296,15 +296,18 @@ Reimu.prototype.draw = function () {
 //	this.speed = 185;
 //	
 //};
-function Enemy2(game, spritesheet) {
+function Enemy2(game, spritesheet, x, y) {
+	this.x = x;
+	this.y = y;
 	this.animation = new Animation(spritesheet, 76, 76, 76, 1, 1, true, 1);
+	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
 	this.timer = 6
 	this.speed = 200;
 	this.bulletSpeed = 250;
 	this.bulletY = 50;
 	this.shoot = false;
 	this.ctx = game.ctx;
-	Entity.call(this, game, 400, 500);
+	Entity.call(this, game, x, y);
 };
 Enemy2.prototype = new Entity();
 Enemy2.prototype.constructor = Enemy2;
@@ -388,7 +391,7 @@ Enemy.prototype.draw = function () {
 	if(this.shoot) {
 		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"), this.x, this.y + this.bulletY);
 		tempEnemy.x = this.x+15;
-		tempEnemy.y = 50;
+		tempEnemy.y = this.y+50;
 		this.game.addEntity(tempEnemy);
 		
 		
@@ -420,7 +423,7 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
     gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
 	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
-	gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/mini.png")));
+	gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/mini.png"), 400, 500));
     
     console.log("All Done!");
 });
