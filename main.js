@@ -89,7 +89,13 @@ Animation.prototype.drawEnemyFrame = function (tick, ctx, x, y, left, right) {
                  this.frameWidth * this.scale, // sprite scale; x
                  this.frameHeight * this.scale); // sprite scale; y
 };
-
+/*Animation.prototype.drawEnemy2Frame = function(tick, ctx, x, y) {
+	this.elapseTime += tick;
+	var frame = this.currentFrame();
+	var xindex = frame % this.sheetWidth;
+    var yindex = 0;
+	ctx.drawImage
+    */
 Animation.prototype.currentFrame = function () {
     return Math.floor(this.elapsedTime / this.frameDuration);
 };
@@ -301,7 +307,7 @@ function Enemy2(game, spritesheet, x, y) {
 	this.y = y;
 	this.animation = new Animation(spritesheet, 76, 76, 76, 1, 1, true, 1);
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
-	this.timer = 6
+	this.timer = Math.floor((Math.random()*8) + 3);
 	this.speed = 200;
 	this.bulletSpeed = 250;
 	this.bulletY = 50;
@@ -393,10 +399,11 @@ Enemy.prototype.draw = function () {
 		tempEnemy.x = this.x+15;
 		tempEnemy.y = this.y+50;
 		this.game.addEntity(tempEnemy);
-		
+		this.shoot = false;
 		
 		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, 50);
 		bEnemy.push(tempEnemy);
+		
 		
 		//console.log("shooting");
 	}
@@ -421,9 +428,11 @@ AM.downloadAll(function () {
 
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/desert_background.jpg")));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
+	gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/mini.png"), 400, 50));
     gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
+	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
 	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
-	gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/mini.png"), 400, 500));
+	gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/mini.png"), 400, 50));
     
     console.log("All Done!");
 });
