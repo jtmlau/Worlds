@@ -343,7 +343,7 @@ function Enemy(game, spritesheet, x, y){
 	this.x = x;
 	this.y = y;
 	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation.
-	this.bulletAnimation = new Animation("./img/battle.png", 90, 90, 90, 90, 1, true, .1);
+	//this.bulletAnimation = new Animation("./img/battle.png", 90, 90, 90, 90, 1, true, .1);
 	this.moveRight = true;
 	this.moveLeft = false;
 	this.speed = 185;
@@ -408,7 +408,7 @@ Enemy.prototype.draw = function () {
 		this.game.addEntity(tempEnemy);
 		this.shoot = false;
 		
-		this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
+		//this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
 		bEnemy.push(tempEnemy);
 		
 		
