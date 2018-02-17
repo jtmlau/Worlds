@@ -113,7 +113,7 @@ Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
     ctx.drawImage(this.spriteSheet,
     		xindex, 980,  // (x,y) source from sheet
             32, 35, // (x,y) size of sprite.
-            300, 50, // sprite position on screen.
+            x, y, // sprite position on screen.
             this.frameWidth * this.scale, // sprite scale; x
             this.frameHeight * this.scale); // sprite scale; y
 };
@@ -565,8 +565,9 @@ Reimu.prototype.draw = function () {
 function Enemy2(game, spritesheet, x, y) {
 	this.x = x;
 	this.y = y;
-	this.animation = new Animation(spritesheet, 28, 32, 242, .5, 8, true, 1.5);
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
+	
+	this.animation = new Animation(spritesheet, 28, 32, 1350, .5, 8, true, 1.5);// Creates an Enemy animation
 	this.enemyType = "StraightLeft";
 	this.nextType = "StraightLeft";
 	this.attackType = "Star";
@@ -577,7 +578,7 @@ function Enemy2(game, spritesheet, x, y) {
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
-	this.bulletY = 50;
+	this.bulletY = 23;
 	this.radius = 15
 	this.count = 0;
 	this.bulletInterval = bulletInterval = Math.floor(Math.random() * 11) + 1;
@@ -593,7 +594,8 @@ Enemy2.prototype = new Entity();
 Enemy2.prototype.constructor = Enemy2;
 
 Enemy2.prototype.update = function() {
-	Entity.prototype.update.call(this);
+Entity.prototype.update.call(this);
+	
 	//this.speed = Math.floor(Math.random() * 10)*100);
 	if(this.shoot){
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
@@ -657,7 +659,10 @@ Enemy2.prototype.update = function() {
 }
 
 Enemy2.prototype.draw = function() {
-	this.animation.drawEnemy2Frame(this.game.clockTick, this.ctx, this.ctx, this.x, this.y);
+
+
+	this.animation.drawEnemy2Frame(this.game.clockTick, this.ctx, this.x, this.y);
+	
 	if(this.shoot) {
 		if(this.attackType === "Star")
 		{
@@ -672,7 +677,8 @@ Enemy2.prototype.draw = function() {
 		}
 		
 	}
-	Entity.prototype.draw.call(this);
+	
+    Entity.prototype.draw.call(this);
 };
 
 function Enemy(game, spritesheet, x, y){
@@ -804,7 +810,7 @@ function drawSpreads(enemy, attackPattern)
 	{
 		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy.x = enemy.x+15;
-		tempEnemy.y = enemy.y+50;
+		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDownLeft";
 		enemy.game.addEntity(tempEnemy);
 		//this.shoot = false;
@@ -812,26 +818,26 @@ function drawSpreads(enemy, attackPattern)
 		//trying 2 bullet
 		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy2.x = enemy.x+15;
-		tempEnemy2.y = enemy.y+50;
+		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyDownRight";
 		enemy.game.addEntity(tempEnemy2);
 		
 		//trying all bullet
 		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy3.x = enemy.x+15;
-		tempEnemy3.y = enemy.y+50;
+		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyRightUp";
 		enemy.game.addEntity(tempEnemy3);
 		
 		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy4.x = enemy.x+15;
-		tempEnemy4.y = enemy.y+50;
+		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftUp";
 		enemy.game.addEntity(tempEnemy4);
 		
 		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy5.x = enemy.x+15;
-		tempEnemy5.y = enemy.y+50;
+		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyUp";
 		enemy.game.addEntity(tempEnemy5);
 	
@@ -845,27 +851,27 @@ function drawSpreads(enemy, attackPattern)
 	{
 		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy.x = enemy.x+15;
-		tempEnemy.y = enemy.y+50;
+		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDown";
 		enemy.game.addEntity(tempEnemy);
 		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy2.x = enemy.x+15;
-		tempEnemy2.y = enemy.y+50;
+		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyUpLeft";
 		enemy.game.addEntity(tempEnemy2);
 		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy3.x = enemy.x+15;
-		tempEnemy3.y = enemy.y+50;
+		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyUpRight";
 		enemy.game.addEntity(tempEnemy3);
 		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy4.x = enemy.x+15;
-		tempEnemy4.y = enemy.y+50;
+		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftDown";
 		enemy.game.addEntity(tempEnemy4);
 		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy5.x = enemy.x+15;
-		tempEnemy5.y = enemy.y+50;
+		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyRightDown";
 		enemy.game.addEntity(tempEnemy5);
 	
@@ -896,7 +902,7 @@ function Enemy3(game, spritesheet, x, y){
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
-	this.bulletY = 50;
+	this.bulletY = 23;
 	this.radius = 15
 	this.count = 0;
 	this.bulletInterval = bulletInterval = Math.floor(Math.random() * 11) + 1;
@@ -1067,7 +1073,7 @@ function spawnEnemies(gameEngine)
 	{
 	setTimeout(function()
 			{
-				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
+				tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowLeft";
 				tempEnemy.attackType = "FullSpread";
