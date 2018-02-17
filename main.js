@@ -96,6 +96,25 @@ Animation.prototype.drawEnemyFrame = function (tick, ctx, x, y, left, right) {
                  this.frameWidth * this.scale, // sprite scale; x
                  this.frameHeight * this.scale); // sprite scale; y
 };
+Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
+    this.elapsedTime += tick;
+    if (this.isDone()) {
+        if (this.loop) this.elapsedTime = 0;
+    }
+    
+    
+    var frame = this.currentFrame();
+    var xindex = 0;
+    var yindex = 0;
+    
+    
+    
+    /*.drawImage(this.spriteSheet,
+                 0, 0, 76, 76, x, y, // sprite position on screen.
+                 this.frameWidth * this.scale, // sprite scale; x
+                 this.frameHeight * this.scale); // sprite scale; y*/
+};
+
 /*Animation.prototype.drawEnemy2Frame = function(tick, ctx, x, y) {
 	this.elapseTime += tick;
 	var frame = this.currentFrame();
@@ -267,15 +286,23 @@ Reimu.prototype.update = function () {
 		
 		//this.bulletY -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
 	}if(this.moveRight){
+		if(this.x < 750) {
 		this.x += this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
-		
+		}
 	}if(this.moveLeft){
-		this.x -= this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
+		if(this.x > 0) {
+			this.x -= this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
+		}
 	}if(this.moveUp){
+		if(this.y > 0) {
 		this.y -= this.game.clockTick * this.speed; // Reimu moves towards the top of the screen
-		
+		}
 	}if(this.moveDown){
+		if(this.y < 600) {
+		
+		
 		this.y += this.game.clockTick * this.speed; // Reimu moves towards the bottom of the screen
+		}
 	}
 	
 	if(!this.game.left) { // If the left arrow key is pressed.
@@ -359,9 +386,9 @@ Enemy2.prototype.update = function() {
 	Entity.prototype.update.call(this);
 }
 Enemy2.prototype.draw = function() {
-	this.animation.drawEnemyFrame(this.game.clockTick, this.ctx, this.ctx, this.x, this.y);
+	this.animation.drawEnemy2Frame(this.game.clockTick, this.ctx, this.ctx, this.x, this.y);
 	Entity.prototype.draw.call(this);
-}
+};
 
 function Enemy(game, spritesheet, x, y){
 	this.x = x;
@@ -370,7 +397,7 @@ function Enemy(game, spritesheet, x, y){
 	//this.bulletAnimation = new Animation("./img/battle.png", 90, 90, 90, 90, 1, true, .1);
 	this.moveRight = true;
 	this.moveLeft = false;
-	this.speed = 185;
+	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 230;
 	this.bulletY = 50;
 	this.shoot = false;
