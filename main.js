@@ -1,6 +1,9 @@
 
 var AM = new AssetManager();
 
+gameScore = 0;
+gameEnd = false;
+
 function distance(a, b) {
     var difX = a.x - b.x;
     var difY = a.y - b.y;
@@ -144,6 +147,7 @@ Background.prototype = new Entity();
 Background.prototype.constructor = Background;
 
 Background.prototype.update = function () {	
+	
 };
 
 $(document).ready(function() {
@@ -151,7 +155,9 @@ $(document).ready(function() {
     setInterval(function(){
         x+=1;
         $('canvas').css('background-position','0 ' + x + 'px');
+        
     }, 1);
+    
 });
 
 
@@ -212,7 +218,7 @@ function Reimu(game, spritesheet) {
 ReimuBullet.prototype = new Entity();
 ReimuBullet.prototype.constructor = ReimuBullet;
 
-/*ReimuBullet.prototype.collideRight = function () {
+ReimuBullet.prototype.collideRight = function () {
     return this.x + this.radius > 800;
 };
 ReimuBullet.prototype.collideLeft = function () {
@@ -228,7 +234,7 @@ ReimuBullet.prototype.collideTop = function () {
 ReimuBullet.prototype.collide = function (other) {
     return distance(this, other) < this.radius + other.radius;
 };
-*/
+
 
 function ReimuBullet(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
@@ -259,17 +265,18 @@ EnemyBullet.prototype.constructor = EnemyBullet;
 
 function EnemyBullet(game, spritesheet, x, y) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-	this.speed = Math.floor((Math.random() * 10) * 7);//	 + 55;
+	this.speed = Math.floor((Math.random() * 10) * 4);//	 + 55;
 	this.x = x;
 	this.y = y;
 	this.bulletType = "EnemyDown";
-	this.radius = 4;
+	this.radius = 2;
+	this.isEnemy = true;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
 	Entity.call(this, game, x, y);
 }
 
-/*EnemyBullet.prototype.collideRight = function () {
+EnemyBullet.prototype.collideRight = function () {
     return this.x + this.radius > 800;
 };
 EnemyBullet.prototype.collideLeft = function () {
@@ -280,7 +287,7 @@ EnemyBullet.prototype.collideBottom = function () {
 };
 EnemyBullet.prototype.collideTop = function () {
     return this.y - this.radius < 0;
-};*/
+};
 
 EnemyBullet.prototype.collide = function (other) {
     return distance(this, other) < this.radius + other.radius;
@@ -288,7 +295,7 @@ EnemyBullet.prototype.collide = function (other) {
 
 EnemyBullet.prototype.Enemyupdate = function() {
 	updateBullet(this);
-	//this.y += this.game.clockTick * this.speed;
+
     Entity.prototype.update.call(this);
 }
 
@@ -383,8 +390,6 @@ Reimu.prototype.update = function () {
 	}
 	
 	
-	
-	
 	if(!this.game.left) { // If the left arrow key is pressed.
 		this.moveLeft = false;
 }
@@ -408,9 +413,10 @@ Reimu.prototype.update = function () {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent)) {
+        if (this != ent && this.collide(ent) && ent.isEnemy) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
+            this.game.gameEnd = true;
         };
     };
 
@@ -449,11 +455,13 @@ function Enemy2(game, spritesheet, x, y) {
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
 	this.timer = Math.floor((Math.random()*8) + 3);
 	this.speed = 200;
-	this.bulletSpeed = 250;
+	this.bulletSpeed = 200;
 	this.bulletY = 50;
 	this.radius = 5;
+	this.isEnemy = true;
 	this.shoot = false;
 	this.ctx = game.ctx;
+	this.killScore = 200;
 	Entity.call(this, game, x, y);
 };
 Enemy2.prototype = new Entity();
@@ -487,9 +495,10 @@ Enemy2.prototype.update = function() {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent)) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
+            this.game.gameScore += this.killScore;
         };
     };
 }
@@ -502,15 +511,16 @@ Enemy2.prototype.draw = function() {
 function Enemy(game, spritesheet, x, y){
 	this.x = x;
 	this.y = y;
-	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation.
-	//this.bulletAnimation = new Animation("./img/battle.png", 90, 90, 90, 90, 1, true, .1);
+	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation
 	this.moveRight = true;
 	this.moveLeft = false;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
-	this.bulletSpeed = 230;
+	this.bulletSpeed = 200;
 	this.bulletY = 50;
 	this.radius = 5;
+	this.isEnemy = true;
 	this.shoot = false;
+	this.killScore = 100;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
 };
@@ -566,7 +576,7 @@ Enemy.prototype.update = function () {
 	if ((this.x > firestart + 200) ||(this.x < firestart - 200)) {
 		this.shoot = false;
 	}*/
-	//if (this.x > 400 && this.x < 600){
+
 	if (Math.floor(Math.random() * 100)> 90) {
 		this.shoot = true;
 	}else{
@@ -583,9 +593,10 @@ Enemy.prototype.update = function () {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent)) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
+            this.game.gameScore += this.killScore;
         };
     };
 	
@@ -628,10 +639,12 @@ function Enemy3(game, spritesheet, x, y){
 	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation.
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
 	this.radius = 5;
+	this.isEnemy = true;
 	this.speed = 185;
-	this.bulletSpeed = 230;
+	this.bulletSpeed = 200;
 	this.bulletY = this.y + 50;
 	this.shoot = false;
+	this.killScore = 500;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
 };
@@ -668,7 +681,7 @@ Enemy3.prototype.update = function () {
 	}
 	
 	
-	if (Math.floor(Math.random() * 60)> 50){
+	if (Math.floor(Math.random() * 60) > 50){
 		this.shoot = true;
 	}else{
 		this.shoot = false;
@@ -683,9 +696,10 @@ Enemy3.prototype.update = function () {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent)) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
+            this.game.gameScore += this.killScore;
         };
     };
 }
@@ -726,6 +740,8 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     gameEngine.start();
+    
+    gameEngine.gameScore = gameScore;
     
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 

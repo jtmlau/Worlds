@@ -14,6 +14,8 @@ function GameEngine() {
     this.ctx = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
+    this.gameEnd = false;
+    this.gameScore = 0;
 };
 
 GameEngine.prototype.init = function (ctx) {
@@ -22,6 +24,8 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceHeight = this.ctx.canvas.height;
     this.startInput();
     this.timer = new Timer();
+    this.gameEnd = false;
+    this.gameScore = 0;
     console.log('game initialized');
 };
 
@@ -69,11 +73,7 @@ GameEngine.prototype.startInput = function () {
     	case "KeyD":
     		that.right = true;
     		break;
-		case "KeyC":
-			that.c = true;
-			break;
-		}
-
+    	}
     	
     	e.preventDefault();
     	
@@ -103,8 +103,6 @@ GameEngine.prototype.startInput = function () {
     	case "KeyD":
     		that.right = false;
     		break;
-    	case "KeyC":
-    		that.c = false;
     	}
     	
     	e.preventDefault();
@@ -115,7 +113,7 @@ GameEngine.prototype.startInput = function () {
 }
 
 GameEngine.prototype.addEntity = function (entity) {
-    console.log('added entity');
+    //console.log('added entity');
     this.entities.push(entity);
 };
 
@@ -144,6 +142,20 @@ GameEngine.prototype.update = function () {
             this.entities.splice(i, 1);
         }
     }
+    
+    this.gameScore = this.gameScore + 1;
+    
+    //console.log(this.gameScore);
+    
+    if(this.gameScore > 2500) this.gameEnd = true;
+    
+    if (this.gameEnd){
+    	for (var i = this.entities.length - 1; i >= 0; --i) {
+    		this.entities.splice(i, 1);
+        }
+    	this.clockTick = 0;
+    }
+    //console.log(this.entities.length)
 };
 
 GameEngine.prototype.loop = function () {
