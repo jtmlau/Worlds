@@ -404,7 +404,7 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.y = y;
 	this.centerX = 11;
 	this.centerY = 11;
-	this.bulletType = "EnemyDown"
+	this.bulletType = "EnemyDown";
 	this.radius = 11;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
