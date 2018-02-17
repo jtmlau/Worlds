@@ -338,7 +338,7 @@ function Reimu(game, spritesheet) {
     this.moveUp = false;
     this.moveDown = false;
     this.ctx = game.ctx;
-    Entity.call(this, game, 300, 550);
+    Entity.call(this, game, 268, 550);
 }
 
 ReimuBullet.prototype = new Entity();
@@ -349,7 +349,7 @@ function ReimuBullet(game, spritesheet) {
 	this.speed = 450;
 	this.X;
 	this.Y;
-	this.radius = 2;
+	this.radius = 6;
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
 	Entity.call(this, game, 300, 550);
@@ -377,7 +377,7 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.x = x;
 	this.y = y;
 	this.bulletType = "EnemyDown";
-	this.radius = 2;
+	this.radius = 12;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -588,12 +588,12 @@ function Enemy(game, spritesheet, x, y){
 	this.nextType = "StraightLeft";
 	this.attackType = "Star";
 	this.waiting = false;
-	this.maxShot = 12;
+	this.maxShot = 16;
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
 	this.bulletY = 50;
-	this.radius = 5;
+	this.radius = 12;
 	this.count = 0;
 	this.bulletInterval = 0;
 	this.isEnemy = true;
@@ -1017,37 +1017,10 @@ AM.downloadAll(function () {
     gameEngine.start();
     
     gameEngine.gameScore = gameScore;
-    //gameEngine.showOutlines = true;
+    gameEngine.showOutlines = true;
     
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
-
-    /*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
-	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
-	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
-    
     spawnEnemies(gameEngine)
-    
-//	for(var i = 10000; i<=10500; i+=100)
-//    {
-//    	setTimeout(function()
-//	    {
-//    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 80);
-//    		tempEnemy.enemyType = "StraightDown";
-//    		gameEngine.addEntity(tempEnemy);
-//	    }, i);
-//    }
-//	for(var i = 2000; i < 5000; i +=500)
-//	{
-//		setTimeout(function()
-//		{ 
-//			tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/mini.png"), 500, 0);
-//			gameEngine.addEntity(tempEnemy);
-//		}, i);
-//	}
     
     console.log("All Done!");
 });
