@@ -226,6 +226,7 @@ function Reimu(game, spritesheet) {
     this.radius = 3;
     this.isShooting = false;
 	this.slow = false;
+	this.isHero = true;
     this.moveRight = false;
     this.moveLeft = false;
     this.moveUp = false;
@@ -558,10 +559,11 @@ Enemy.prototype.update = function () {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && !ent.isEnemy) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy && ent.isHero) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
+            if(ent.isHero) this.game.gameEnd = true;
         };
     };
 	
