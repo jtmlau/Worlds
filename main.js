@@ -203,7 +203,7 @@ function enemyMovement(the_enemy)
 	switch(the_enemy.enemyType)
 	{
 		case "StraightRight":
-			//this.x += this.game.clockTick * 30;
+			the_enemy.x += the_enemy.game.clockTick * 500;
 			console.log("Enemy should move!");
 			
 			break;
@@ -776,8 +776,24 @@ AM.downloadAll(function () {
     
     setTimeout(function()
     {
-    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 50, 100));
+    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
     }, 2000);
+    setTimeout(function()
+    {
+    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
+    }, 2100);
+    setTimeout(function()
+    {
+    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
+    }, 2200);
+    setTimeout(function()
+    {
+    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
+    }, 2300);
+    setTimeout(function()
+    {
+    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
+    }, 2400);
     
     console.log("All Done!");
 });
