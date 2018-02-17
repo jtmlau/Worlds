@@ -219,7 +219,7 @@ function enemyMovement(the_enemy)
 		case "Stop":
 			{
 				the_enemy.timer += 1;
-				if(the_enemy.timer > 100)
+				if(the_enemy.timer > 30)
 				{
 					the_enemy.enemyType = the_enemy.nextType;
 				}
@@ -227,6 +227,12 @@ function enemyMovement(the_enemy)
 			}
 		case "StraightRight":
 			the_enemy.x += the_enemy.game.clockTick * 650;
+			if(the_enemy.x > 1000) {
+				the_enemy.removeFromWorld = true;
+			}	
+			break;
+		case "SlowRight":
+			the_enemy.x += the_enemy.game.clockTick * 400;
 			if(the_enemy.x > 1000) {
 				the_enemy.removeFromWorld = true;
 			}	
@@ -243,6 +249,12 @@ function enemyMovement(the_enemy)
 				the_enemy.removeFromWorld = true;
 			}	
 			break;
+		case "SlowLeft":
+			the_enemy.x -= the_enemy.game.clockTick * 400;
+			if(the_enemy.x < -200) {
+				the_enemy.removeFromWorld = true;
+			}	
+			break;
 		case "StraightLeftLoop":
 			the_enemy.x -= the_enemy.game.clockTick * 650;
 			if(the_enemy.x < -200) {
@@ -250,7 +262,7 @@ function enemyMovement(the_enemy)
 			}	
 			break;
 		case "StraightDown":
-			the_enemy.y += the_enemy.game.clockTick * 150;
+			the_enemy.y += the_enemy.game.clockTick * 230;
 			if(the_enemy.y >750) {
 				the_enemy.removeFromWorld = true;
 			}
@@ -284,7 +296,7 @@ function enemyMovement(the_enemy)
 function Reimu(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-    this.speed = 200;
+    this.speed = 350;
     this.bulletSpeed = 230;
     this.bulletY = this.y;
     this.radius = 3;
@@ -391,7 +403,7 @@ Reimu.prototype.update = function () {
 	}
 	if(!this.game.shift) 
 	{ // If the left arrow key is pressed.
-		this.speed = 200;
+		this.speed = 350;
 	}
 	
 	if(this.game.left) { // If the left arrow key is pressed.
@@ -600,38 +612,7 @@ Enemy.prototype.update = function () {
 	}
 	
 	//should update enemy movement
-	enemyMovement(this);
-	//OLD MOVING LEFT RIGHT CODE
-	
-	/*if(this.x <= 0 ){
-		
-		this.moveRight = true;
-		this.moveLeft= false;
-		this.x += this.game.clockTick * this.speed;
-	}else if(this.x >= 568){
-		this.moveRight = false;
-		this.moveLeft = true;
-		
-	}
-	if(this.moveLeft){
-		this.x -= this.game.clockTick * this.speed;
-	}
-	
-	if(this.moveRight){
-		this.x += this.game.clockTick * this.speed;
-	}*/
-	/*firestart = Math.floor((Math.random() * 8) * 100);
-	if (this.x === firestart) {
-		this.shoot = true;
-	if ((this.x > firestart + 200) ||(this.x < firestart - 200)) {
-		this.shoot = false;
-	}*/
-
-	/*if (Math.floor(Math.random() * 100)> 90) {
-		this.shoot = true;
-	}else{
-		this.shoot = false;
-	}*/
+	enemyMovement(this)
 	
 	if(this.count < this.maxShot)
 	{
@@ -651,17 +632,9 @@ Enemy.prototype.update = function () {
 		}
 	}
 	
-	/*bEnemy.forEach(function(element)
-	{
-		element.Enemyupdate();
-		element.draw();
-		//console.log("update");
-		
-	});*/
-	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && !ent.isEnemy && ent.canCollide) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
@@ -825,8 +798,7 @@ function spawnEnemies(gameEngine)
     	setTimeout(function()
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 40);
-    		tempEnemy.enemyType = "StraightRightLoop";
-    		tempEnemy.nextType = "StraightRight";
+    		tempEnemy.enemyType = "StraightRight";
     		gameEngine.addEntity(tempEnemy);
 	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
 	    }, i);
@@ -836,8 +808,7 @@ function spawnEnemies(gameEngine)
     	setTimeout(function()
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 100);
-    		tempEnemy.enemyType = "StraightLeftLoop";
-    		tempEnemy.nextType = "StraightLeft";
+    		tempEnemy.enemyType = "StraightLeft";
     		gameEngine.addEntity(tempEnemy);
 	    }, i);
     }
@@ -854,25 +825,67 @@ function spawnEnemies(gameEngine)
 	    }, i);
     }
     
-    setTimeout(function()
+//    setTimeout(function()
+//	{
+//		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
+//		tempEnemy.enemyType = "StraightDown";
+//		tempEnemy.nextType = "SlowLeft";
+//		tempEnemy.waiting = true;
+//		tempEnemy.maxShot = 20
+//		gameEngine.addEntity(tempEnemy);
+//	}, 16500);
+    
+    for(var i = 16500; i<=26000; i+=4600)
 	{
-		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -50);
-		tempEnemy.enemyType = "StraightDown";
-		tempEnemy.nextType = "StraightRight";
-		tempEnemy.waiting = true;
-		tempEnemy.maxShot = 20
-		gameEngine.addEntity(tempEnemy);
-	}, 16500);
+	setTimeout(function()
+			{
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
+				tempEnemy.enemyType = "StraightDown";
+				tempEnemy.nextType = "SlowLeft";
+				tempEnemy.waiting = true;
+				tempEnemy.maxShot = 20
+				gameEngine.addEntity(tempEnemy);
+			}, i);
+	}
+    
+    for(var i = 18800; i<=29000; i+=4600)
+	{
+	setTimeout(function()
+			{
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -50);
+				tempEnemy.enemyType = "StraightDown";
+				tempEnemy.nextType = "SlowRight";
+				tempEnemy.waiting = true;
+				tempEnemy.maxShot = 20
+				gameEngine.addEntity(tempEnemy);
+			}, i);
+	}
+    
     
     setTimeout(function()
-	{
-		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
-		tempEnemy.enemyType = "StraightDown";
+    {
+		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 180);
+		tempEnemy.enemyType = "StraightLeftLoop";
 		tempEnemy.nextType = "StraightLeft";
-		tempEnemy.waiting = true;
-		tempEnemy.maxShot = 20
 		gameEngine.addEntity(tempEnemy);
-	}, 17500);
+    }, 21000);
+    
+    setTimeout(function()
+    {
+		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 180);
+		tempEnemy.enemyType = "StraightLeftLoop";
+		tempEnemy.nextType = "StraightLeft";
+		gameEngine.addEntity(tempEnemy);
+    }, 25500);
+    
+    setTimeout(function()
+	    {
+			tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 50);
+			tempEnemy.enemyType = "StraightRightLoop";
+			tempEnemy.nextType = "StraightRight";
+			gameEngine.addEntity(tempEnemy);
+	    }, 28000);
+    	    
 }
 
 AM.queueDownload("./img/desert_background.jpg");
@@ -891,6 +904,7 @@ AM.downloadAll(function () {
     gameEngine.start();
     
     gameEngine.gameScore = gameScore;
+    gameEngine.showOutlines = true;
     
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 
