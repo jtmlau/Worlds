@@ -699,7 +699,7 @@ AM.downloadAll(function () {
     {
     	setTimeout(function()
 	    {
-    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80);
+    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 70);
     		tempEnemy.enemyType = "StraightRight";
     		gameEngine.addEntity(tempEnemy);
 	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
@@ -709,9 +709,40 @@ AM.downloadAll(function () {
     {
     	setTimeout(function()
 	    {
-    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 80);
+    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 70);
     		tempEnemy.enemyType = "StraightLeft";
     		gameEngine.addEntity(tempEnemy);
+	    }, i);
+    }
+    for(var i = 8000; i<=8500; i+=100)
+    {
+    	setTimeout(function()
+	    {
+    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 40);
+    		tempEnemy.enemyType = "StraightRight";
+    		gameEngine.addEntity(tempEnemy);
+	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
+	    }, i);
+    }
+    for(var i = 10000; i<=10500; i+=100)
+    {
+    	setTimeout(function()
+	    {
+    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 100);
+    		tempEnemy.enemyType = "StraightLeft";
+    		gameEngine.addEntity(tempEnemy);
+	    }, i);
+    }
+    for(var i = 12000; i<=12500; i+=100)
+    {
+    	setTimeout(function()
+	    {
+    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
+    		tempEnemy.enemyType = "StraightLeft";
+    		tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
+    		tempEnemy2.enemyType = "StraightRight";
+    		gameEngine.addEntity(tempEnemy);
+    		gameEngine.addEntity(tempEnemy2);
 	    }, i);
     }
 //	for(var i = 10000; i<=10500; i+=100)
