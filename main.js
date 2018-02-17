@@ -176,14 +176,34 @@ function updateBullet(bullet)
 		break;
 	case "EnemyDownLeft":
 		bullet.y += bullet.game.clockTick * bullet.speed + 5;
-		bullet.x -= bullet.game.clockTick * 40;
+		bullet.x -= bullet.game.clockTick * 55;
 		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDownRight":
 		bullet.y += bullet.game.clockTick * bullet.speed + 5;
-		bullet.x += bullet.game.clockTick * 40;
+		bullet.x += bullet.game.clockTick * 55;
+		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+			bullet.removeFromWorld = true;
+		}
+		break;
+	case "EnemyRight":
+		bullet.x += bullet.game.clockTick * bullet.speed + 5;
+		bullet.y -= bullet.game.clockTick * 40;
+		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+			bullet.removeFromWorld = true;
+		}
+		break;
+	case "EnemyLeft":
+		bullet.x -= bullet.game.clockTick * bullet.speed + 5;
+		bullet.y -= bullet.game.clockTick * 40;
+		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+			bullet.removeFromWorld = true;
+		}
+		break;
+	case "EnemyUp":
+		bullet.y -= bullet.game.clockTick * bullet.speed + 3;
 		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
@@ -587,12 +607,36 @@ Enemy.prototype.draw = function () {
 		tempEnemy2.y = this.y+50;
 		tempEnemy2.bulletType = "EnemyDownRight";
 		this.game.addEntity(tempEnemy2);
-		this.shoot = false;
+		
+		
+		//trying all bullet
+		tempEnemy3 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+		tempEnemy3.x = this.x+15;
+		tempEnemy3.y = this.y+50;
+		tempEnemy3.bulletType = "EnemyRight";
+		this.game.addEntity(tempEnemy3);
+		
+		tempEnemy4 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+		tempEnemy4.x = this.x+15;
+		tempEnemy4.y = this.y+50;
+		tempEnemy4.bulletType = "EnemyLeft";
+		this.game.addEntity(tempEnemy4);
+		
+		tempEnemy5 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+		tempEnemy5.x = this.x+15;
+		tempEnemy5.y = this.y+50;
+		tempEnemy5.bulletType = "EnemyUp";
+		this.game.addEntity(tempEnemy5);
+		
 		
 		//this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
+		
+		this.shoot = false;
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
-		
+		bEnemy.push(tempEnemy3);
+		bEnemy.push(tempEnemy4);
+		bEnemy.push(tempEnemy5);
 		//console.log("shooting");
 	}
 	
