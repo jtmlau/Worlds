@@ -107,14 +107,14 @@ Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
     
     
     var frame = this.currentFrame();
-    var xindex = (frame % this.sheetWidth)* this.frameWidth + 5;
+    var xindex = 1042 + ((frame % this.sheetWidth)* this.frameWidth);
     var yindex = 980;
     
     
     
     ctx.drawImage(this.spriteSheet,
-    		xindex+1042, 980,  // (x,y) source from sheet
-            35, 33, // (x,y) size of sprite.
+    		xindex, 980,  // (x,y) source from sheet
+            this.frameWidth, this.frameHeight, // (x,y) size of sprite.
             300, 50, // sprite position on screen.
             this.frameWidth * this.scale, // sprite scale; x
             this.frameHeight * this.scale); // sprite scale; y
@@ -128,15 +128,12 @@ Animation.prototype.drawEnemy3Frame = function (tick, ctx, x, y) {
     
     
     var frame = this.currentFrame();
-    var xindex = frame % this.sheetWidth;
-    var yindex = 980;
-    
-    
+    var xindex = 789 + (frame % this.sheetWidth * 32);
+    var yindex = 985;
     
     ctx.drawImage(this.spriteSheet,
-    		this.spriteSheet,
-            xindex * this.frameWidth, yindex,  // (x,y) source from sheet
-            this.frameWidth, this.frameHeight, // (x,y) size of sprite.
+    		xindex, yindex,  // (x,y) source from sheet
+            32, 28, // (x,y) size of sprite.
             x, y, // sprite position on screen.
             this.frameWidth * this.scale, // sprite scale; x
             this.frameHeight * this.scale); // sprite scale; y
@@ -378,13 +375,9 @@ function ReimuBullet(game, spritesheet) {
 	this.speed = 450;
 	this.X;
 	this.Y;
-<<<<<<< HEAD
-	this.radius = 2;
-=======
 	this.centerX = 7;
 	this.centerY = 6;
 	this.radius = 6;
->>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
 	Entity.call(this, game, 268, 550);
@@ -414,11 +407,7 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.centerX = 11;
 	this.centerY = 11;
 	this.bulletType = "EnemyDown";
-<<<<<<< HEAD
-	this.radius = 2;
-=======
 	this.radius = 11;
->>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.isEnemy = true;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -636,11 +625,7 @@ function Enemy(game, spritesheet, x, y){
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
 	this.bulletY = 50;
-<<<<<<< HEAD
-	this.radius = 5;
-=======
 	this.radius = 15;
->>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.count = 0;
 	this.bulletInterval = 0;
 	this.isEnemy = true;
@@ -831,7 +816,7 @@ function drawSpreads(enemy, attackPattern)
 function Enemy3(game, spritesheet, x, y){
 	this.x = x;
 	this.y = y;
-	this.animation = new Animation(spritesheet, 76, 76, 76, 1, 1, true, 1); // Creates an Enemy animation.
+	this.animation = new Animation(spritesheet, 28, 30, 252, .5, 8, true, 1.5); // Creates an Enemy animation.
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
 	this.radius = 5;
 	this.isEnemy = true;
@@ -879,7 +864,7 @@ Enemy3.prototype.update = function () {
 Enemy3.prototype.draw = function () {
 
 
-	this.animation.drawEnemyFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
+	this.animation.drawEnemy3Frame(this.game.clockTick, this.ctx, this.x, this.y);
 	
 	if(this.shoot) {
 		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"), this.x, this.y + this.bulletY);
@@ -888,7 +873,7 @@ Enemy3.prototype.draw = function () {
 		this.game.addEntity(tempEnemy);
 		
 		
-		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, 50);
+		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, this.y);
 		bEnemy.push(tempEnemy);
 		
 		//console.log("shooting");
@@ -1070,8 +1055,8 @@ AM.downloadAll(function () {
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 
     gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 50));
-	/*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
-	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 350));
+	/*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
