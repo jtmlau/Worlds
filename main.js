@@ -606,6 +606,7 @@ function Enemy(game, spritesheet, x, y){
 	this.radius = 15;
 	this.count = 0;
 	this.bulletInterval = 0;
+	this.totalInterval = 12;
 	this.isEnemy = true;
 	this.shoot = false;
 	this.currentState = 60;
@@ -661,7 +662,7 @@ Enemy.prototype.update = function () {
 			{
 				this.shoot = true;
 				this.count++;
-				this.bulletInterval = 8;
+				this.bulletInterval = this.totalInterval;
 			}
 			else
 			{
@@ -868,6 +869,8 @@ function spawnEnemies(gameEngine)
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 70);
     		tempEnemy.enemyType = "StraightRight";
+    		//tempEnemy.totalInterval = 20;
+    		tempEnemy.bulletInterval = Math.floor(Math.random() * 11) + 1;
     		gameEngine.addEntity(tempEnemy);
 	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
 	    }, i);
@@ -878,6 +881,8 @@ function spawnEnemies(gameEngine)
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 70);
     		tempEnemy.enemyType = "StraightLeft";
+    		//tempEnemy.totalInterval = 20;
+    		tempEnemy.bulletInterval = Math.floor(Math.random() * 11) + 1;
     		gameEngine.addEntity(tempEnemy);
 	    }, i);
     }
