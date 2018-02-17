@@ -9,6 +9,12 @@ window.requestAnimFrame = (function () {
             };
 })();
 
+function distance(a, b) {
+    var difX = a.x - b.x;
+    var difY = a.y - b.y;
+    return Math.sqrt(difX * difX + difY * difY);
+};
+
 function GameEngine() {
     this.entities = [];
     this.ctx = null;
@@ -185,6 +191,23 @@ function Entity(game, x, y) {
     this.x = x;
     this.y = y;
     this.removeFromWorld = false;
+};
+
+Entity.prototype.collideRight = function () {
+    return this.x + this.radius > 600;
+};
+Entity.prototype.collideLeft = function () {
+    return this.x - this.radius < 0;
+};
+Entity.prototype.collideBottom = function () {
+    return this.y + this.radius > 600;
+};
+Entity.prototype.collideTop = function () {
+    return this.y - this.radius < 0;
+};
+
+Entity.prototype.collide = function (other) {
+    return distance(this, other) < this.radius + other.radius;
 };
 
 Entity.prototype.update = function () {
