@@ -169,42 +169,70 @@ function updateBullet(bullet)
 		}
 		break;
 	case "EnemyDown":
-		bullet.y += bullet.game.clockTick * bullet.speed;
-		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+		bullet.y += bullet.game.clockTick * bullet.speed + 5;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDownLeft":
 		bullet.y += bullet.game.clockTick * bullet.speed + 5;
-		bullet.x -= bullet.game.clockTick * 55;
-		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+		bullet.x -= bullet.game.clockTick * bullet.speed + 1;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDownRight":
 		bullet.y += bullet.game.clockTick * bullet.speed + 5;
-		bullet.x += bullet.game.clockTick * 55;
-		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+		bullet.x += bullet.game.clockTick * bullet.speed + 1;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
-	case "EnemyRight":
+	case "EnemyRightUp":
 		bullet.x += bullet.game.clockTick * bullet.speed + 5;
-		bullet.y -= bullet.game.clockTick * 40;
-		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+		bullet.y -= bullet.game.clockTick * bullet.speed + 1;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
-	case "EnemyLeft":
+	case "EnemyLeftUp":
 		bullet.x -= bullet.game.clockTick * bullet.speed + 5;
-		bullet.y -= bullet.game.clockTick * 40;
-		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+		bullet.y -= bullet.game.clockTick * bullet.speed + 1;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+			bullet.removeFromWorld = true;
+		}
+		break;
+	case "EnemyRightDown":
+		bullet.x += bullet.game.clockTick * bullet.speed + 5;
+		bullet.y += bullet.game.clockTick * 55;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+			bullet.removeFromWorld = true;
+		}
+		break;
+	case "EnemyLeftDown":
+		bullet.x -= bullet.game.clockTick * bullet.speed + 5;
+		bullet.y += bullet.game.clockTick * bullet.speed + 1;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyUp":
 		bullet.y -= bullet.game.clockTick * bullet.speed + 3;
-		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+			bullet.removeFromWorld = true;
+		}
+		break;
+	case "EnemyUpLeft":
+		bullet.y -= bullet.game.clockTick * bullet.speed + 5;
+		bullet.x -= bullet.game.clockTick * bullet.speed + 1;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
+			bullet.removeFromWorld = true;
+		}
+		break;
+	case "EnemyUpRight":
+		bullet.y -= bullet.game.clockTick * bullet.speed + 5;
+		bullet.x += bullet.game.clockTick * bullet.speed + 1;
+		if(bullet.y < -50 || bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
@@ -344,7 +372,7 @@ EnemyBullet.prototype.constructor = EnemyBullet;
 
 function EnemyBullet(game, spritesheet, x, y) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-	this.speed = Math.floor((Math.random() * 10) * 15);//	 + 55;
+	this.speed = Math.floor((Math.random() * 12) * 3);//	 + 55;
 	this.x = x;
 	this.y = y;
 	this.bulletType = "EnemyDown";
@@ -562,7 +590,7 @@ function Enemy(game, spritesheet, x, y){
 	this.maxShot = 12;
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
-	this.bulletSpeed = 400;
+	this.bulletSpeed = 10;
 	this.bulletY = 50;
 	this.radius = 5;
 	this.count = 0;
@@ -644,6 +672,8 @@ Enemy.prototype.update = function () {
 	
 }
 
+
+
 Enemy.prototype.draw = function () {
 
 
@@ -652,56 +682,103 @@ Enemy.prototype.draw = function () {
 	if(this.shoot) {
 		if(this.attackType === "Star")
 		{
-			tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-			tempEnemy.x = this.x+15;
-			tempEnemy.y = this.y+50;
-			tempEnemy.bulletType = "EnemyDownLeft";
-			this.game.addEntity(tempEnemy);
-			//this.shoot = false;
-			
-			//trying 2 bullet
-			tempEnemy2 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-			tempEnemy2.x = this.x+15;
-			tempEnemy2.y = this.y+50;
-			tempEnemy2.bulletType = "EnemyDownRight";
-			this.game.addEntity(tempEnemy2);
-			
-			
-			//trying all bullet
-			tempEnemy3 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-			tempEnemy3.x = this.x+15;
-			tempEnemy3.y = this.y+50;
-			tempEnemy3.bulletType = "EnemyRight";
-			this.game.addEntity(tempEnemy3);
-			
-			tempEnemy4 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-			tempEnemy4.x = this.x+15;
-			tempEnemy4.y = this.y+50;
-			tempEnemy4.bulletType = "EnemyLeft";
-			this.game.addEntity(tempEnemy4);
-			
-			tempEnemy5 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-			tempEnemy5.x = this.x+15;
-			tempEnemy5.y = this.y+50;
-			tempEnemy5.bulletType = "EnemyUp";
-			this.game.addEntity(tempEnemy5);
-			
-			
-			//this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
-			
+			drawSpreads(this, "Star");
 			this.shoot = false;
-			bEnemy.push(tempEnemy);
-			bEnemy.push(tempEnemy2);
-			bEnemy.push(tempEnemy3);
-			bEnemy.push(tempEnemy4);
-			bEnemy.push(tempEnemy5);
-			//console.log("shooting");
+		}
+		if(this.attackType === "FullSpread")
+		{
+			drawSpreads(this, "Star");
+			drawSpreads(this, "SecondaryStar");
+			this.shoot = false;
 		}
 		
 	}
 	
     Entity.prototype.draw.call(this);
 };
+
+function drawSpreads(enemy, attackPattern)
+{
+	if(attackPattern === "Star")
+	{
+		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy.x = enemy.x+15;
+		tempEnemy.y = enemy.y+50;
+		tempEnemy.bulletType = "EnemyDownLeft";
+		enemy.game.addEntity(tempEnemy);
+		//this.shoot = false;
+		
+		//trying 2 bullet
+		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy2.x = enemy.x+15;
+		tempEnemy2.y = enemy.y+50;
+		tempEnemy2.bulletType = "EnemyDownRight";
+		enemy.game.addEntity(tempEnemy2);
+		
+		//trying all bullet
+		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy3.x = enemy.x+15;
+		tempEnemy3.y = enemy.y+50;
+		tempEnemy3.bulletType = "EnemyRightUp";
+		enemy.game.addEntity(tempEnemy3);
+		
+		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy4.x = enemy.x+15;
+		tempEnemy4.y = enemy.y+50;
+		tempEnemy4.bulletType = "EnemyLeftUp";
+		enemy.game.addEntity(tempEnemy4);
+		
+		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy5.x = enemy.x+15;
+		tempEnemy5.y = enemy.y+50;
+		tempEnemy5.bulletType = "EnemyUp";
+		enemy.game.addEntity(tempEnemy5);
+	
+		bEnemy.push(tempEnemy);
+		bEnemy.push(tempEnemy2);
+		bEnemy.push(tempEnemy3);
+		bEnemy.push(tempEnemy4);
+		bEnemy.push(tempEnemy5);
+	}
+	if(attackPattern === "SecondaryStar")
+	{
+		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy.x = enemy.x+15;
+		tempEnemy.y = enemy.y+50;
+		tempEnemy.bulletType = "EnemyDown";
+		enemy.game.addEntity(tempEnemy);
+		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy2.x = enemy.x+15;
+		tempEnemy2.y = enemy.y+50;
+		tempEnemy2.bulletType = "EnemyUpLeft";
+		enemy.game.addEntity(tempEnemy2);
+		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy3.x = enemy.x+15;
+		tempEnemy3.y = enemy.y+50;
+		tempEnemy3.bulletType = "EnemyUpRight";
+		enemy.game.addEntity(tempEnemy3);
+		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy4.x = enemy.x+15;
+		tempEnemy4.y = enemy.y+50;
+		tempEnemy4.bulletType = "EnemyLeftDown";
+		enemy.game.addEntity(tempEnemy4);
+		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy5.x = enemy.x+15;
+		tempEnemy5.y = enemy.y+50;
+		tempEnemy5.bulletType = "EnemyRightDown";
+		enemy.game.addEntity(tempEnemy5);
+	
+		bEnemy.push(tempEnemy);
+		bEnemy.push(tempEnemy2);
+		bEnemy.push(tempEnemy3);
+		bEnemy.push(tempEnemy4);
+		bEnemy.push(tempEnemy5);
+	}
+	
+	
+}
+
+
 
 function Enemy3(game, spritesheet, x, y){
 	this.x = x;
@@ -842,6 +919,7 @@ function spawnEnemies(gameEngine)
 				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowLeft";
+				tempEnemy.attackType = "FullSpread";
 				tempEnemy.waiting = true;
 				tempEnemy.maxShot = 20
 				gameEngine.addEntity(tempEnemy);
@@ -855,6 +933,7 @@ function spawnEnemies(gameEngine)
 				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -50);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowRight";
+				tempEnemy.attackType = "FullSpread";
 				tempEnemy.waiting = true;
 				tempEnemy.maxShot = 20
 				gameEngine.addEntity(tempEnemy);
