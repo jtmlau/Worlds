@@ -579,7 +579,7 @@ Enemy.prototype.update = function () {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && !ent.isEnemy && ent.isHero) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
@@ -791,6 +791,19 @@ AM.downloadAll(function () {
     		gameEngine.addEntity(tempEnemy2);
 	    }, i);
     }
+	/*
+	for(var i = 12000; i<=12500; i+=100)
+    {
+    	setTimeout(function()
+	    {
+    		tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/mini.png"), 300, 0);
+    		tempEnemy.enemyType = "StraightLeft";
+    		tempEnemy2 = new Enemy3(gameEngine, AM.getAsset("./img/mini.png"), 100, 0);
+    		tempEnemy2.enemyType = "StraightRight";
+    		gameEngine.addEntity(tempEnemy);
+    		gameEngine.addEntity(tempEnemy2);
+	    }, i);
+    }*/
 //	for(var i = 10000; i<=10500; i+=100)
 //    {
 //    	setTimeout(function()
@@ -811,3 +824,17 @@ AM.downloadAll(function () {
     
     console.log("All Done!");
 });
+/*
+function gameOver(game, sprite) {
+	this.sprite = sprite;
+	Entity.call(this, game, x, y);
+}
+gameOver.prototype = new Entity();
+gameOver.prototype.constructor = gameOver;
+gameOver.prototype.update = function() {
+	if(
+	
+)}
+
+gameOver.prototype.draw = function(ctx) {
+	if(!this.game.*/
