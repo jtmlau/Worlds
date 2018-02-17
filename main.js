@@ -201,7 +201,13 @@ function enemyMovement(the_enemy)
 			if(the_enemy.x > 1000) {
 				the_enemy.removeFromWorld = true;
 			}	
-			
+			break;
+		case "StraightLeft":
+			the_enemy.x -= the_enemy.game.clockTick * 500;
+			console.log("Enemy should move!");
+			if(the_enemy.x < -200) {
+				the_enemy.removeFromWorld = true;
+			}	
 			break;
 	}
 }
@@ -673,26 +679,25 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
     
-    setTimeout(function()
+    for(var i = 2000; i<=2500; i+=100)
     {
-    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
-    }, 2000);
-    setTimeout(function()
+    	setTimeout(function()
+	    {
+    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80);
+    		this.enemyType = "StraightRight";
+    		gameEngine.addEntity(tempEnemy);
+	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
+	    }, i);
+    }
+    for(var i = 8000; i<=8500; i+=100)
     {
-    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
-    }, 2100);
-    setTimeout(function()
-    {
-    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
-    }, 2200);
-    setTimeout(function()
-    {
-    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
-    }, 2300);
-    setTimeout(function()
-    {
-    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100));
-    }, 2400);
+    	setTimeout(function()
+	    {
+    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 80);
+    		this.enemyType = "StraightLeft";
+    		gameEngine.addEntity(tempEnemy);
+	    }, i);
+    }
     
     console.log("All Done!");
 });
