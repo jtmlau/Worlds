@@ -1267,7 +1267,7 @@ AM.downloadAll(function () {
 			[
 				'./audio/sennen.wav',
 				'./SFX/Attack3.wav',
-				'./SFX/Dead.wav'
+				'./SFX/Dead.wav',
 			],
 			function(buffer) {
 				console.log("Callback");
