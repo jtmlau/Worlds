@@ -164,27 +164,27 @@ function updateBullet(bullet)
 	
 	case "Reimu":
 		bullet.y -= bullet.game.clockTick * bullet.speed;
-		if(bullet.y < 0 || bullet.x > 600 || bullet.x < 0){
+		if(bullet.y < -50 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDown":
 		bullet.y += bullet.game.clockTick * bullet.speed;
-		if(bullet.y > 700 || bullet.x > 600 || bullet.x < 0){
+		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDownLeft":
 		bullet.y += bullet.game.clockTick * bullet.speed;
 		bullet.x -= bullet.game.clockTick * 20;
-		if(bullet.y > 700 || bullet.x > 600 || bullet.x < 0){
+		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDownRight":
 		bullet.y += bullet.game.clockTick * bullet.speed;
 		bullet.x += bullet.game.clockTick * 20;
-		if(bullet.y > 700 || bullet.x > 600 || bullet.x < 0){
+		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
