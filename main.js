@@ -201,9 +201,25 @@ function BufferLoader(context, urlList, callback) {
 
 function playSound(buffer) {
 	var source = audioCtx.createBufferSource(); // creates a sound source
+	var gainNode = audioCtx.createGain();
 	source.buffer = buffer;                    // tell the source which sound to play
-	source.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	source.connect(gainNode);
+	gainNode.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	gainNode.gain.value = 0.06;
 	source.start(0);  
+}
+
+function playBGM(buffer)
+{
+	var source1 = audioCtx.createBufferSource(); // creates a sound source
+	var gainNode1 = audioCtx.createGain();
+	source1.buffer = buffer;                    // tell the source which sound to play
+	source1.connect(gainNode1);
+	gainNode1.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	gainNode1.gain.value = 0.7;
+	source1.start(0); 
+	
+	
 }
 
 function Background(game, spritesheet) {
@@ -519,7 +535,7 @@ Reimu.prototype.update = function () {
 		{
 			if(soundBuffer != null)
 			{
-				playSound(soundBuffer[0]);
+				playBGM(soundBuffer[0]);
 				this.music = true;
 			}
 			
@@ -531,7 +547,7 @@ Reimu.prototype.update = function () {
 	{
 		if(soundBuffer != null)
 		{
-			playSound(soundBuffer[0]);
+			playBGM(soundBuffer[0]);
 			this.music = true;
 		}
 	}
@@ -923,6 +939,10 @@ function drawSpreads(enemy, attackPattern)
 		tempEnemy5.bulletType = "EnemyUp";
 		enemy.game.addEntity(tempEnemy5);
 	
+		if(soundBuffer != null)
+		{
+			playSound(soundBuffer[1]);
+		}
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
 		bEnemy.push(tempEnemy3);
@@ -957,6 +977,10 @@ function drawSpreads(enemy, attackPattern)
 		tempEnemy5.bulletType = "EnemyRightDown";
 		enemy.game.addEntity(tempEnemy5);
 	
+		if(soundBuffer != null)
+		{
+			playSound(soundBuffer[1]);
+		}
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
 		bEnemy.push(tempEnemy3);
@@ -1266,8 +1290,8 @@ AM.downloadAll(function () {
 			audioCtx,
 			[
 				'./audio/sennen.wav',
-//				'./SFX/Attack3.wav',
-//				'./SFX/Dead.wav',
+				'./SFX/Attack3.wav',
+				'./SFX/Dead.wav',
 			],
 			function(buffer) {
 				console.log("Callback");
