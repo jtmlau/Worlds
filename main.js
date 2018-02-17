@@ -66,7 +66,6 @@ Animation.prototype.drawEnemyCircle = function (tick, ctx,x, y) {
 	ctx.drawImage(this.spriteSheet,
 	0, 0, 90, 90, x, y, 
 	15 * this.scale, 15 * this.scale);
-	
 };
 Animation.prototype.drawEnemyFrame = function (tick, ctx, x, y, left, right) {
     this.elapsedTime += tick;
@@ -148,17 +147,29 @@ function updateBullet(bullet)
 	
 	case "Reimu":
 		bullet.y -= bullet.game.clockTick * bullet.speed;
+		if(bullet.y < 0){
+			bullet.removeFromWorld = true;
+		}
 		break;
 	case "EnemyDown":
 		bullet.y += bullet.game.clockTick * bullet.speed;
+		if(bullet.y > 800){
+			bullet.removeFromWorld = true;
+		}
 		break;
 	case "EnemyDownLeft":
 		bullet.y += bullet.game.clockTick * bullet.speed;
 		bullet.x -= bullet.game.clockTick * 20;
+		if(bullet.y > 800){
+			bullet.removeFromWorld = true;
+		}
 		break;
 	case "EnemyDownRight":
 		bullet.y += bullet.game.clockTick * bullet.speed;
 		bullet.x += bullet.game.clockTick * 20;
+		if(bullet.y > 800){
+			bullet.removeFromWorld = true;
+		}
 		break;
 	}
 }
@@ -214,13 +225,13 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.y = y;
 	this.bulletType = "EnemyDown";
 	this.ctx = game.ctx;
+	this.removeFromWorld = false;
 	Entity.call(this, game, x, y);
 }
 
 EnemyBullet.prototype.Enemyupdate = function() {
 	updateBullet(this);
 	//this.y += this.game.clockTick * this.speed;
-    
     Entity.prototype.update.call(this);
 }
 
@@ -422,7 +433,9 @@ Enemy.prototype.update = function () {
 		element.Enemyupdate();
 		element.draw();
 		//console.log("update");
+		
 	});
+	
 	
 	Entity.prototype.update.call(this);
 }
@@ -451,6 +464,7 @@ Enemy.prototype.draw = function () {
 		//this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
+		
 		
 		
 		//console.log("shooting");
