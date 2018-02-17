@@ -465,7 +465,7 @@ function Enemy(game, spritesheet, x, y){
 	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation
 	//this.moveRight = true;
 	//this.moveLeft = false;
-	this.enemyType = "StraightRight";
+	this.enemyType = "StraightLeft";
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 200;
 	this.bulletY = 50;
@@ -684,7 +684,7 @@ AM.downloadAll(function () {
     	setTimeout(function()
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80);
-    		this.enemyType = "StraightRight";
+    		tempEnemy.enemyType = "StraightRight";
     		gameEngine.addEntity(tempEnemy);
 	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
 	    }, i);
@@ -694,7 +694,7 @@ AM.downloadAll(function () {
     	setTimeout(function()
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 80);
-    		this.enemyType = "StraightLeft";
+    		tempEnemy.enemyType = "StraightLeft";
     		gameEngine.addEntity(tempEnemy);
 	    }, i);
     }
