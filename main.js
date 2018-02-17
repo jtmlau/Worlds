@@ -621,12 +621,12 @@ Enemy3.prototype.update = function () {
 		this.shoot = false;
 	}*/
 	
-	bEnemy.forEach(function(element)
+	/*bEnemy.forEach(function(element)
 	{
 		element.Enemyupdate();
 		element.draw();
 		//console.log("update");
-	});
+	});*/
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
