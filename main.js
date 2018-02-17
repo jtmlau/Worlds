@@ -241,16 +241,16 @@ function enemyMovement(the_enemy)
 			}	
 			break;
 		case "StraightDown":
-			the_enemy.y += the_enemy.game.clockTick * 20;
-			console.log("Enemy should move!");
-			if(the_enemy.y >1000) {
+			the_enemy.y += the_enemy.game.clockTick * 350;
+			if(the_enemy.y >750) {
 				the_enemy.removeFromWorld = true;
 			}
 			break;
+			
 		case "ClockwiseCircle":
 			angle = 0.1 * the_enemy.currentState;
 			the_enemy.x += 45 * the_enemy.game.clockTick * ((1+angle)*Math.cos(angle));
-			the_enemy.y += 45 *  the_enemy.game.clockTick * ((1+angle)*Math.sin(angle));
+			the_enemy.y += 45 * the_enemy.game.clockTick * ((1+angle)*Math.sin(angle));
 			the_enemy.currentState++;
 			
 			if(the_enemy.currentState > 120)
@@ -828,6 +828,15 @@ function spawnEnemies(gameEngine)
     		gameEngine.addEntity(tempEnemy2);
 	    }, i);
     }
+    
+    setTimeout(function()
+	{
+		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 200, -20);
+		tempEnemy.enemyType = "StraightDown";
+		tempEnemy.nextType = "StraightRight";
+		gameEngine.addEntity(tempEnemy);
+		gameEngine.addEntity(tempEnemy2);
+	}, 16500);
 }
 
 AM.queueDownload("./img/desert_background.jpg");
