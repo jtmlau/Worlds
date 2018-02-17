@@ -288,7 +288,7 @@ function Reimu(game, spritesheet) {
     this.moveUp = false;
     this.moveDown = false;
     this.ctx = game.ctx;
-    Entity.call(this, game, 400, 550);
+    Entity.call(this, game, 300, 550);
 }
 
 ReimuBullet.prototype = new Entity();
@@ -302,7 +302,7 @@ function ReimuBullet(game, spritesheet) {
 	this.radius = 2;
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
-	Entity.call(this, game, 400, 550);
+	Entity.call(this, game, 300, 550);
 }
 
 ReimuBullet.prototype.update = function() {
