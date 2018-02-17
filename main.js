@@ -1289,9 +1289,9 @@ AM.downloadAll(function () {
 	bufferLoader = new BufferLoader(
 			audioCtx,
 			[
-				'./audio/sennen.wav',
-				'./SFX/Attack3.wav',
-				'./SFX/Dead.wav',
+				'./audio/sennen.ogg',
+				'./SFX/Attack3.ogg',
+				'./SFX/Dead.ogg',
 			],
 			function(buffer) {
 				console.log("Callback");
