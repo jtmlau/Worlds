@@ -636,13 +636,6 @@ Enemy3.prototype.update = function () {
 		this.shoot = false;
 	}*/
 	
-	/*bEnemy.forEach(function(element)
-	{
-		element.Enemyupdate();
-		element.draw();
-		//console.log("update");
-	});*/
-	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && !ent.isEnemy) {
@@ -721,23 +714,23 @@ AM.downloadAll(function () {
     		gameEngine.addEntity(tempEnemy);
 	    }, i);
     }
-	for(var i = 10000; i<=10500; i+=100)
-    {
-    	setTimeout(function()
-	    {
-    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 80);
-    		tempEnemy.enemyType = "StraightDown";
-    		gameEngine.addEntity(tempEnemy);
-	    }, i);
-    }
-	for(var i = 2000; i < 5000; i +=500)
-	{
-		setTimeout(function()
-		{ 
-			tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/mini.png"), 500, 0);
-			gameEngine.addEntity(tempEnemy);
-		}, i);
-	}
+//	for(var i = 10000; i<=10500; i+=100)
+//    {
+//    	setTimeout(function()
+//	    {
+//    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 80);
+//    		tempEnemy.enemyType = "StraightDown";
+//    		gameEngine.addEntity(tempEnemy);
+//	    }, i);
+//    }
+//	for(var i = 2000; i < 5000; i +=500)
+//	{
+//		setTimeout(function()
+//		{ 
+//			tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/mini.png"), 500, 0);
+//			gameEngine.addEntity(tempEnemy);
+//		}, i);
+//	}
     
     console.log("All Done!");
 });
