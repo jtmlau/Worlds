@@ -1,4 +1,7 @@
-
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioCtx = new AudioContext();
+var bufferLoader;
+var soundBuffer = null;
 var AM = new AssetManager();
 
 gameScore = 0;
@@ -146,6 +149,62 @@ Animation.prototype.isDone = function () {
 };
 
 // no inheritance
+
+
+function BufferLoader(context, urlList, callback) {
+	  this.context = context;
+	  this.urlList = urlList;
+	  this.onload = callback;
+	  this.bufferList = new Array();
+	  this.loadCount = 0;
+	}
+
+	BufferLoader.prototype.loadBuffer = function(url, index) {
+	  // Load buffer asynchronously
+	  var request = new XMLHttpRequest();
+	  request.open("GET", url, true);
+	  request.responseType = "arraybuffer";
+
+	  var loader = this;
+
+	  request.onload = function() {
+	    // Asynchronously decode the audio file data in request.response
+	    loader.context.decodeAudioData(
+	      request.response,
+	      function(buffer) {
+	        if (!buffer) {
+	          alert('error decoding file data: ' + url);
+	          return;
+	        }
+	        loader.bufferList[index] = buffer;
+	        if (++loader.loadCount == loader.urlList.length)
+	          loader.onload(loader.bufferList);
+	      },
+	      function(error) {
+	        console.error('decodeAudioData error', error);
+	      }
+	    );
+	  }
+
+	  request.onerror = function() {
+	    alert('BufferLoader: XHR error');
+	  }
+
+	  request.send();
+	}
+
+	BufferLoader.prototype.load = function() {
+	  for (var i = 0; i < this.urlList.length; ++i)
+	  this.loadBuffer(this.urlList[i], i);
+	}
+	
+
+function playSound(buffer) {
+	var source = audioCtx.createBufferSource(); // creates a sound source
+	source.buffer = buffer;                    // tell the source which sound to play
+	source.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	source.start(0);  
+}
 
 function Background(game, spritesheet) {
 	this.x = 0;
@@ -362,6 +421,8 @@ function Reimu(game, spritesheet) {
     this.moveUp = false;
     this.moveDown = false;
     this.ctx = game.ctx;
+    this.spawned = false;
+    this.music = false;
     Entity.call(this, game, 268, 550);
 }
 
@@ -453,7 +514,28 @@ Reimu.prototype.update = function () {
 	if(this.game.space) { // If the space key is pressed.
 		this.isShooting = true;
 		this.bulletY = that.y;
+		
+		if(!this.spawned)
+		{
+			if(soundBuffer != null)
+			{
+				playSound(soundBuffer[0]);
+				this.music = true;
+			}
+			
+			spawnEnemies(this.game);
+			this.spawned = true;
+		}
 	}
+	if(this.spawned && !this.music)
+	{
+		if(soundBuffer != null)
+		{
+			playSound(soundBuffer[0]);
+			this.music = true;
+		}
+	}
+
 	if(this.game.shift) 
 	{
 		this.speed = 100;
@@ -1008,6 +1090,8 @@ Enemy3.prototype.draw = function () {
 
 function spawnEnemies(gameEngine)
 {
+	console.log("spawn");
+	
 	for(var i = 2000; i<=2500; i+=100)
     {
     	setTimeout(function()
@@ -1124,6 +1208,15 @@ function spawnEnemies(gameEngine)
     	    
 }
 
+//function finishedLoading(bufferList)
+//{
+//	var source1 = context.createBufferSource();
+//	source1.buffer = bufferList[0];
+//	source1.connect(context.destination);
+//	source1.start(0);
+//}
+
+
 function Menu(game, sprite) {
 	this.sprite = sprite;
 	Entity.call(this, game, 0, 0);
@@ -1168,7 +1261,20 @@ AM.downloadAll(function () {
 	gameEngine.play = false;
 	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
 	gameEngine.addEntity(menu);
-
+	
+	bufferLoader = new BufferLoader(
+			audioCtx,
+			[
+				'./audio/sennen.wav',
+				'./SFX/Attack3.wav',
+				'./SFX/Dead.wav'
+			],
+			function(buffer) {
+				console.log("Callback");
+				soundBuffer = buffer;
+			}
+			);
+	bufferLoader.load();
     
     gameEngine.init(ctx);
     gameEngine.start();
@@ -1186,10 +1292,8 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
     
-    if(gameEngine.play){
-    	
-    }
-    spawnEnemies(gameEngine);
+    
+    
     
 //	for(var i = 10000; i<=10500; i+=100)
 //    {
