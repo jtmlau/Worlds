@@ -69,7 +69,15 @@ GameEngine.prototype.startInput = function () {
     	case "KeyD":
     		that.right = true;
     		break;
-    	}
+    	
+		case "KeyZ":
+			that.z = true;
+			break;
+		case "KeyC":
+			that.c = true;
+			break;
+		}
+
     	
     	e.preventDefault();
     	

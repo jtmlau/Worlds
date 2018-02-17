@@ -200,6 +200,7 @@ function Reimu(game, spritesheet) {
     this.bulletY = this.y;
     this.radius = 3;
     this.isShooting = false;
+	this.slow = false;
     this.moveRight = false;
     this.moveLeft = false;
     this.moveUp = false;
@@ -332,6 +333,19 @@ Reimu.prototype.update = function () {
 		this.isShooting = true;
 		this.bulletY = that.y;
 	}
+	if(this.game.z) {
+		if(!this.slow) {
+				
+			this.slow = true;
+			this.speed = 100;
+		}
+	}
+	if(this.game.c) {
+		if(this.slow) {
+			this.slow = false;
+			this.speed = 200;
+		}
+	}
 	
 	if(this.game.left) { // If the left arrow key is pressed.
 		this.moveLeft = true;
@@ -372,6 +386,9 @@ Reimu.prototype.update = function () {
 		this.y += this.game.clockTick * this.speed; // Reimu moves towards the bottom of the screen
 		}
 	}
+	
+	
+	
 	
 	if(!this.game.left) { // If the left arrow key is pressed.
 		this.moveLeft = false;
