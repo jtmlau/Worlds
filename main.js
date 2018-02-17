@@ -636,6 +636,15 @@ Enemy3.prototype.update = function () {
 		this.shoot = false;
 	}*/
 	
+<<<<<<< HEAD
+=======
+	/*bEnemy.forEach(function(element)
+	{
+		element.Enemyupdate();
+		element.draw();
+		//console.log("update");
+	});*/
+>>>>>>> 265205fe3171960db53f4147913ff012e22076eb
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
