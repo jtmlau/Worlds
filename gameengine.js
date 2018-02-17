@@ -10,6 +10,7 @@ window.requestAnimFrame = (function () {
 })();
 
 function distance(a, b) {
+	
     var difX = a.x - b.x;
     var difY = a.y - b.y;
     return Math.sqrt(difX * difX + difY * difY);
@@ -31,6 +32,7 @@ GameEngine.prototype.init = function (ctx) {
     this.startInput();
     this.timer = new Timer();
     this.gameEnd = false;
+    this.endGameScore = 0;
     this.gameScore = 0;
     console.log('game initialized');
 };
@@ -68,19 +70,19 @@ GameEngine.prototype.startInput = function () {
     		that.shift = true;
     		break;
     		
-    	case "ArrowUp":
+    	case "KeyW":
     		that.up = true;
     		break;
     		
-    	case "ArrowLeft":
+    	case "KeyA":
     		that.left = true;
     		break;
     		
-    	case "ArrowDown":
+    	case "KeyS":
     		that.down = true;
     		break;
     		
-    	case "ArrowRight":
+    	case "KeyD":
     		that.right = true;
     		break;
     		
@@ -107,19 +109,19 @@ GameEngine.prototype.startInput = function () {
     		that.shift = false;
     		break;
     		
-    	case "ArrowUp":
+    	case "KeyW":
     		that.up = false;
     		break;
     		
-    	case "ArrowLeft":
+    	case "KeyA":
     		that.left = false;
     		break;
     		
-    	case "ArrowDown":
+    	case "KeyS":
     		that.down = false;
     		break;
     		
-    	case "ArrowRight":
+    	case "KeyD":
     		that.right = false;
     		break;
     		
@@ -153,8 +155,6 @@ GameEngine.prototype.update = function () {
 	var canvas = document.getElementById("hud");
 	var ctx = canvas.getContext("2d");
 	
-	ctx.fillStyle = 'brown';
-	ctx.fillRect(0, 0, canvas.width, canvas.height);
 	
     var entitiesCount = this.entities.length;
 
@@ -172,7 +172,7 @@ GameEngine.prototype.update = function () {
         }
     }
 
-    ctx.save();
+    /*ctx.save();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     var stringScore = "Score: " + this.gameScore;
@@ -180,13 +180,22 @@ GameEngine.prototype.update = function () {
     ctx.font="20px Arial";
     var text_score = stringScore;
     
-    ctx.fillText(stringScore, 0, 50);
-    this.gameScore = this.gameScore + 1;
+    ctx.fillText(stringScore, 0, 50);*/
+    ctx.font = "20px Arial";
+    ctx.fillText("Controls", 150, 20);
+    ctx.fillText("G: God Mode", 10, 50);
+    ctx.fillText("Left: Left Arrow", 10, 100);
+    ctx.fillText("Up: Up Arrow", 10, 150);
+    ctx.fillText("Right: Right Arrow", 200, 100);
+    ctx.fillText("Down: Down Arrow", 200, 150);
     
-    ctx.restore();
+    this.endGameScore = this.endGameScore + 1;
+    this.gameScore = this.gameScore + this.endGameScore;
+    //ctx.restore();
     
+    //console.log(this.endGameScore);
     
-    if(this.gameScore > 20000) this.gameEnd = true;
+    if(this.endGameScore > 3000) this.gameEnd = true;
     
     if (this.gameEnd){
     	for (var i = this.entities.length - 1; i >= 0; --i) {
@@ -195,7 +204,7 @@ GameEngine.prototype.update = function () {
     	this.clockTick = 0;
     }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
     //console.log(this.entities.length)
 };
 
@@ -242,6 +251,7 @@ Entity.prototype.collideTop = function () {
 };
 
 Entity.prototype.collide = function (other) {
+	
     return distance(this, other) < this.radius + other.radius;
 };
 
@@ -251,9 +261,10 @@ Entity.prototype.update = function () {
 Entity.prototype.draw = function (ctx) {
     if (this.game.showOutlines && this.radius) {
         this.game.ctx.beginPath();
-        this.game.ctx.strokeStyle = "green";
-        this.game.ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-        this.game.ctx.stroke();
+        this.game.ctx.fillstyle = "green";
+        this.animation.frameWidth;
+        this.game.ctx.arc(this.x+this.animation.frameWidth, this.y, this.radius, 0, Math.PI * 2, false);
+        this.game.ctx.fill();
         this.game.ctx.closePath();
     }
 };
