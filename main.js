@@ -377,14 +377,10 @@ function ReimuBullet(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
 	this.speed = 450;
 	this.X;
-	this.Y;
-<<<<<<< HEAD
-	this.radius = 2;
-=======
+	this.Y
 	this.centerX = 7;
 	this.centerY = 6;
-	this.radius = 6;
->>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
+	this.radius = 6
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
 	Entity.call(this, game, 268, 550);
@@ -413,12 +409,8 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.y = y;
 	this.centerX = 11;
 	this.centerY = 11;
-	this.bulletType = "EnemyDown";
-<<<<<<< HEAD
-	this.radius = 2;
-=======
+	this.bulletType = "EnemyDown"
 	this.radius = 11;
->>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.isEnemy = true;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -636,13 +628,9 @@ function Enemy(game, spritesheet, x, y){
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
 	this.bulletY = 50;
-<<<<<<< HEAD
-	this.radius = 5;
-=======
-	this.radius = 15;
->>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
+	this.radius = 15
 	this.count = 0;
-	this.bulletInterval = 0;
+	this.bulletInterval = bulletInterval = Math.floor(Math.random() * 11) + 1;
 	this.totalInterval = 12;
 	this.isEnemy = true;
 	this.shoot = false;
@@ -906,8 +894,6 @@ function spawnEnemies(gameEngine)
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 70);
     		tempEnemy.enemyType = "StraightRight";
-    		//tempEnemy.totalInterval = 20;
-    		tempEnemy.bulletInterval = Math.floor(Math.random() * 11) + 1;
     		gameEngine.addEntity(tempEnemy);
 	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
 	    }, i);
@@ -918,8 +904,6 @@ function spawnEnemies(gameEngine)
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 70);
     		tempEnemy.enemyType = "StraightLeft";
-    		//tempEnemy.totalInterval = 20;
-    		tempEnemy.bulletInterval = Math.floor(Math.random() * 11) + 1;
     		gameEngine.addEntity(tempEnemy);
 	    }, i);
     }
