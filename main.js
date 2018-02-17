@@ -508,22 +508,22 @@ function Enemy3(game, spritesheet, x, y){
 	
 	this.speed = 185;
 	this.bulletSpeed = 230;
-	this.bulletY = 50;
+	this.bulletY = this.y + 50;
 	this.shoot = false;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
 };
 
 Enemy3.prototype = new Entity();
-Enemy3.prototype.constructor = Enemy;
+Enemy3.prototype.constructor = Enemy3;
 
 Enemy3.prototype.update = function () {
 	
 	if(this.shoot){
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
 	}
-	this.y += 1;
-	if (this.y > 700) {
+	this.y += 2;
+	if (this.y > 600) {
 		this.y = 0;
 	}
 	
@@ -552,7 +552,7 @@ Enemy3.prototype.draw = function () {
 	if(this.shoot) {
 		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"), this.x, this.y + this.bulletY);
 		tempEnemy.x = this.x+15;
-		tempEnemy.y = 50;
+		tempEnemy.y = this.y + 50;
 		this.game.addEntity(tempEnemy);
 		
 		
