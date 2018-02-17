@@ -216,6 +216,15 @@ function enemyMovement(the_enemy)
 {
 	switch(the_enemy.enemyType)
 	{
+		case "Stop":
+			{
+				the_enemy.timer += 1;
+				if(the_enemy.timer > 100)
+				{
+					the_enemy.enemyType = the_enemy.nextType;
+				}
+				break;
+			}
 		case "StraightRight":
 			the_enemy.x += the_enemy.game.clockTick * 650;
 			if(the_enemy.x > 1000) {
@@ -241,7 +250,7 @@ function enemyMovement(the_enemy)
 			}	
 			break;
 		case "StraightDown":
-			the_enemy.y += the_enemy.game.clockTick * 350;
+			the_enemy.y += the_enemy.game.clockTick * 150;
 			if(the_enemy.y >750) {
 				the_enemy.removeFromWorld = true;
 			}
@@ -536,8 +545,10 @@ function Enemy(game, spritesheet, x, y){
 	//this.moveLeft = false;
 	this.enemyType = "StraightLeft";
 	this.nextType = "StraightLeft";
-	this.storedX = 0;
-	this.storedY = 0;
+	this.attackType = "Star";
+	this.waiting = false;
+	this.maxShot = 12;
+	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 400;
 	this.bulletY = 50;
@@ -579,6 +590,14 @@ Enemy.prototype.update = function () {
 		}
 	}
 	
+	if(this.enemyType === "StraightDown")
+	{
+		if(this.y > 130)
+		{
+			this.waiting = false;
+			this.enemyType = "Stop";
+		}
+	}
 	
 	//should update enemy movement
 	enemyMovement(this);
@@ -614,19 +633,22 @@ Enemy.prototype.update = function () {
 		this.shoot = false;
 	}*/
 	
-	if(this.count < 12)
+	if(this.count < this.maxShot)
 	{
-		if(this.bulletInterval === 0)
+		if(this.waiting === false)
 		{
-			this.shoot = true;
-			this.count++;
-			this.bulletInterval = 8;
+			if(this.bulletInterval === 0)
+			{
+				this.shoot = true;
+				this.count++;
+				this.bulletInterval = 8;
+			}
+			else
+			{
+				this.shoot = false;
+			}
+			this.bulletInterval--;
 		}
-		else
-		{
-			this.shoot = false;
-		}
-		this.bulletInterval--;
 	}
 	
 	/*bEnemy.forEach(function(element)
@@ -655,51 +677,54 @@ Enemy.prototype.draw = function () {
 	this.animation.drawEnemyFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
 	
 	if(this.shoot) {
+		if(this.attackType === "Star")
+		{
+			tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+			tempEnemy.x = this.x+15;
+			tempEnemy.y = this.y+50;
+			tempEnemy.bulletType = "EnemyDownLeft";
+			this.game.addEntity(tempEnemy);
+			//this.shoot = false;
+			
+			//trying 2 bullet
+			tempEnemy2 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+			tempEnemy2.x = this.x+15;
+			tempEnemy2.y = this.y+50;
+			tempEnemy2.bulletType = "EnemyDownRight";
+			this.game.addEntity(tempEnemy2);
+			
+			
+			//trying all bullet
+			tempEnemy3 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+			tempEnemy3.x = this.x+15;
+			tempEnemy3.y = this.y+50;
+			tempEnemy3.bulletType = "EnemyRight";
+			this.game.addEntity(tempEnemy3);
+			
+			tempEnemy4 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+			tempEnemy4.x = this.x+15;
+			tempEnemy4.y = this.y+50;
+			tempEnemy4.bulletType = "EnemyLeft";
+			this.game.addEntity(tempEnemy4);
+			
+			tempEnemy5 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+			tempEnemy5.x = this.x+15;
+			tempEnemy5.y = this.y+50;
+			tempEnemy5.bulletType = "EnemyUp";
+			this.game.addEntity(tempEnemy5);
+			
+			
+			//this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
+			
+			this.shoot = false;
+			bEnemy.push(tempEnemy);
+			bEnemy.push(tempEnemy2);
+			bEnemy.push(tempEnemy3);
+			bEnemy.push(tempEnemy4);
+			bEnemy.push(tempEnemy5);
+			//console.log("shooting");
+		}
 		
-		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-		tempEnemy.x = this.x+15;
-		tempEnemy.y = this.y+50;
-		tempEnemy.bulletType = "EnemyDownLeft";
-		this.game.addEntity(tempEnemy);
-		//this.shoot = false;
-		
-		//trying 2 bullet
-		tempEnemy2 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-		tempEnemy2.x = this.x+15;
-		tempEnemy2.y = this.y+50;
-		tempEnemy2.bulletType = "EnemyDownRight";
-		this.game.addEntity(tempEnemy2);
-		
-		
-		//trying all bullet
-		tempEnemy3 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-		tempEnemy3.x = this.x+15;
-		tempEnemy3.y = this.y+50;
-		tempEnemy3.bulletType = "EnemyRight";
-		this.game.addEntity(tempEnemy3);
-		
-		tempEnemy4 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-		tempEnemy4.x = this.x+15;
-		tempEnemy4.y = this.y+50;
-		tempEnemy4.bulletType = "EnemyLeft";
-		this.game.addEntity(tempEnemy4);
-		
-		tempEnemy5 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
-		tempEnemy5.x = this.x+15;
-		tempEnemy5.y = this.y+50;
-		tempEnemy5.bulletType = "EnemyUp";
-		this.game.addEntity(tempEnemy5);
-		
-		
-		//this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
-		
-		this.shoot = false;
-		bEnemy.push(tempEnemy);
-		bEnemy.push(tempEnemy2);
-		bEnemy.push(tempEnemy3);
-		bEnemy.push(tempEnemy4);
-		bEnemy.push(tempEnemy5);
-		//console.log("shooting");
 	}
 	
     Entity.prototype.draw.call(this);
@@ -831,12 +856,23 @@ function spawnEnemies(gameEngine)
     
     setTimeout(function()
 	{
-		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 200, -20);
+		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -50);
 		tempEnemy.enemyType = "StraightDown";
 		tempEnemy.nextType = "StraightRight";
+		tempEnemy.waiting = true;
+		tempEnemy.maxShot = 20
 		gameEngine.addEntity(tempEnemy);
-		gameEngine.addEntity(tempEnemy2);
 	}, 16500);
+    
+    setTimeout(function()
+	{
+		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
+		tempEnemy.enemyType = "StraightDown";
+		tempEnemy.nextType = "StraightLeft";
+		tempEnemy.waiting = true;
+		tempEnemy.maxShot = 20
+		gameEngine.addEntity(tempEnemy);
+	}, 17500);
 }
 
 AM.queueDownload("./img/desert_background.jpg");
