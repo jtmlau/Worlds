@@ -168,7 +168,7 @@ GameEngine.prototype.update = function () {
     
     //console.log(this.gameScore);
     
-    if(this.gameScore > 2500) this.gameEnd = true;
+    if(this.gameScore > 20000) this.gameEnd = true;
     
     if (this.gameEnd){
     	for (var i = this.entities.length - 1; i >= 0; --i) {
