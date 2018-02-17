@@ -205,6 +205,9 @@ function enemyMovement(the_enemy)
 		case "StraightRight":
 			the_enemy.x += the_enemy.game.clockTick * 500;
 			console.log("Enemy should move!");
+			if(the_enemy.x > 1000) {
+				the_enemy.removeFromWorld = true;
+			}	
 			
 			break;
 	}
@@ -277,7 +280,7 @@ EnemyBullet.prototype.constructor = EnemyBullet;
 
 function EnemyBullet(game, spritesheet, x, y) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-	this.speed = Math.floor((Math.random() * 10) * 4);//	 + 55;
+	this.speed = Math.floor((Math.random() * 10) * 15);//	 + 55;
 	this.x = x;
 	this.y = y;
 	this.bulletType = "EnemyDown";
@@ -343,6 +346,13 @@ Reimu.prototype.collide = function (other) {
 };
 
 Reimu.prototype.update = function () {
+	bEnemy.forEach(function(element)
+	{
+		element.Enemyupdate();
+		element.draw();
+		//console.log("update");
+		
+	});
 	
 	Entity.prototype.update.call(this);
 	
@@ -604,13 +614,13 @@ Enemy.prototype.update = function () {
 		this.shoot = false;
 	}
 	
-	bEnemy.forEach(function(element)
+	/*bEnemy.forEach(function(element)
 	{
 		element.Enemyupdate();
 		element.draw();
 		//console.log("update");
 		
-	});
+	});*/
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
