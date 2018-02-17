@@ -599,7 +599,8 @@ Enemy2.prototype.update = function() {
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
             if(ent.isHero) this.game.gameEnd = true;
-        };
+        }
+        ;
     };
 }
 
@@ -1013,6 +1014,7 @@ Menu.prototype.reset = function() {
 Menu.update = function() {
 	if(this.game.space) {
 		this.game.play = true;
+		spawnEnemies(this.gameEngine);
 	}
 }
 Menu.prototype.draw = function(ctx) {
@@ -1062,8 +1064,6 @@ AM.downloadAll(function () {
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
-    
-    spawnEnemies(gameEngine)
     
 //	for(var i = 10000; i<=10500; i+=100)
 //    {

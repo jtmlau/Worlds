@@ -213,6 +213,12 @@ GameEngine.prototype.update = function () {
 	    		this.entities.splice(i, 1);
 	        }
 	    	this.clockTick = 0;
+	    	
+			ctx.font = "24pt Times New Roman";
+			ctx.fillStyle = "white";
+			ctx.fillText("GAME OVER", 100, 400);
+			ctx.fillStyle = "black";
+			ctx.strokeText("GAME OVER", 100, 400);
 	    }
 
 	    //ctx.clearRect(0, 0, canvas.width, canvas.height);
