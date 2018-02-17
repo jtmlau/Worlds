@@ -209,7 +209,6 @@ function updateBullet(bullet)
 		}
 		break;
 	}
-	
 }
 
 function enemyMovement(the_enemy)
@@ -521,6 +520,8 @@ Enemy.prototype.update = function () {
 	
 	//should update enemy movement
 	enemyMovement(this);
+	
+	
 	//OLD MOVING LEFT RIGHT CODE
 	
 	/*if(this.x <= 0 ){
@@ -712,6 +713,35 @@ Enemy3.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
+
+AM.queueDownload("./img/desert_background.jpg");
+AM.queueDownload("./img/reimu_hakurei.png");
+AM.queueDownload("./img/enemy.png")
+AM.queueDownload("./img/mini.png")
+AM.queueDownload("./img/battle.png")
+
+
+AM.downloadAll(function () {
+    var canvas = document.getElementById("gameWorld");
+    var ctx = canvas.getContext("2d");
+
+    var gameEngine = new GameEngine();
+    gameEngine.init(ctx);
+    gameEngine.start();
+    
+    gameEngine.gameScore = gameScore;
+    
+    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+
+    /*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
+	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
+	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
+    
+    for(var i = 2000; i<=2500; i+=100)
     {
     	setTimeout(function()
 	    {
@@ -761,7 +791,6 @@ Enemy3.prototype.draw = function () {
     		gameEngine.addEntity(tempEnemy2);
 	    }, i);
     }
-<<<<<<< HEAD
 	/*
 	for(var i = 12000; i<=12500; i+=100)
     {
@@ -775,7 +804,6 @@ Enemy3.prototype.draw = function () {
     		gameEngine.addEntity(tempEnemy2);
 	    }, i);
     }*/
-=======
 //	for(var i = 10000; i<=10500; i+=100)
 //    {
 //    	setTimeout(function()
