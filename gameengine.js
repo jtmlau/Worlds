@@ -194,13 +194,6 @@ GameEngine.prototype.update = function () {
 	    var text_score = stringScore;
 	    
 	    ctx.fillText(stringScore, 0, 50);*/
-	    ctx.font = "20px Arial";
-	    ctx.fillText("Controls", 150, 20);
-	    ctx.fillText("G: God Mode", 10, 50);
-	    ctx.fillText("Left: Left Arrow", 10, 100);
-	    ctx.fillText("Up: Up Arrow", 10, 150);
-	    ctx.fillText("Right: Right Arrow", 200, 100);
-	    ctx.fillText("Down: Down Arrow", 200, 150);
 	    
 	    this.endGameScore = this.endGameScore + 1;
 	    this.gameScore = this.gameScore + this.endGameScore;
