@@ -98,23 +98,48 @@ Animation.prototype.drawEnemyFrame = function (tick, ctx, x, y, left, right) {
                  this.frameWidth * this.scale, // sprite scale; x
                  this.frameHeight * this.scale); // sprite scale; y
 };
+
 Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
-    /*this.elapsedTime += tick;
+    this.elapsedTime += tick;
     if (this.isDone()) {
         if (this.loop) this.elapsedTime = 0;
     }
-    */
+    
     
     var frame = this.currentFrame();
-    var xindex = frame % this.sheetWidth;
-    var yindex = Math.floor(frame/this.sheetWidth);
+    var xindex = (frame % this.sheetWidth)* this.frameWidth + 5;
+    var yindex = 980;
     
     
     
     ctx.drawImage(this.spriteSheet,
-                 xindex * this.frameWidth, yindex * this.frameHeight, 76, 76, x, y, // sprite position on screen.
-                 105, // sprite scale; x
-				105); // sprite scale; y
+    		xindex+1042, 980,  // (x,y) source from sheet
+            35, 33, // (x,y) size of sprite.
+            300, 50, // sprite position on screen.
+            this.frameWidth * this.scale, // sprite scale; x
+            this.frameHeight * this.scale); // sprite scale; y
+};
+
+Animation.prototype.drawEnemy3Frame = function (tick, ctx, x, y) {
+    this.elapsedTime += tick;
+    if (this.isDone()) {
+        if (this.loop) this.elapsedTime = 0;
+    }
+    
+    
+    var frame = this.currentFrame();
+    var xindex = frame % this.sheetWidth;
+    var yindex = 980;
+    
+    
+    
+    ctx.drawImage(this.spriteSheet,
+    		this.spriteSheet,
+            xindex * this.frameWidth, yindex,  // (x,y) source from sheet
+            this.frameWidth, this.frameHeight, // (x,y) size of sprite.
+            x, y, // sprite position on screen.
+            this.frameWidth * this.scale, // sprite scale; x
+            this.frameHeight * this.scale); // sprite scale; y
 };
 
 Animation.prototype.currentFrame = function () {
@@ -353,9 +378,13 @@ function ReimuBullet(game, spritesheet) {
 	this.speed = 450;
 	this.X;
 	this.Y;
+<<<<<<< HEAD
+	this.radius = 2;
+=======
 	this.centerX = 7;
 	this.centerY = 6;
 	this.radius = 6;
+>>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
 	Entity.call(this, game, 268, 550);
@@ -385,7 +414,11 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.centerX = 11;
 	this.centerY = 11;
 	this.bulletType = "EnemyDown";
+<<<<<<< HEAD
+	this.radius = 2;
+=======
 	this.radius = 11;
+>>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.isEnemy = true;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -545,7 +578,7 @@ Reimu.prototype.draw = function () {
 function Enemy2(game, spritesheet, x, y) {
 	this.x = x;
 	this.y = y;
-	this.animation = new Animation(spritesheet, 76, 76, 76, 1, 1, true, 1);
+	this.animation = new Animation(spritesheet, 28, 32, 1350, .5, 8, true, 1.5);
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
 	this.timer = Math.floor((Math.random()*8) + 3);
 	this.speed = 200;
@@ -598,12 +631,16 @@ function Enemy(game, spritesheet, x, y){
 	this.centerX = 16;
 	this.centerY = 24;
 	this.waiting = false;
-	this.maxShot = 16;
+	this.maxShot = 12;
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
 	this.bulletY = 50;
+<<<<<<< HEAD
+	this.radius = 5;
+=======
 	this.radius = 15;
+>>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.count = 0;
 	this.bulletInterval = 0;
 	this.totalInterval = 12;
@@ -1012,6 +1049,7 @@ Menu.prototype.draw = function(ctx) {
 
 
 AM.queueDownload("./img/desert_background.jpg");
+AM.queueDownload("./img/Touhou_pfb_sprites.png");
 AM.queueDownload("./img/reimu_hakurei.png");
 AM.queueDownload("./img/enemy.png")
 AM.queueDownload("./img/mini.png")
@@ -1032,10 +1070,37 @@ AM.downloadAll(function () {
     gameEngine.start();
     
     gameEngine.gameScore = gameScore;
-    gameEngine.showOutlines = true;
+    //gameEngine.showOutlines = true;
     
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+
+    gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 50));
+	/*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
+	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
+    
     spawnEnemies(gameEngine)
+    
+//	for(var i = 10000; i<=10500; i+=100)
+//    {
+//    	setTimeout(function()
+//	    {
+//    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 80);
+//    		tempEnemy.enemyType = "StraightDown";
+//    		gameEngine.addEntity(tempEnemy);
+//	    }, i);
+//    }
+//	for(var i = 2000; i < 5000; i +=500)
+//	{
+//		setTimeout(function()
+//		{ 
+//			tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/mini.png"), 500, 0);
+//			gameEngine.addEntity(tempEnemy);
+//		}, i);
+//	}
     
     console.log("All Done!");
 });
