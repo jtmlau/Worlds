@@ -155,6 +155,16 @@ GameEngine.prototype.update = function () {
 	var canvas = document.getElementById("hud");
 	var ctx = canvas.getContext("2d");
 	
+	ctx.font = "20px Arial";
+    ctx.fillText("Controls", 150, 20);
+    ctx.fillText("G: God Mode", 10, 50);
+    ctx.fillText("Space: Shoot", 200, 50);
+    ctx.fillText("Shift: Slow speed", 100, 200);
+    ctx.fillText("Left Arrow: Left", 10, 100);
+    ctx.fillText("Up Arrow: Up", 10, 150);
+    ctx.fillText("Right Arrow: Right", 200, 100);
+    ctx.fillText("Down Arrow: Down", 200, 150);
+    
 	if(this.space) this.play = true;
 	
 	if(this.play){
