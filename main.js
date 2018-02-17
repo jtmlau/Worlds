@@ -209,6 +209,13 @@ function enemyMovement(the_enemy)
 				the_enemy.removeFromWorld = true;
 			}	
 			break;
+		case "StraightDown":
+			the_enemy.y += the_enemy.game.clockTick * 20;
+			console.log("Enemy should move!");
+			if(the_enemy.y >1000) {
+				the_enemy.removeFromWorld = true;
+			}
+			break;
 	}
 }
 
@@ -551,6 +558,7 @@ Enemy.prototype.draw = function () {
 	this.animation.drawEnemyFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
 	
 	if(this.shoot) {
+		
 		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
 		tempEnemy.x = this.x+15;
 		tempEnemy.y = this.y+50;
@@ -579,7 +587,7 @@ Enemy.prototype.draw = function () {
 function Enemy3(game, spritesheet, x, y){
 	this.x = x;
 	this.y = y;
-	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation.
+	this.animation = new Animation(spritesheet, 76, 76, 76, 1, 1, true, 1); // Creates an Enemy animation.
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
 	this.radius = 5;
 	this.isEnemy = true;
@@ -602,16 +610,16 @@ Enemy3.prototype.update = function () {
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
 	}
 	this.y += 2;
-	if (this.y > 600) {
-		this.y = 0;
+	if (this.y > 700) {
+		this.removeFromWorld = true;
 	}
 	
 	
-	if (Math.floor(Math.random() * 60) > 50){
+	/*if (Math.floor(Math.random() * 60) > 50){
 		this.shoot = true;
 	}else{
 		this.shoot = false;
-	}
+	}*/
 	
 	bEnemy.forEach(function(element)
 	{
@@ -698,6 +706,23 @@ AM.downloadAll(function () {
     		gameEngine.addEntity(tempEnemy);
 	    }, i);
     }
+	for(var i = 10000; i<=10500; i+=100)
+    {
+    	setTimeout(function()
+	    {
+    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 80);
+    		tempEnemy.enemyType = "StraightDown";
+    		gameEngine.addEntity(tempEnemy);
+	    }, i);
+    }
+	for(var i = 2000; i < 5000; i +=500)
+	{
+		setTimeout(function()
+		{ 
+			tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/mini.png"), 500, 0);
+			gameEngine.addEntity(tempEnemy);
+		}, i);
+	}
     
     console.log("All Done!");
 });
