@@ -1277,6 +1277,10 @@ AM.queueDownload("./img/mini.png")
 AM.queueDownload("./img/battle.png")
 AM.queueDownload("./img/menu.png")
 
+AM.queueDownload("./audio/sennen.ogg")
+AM.queueDownload("./SFX/Attack3.ogg")
+AM.queueDownload("./SFX/Dead.ogg")
+
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
