@@ -172,21 +172,21 @@ function updateBullet(bullet)
 		break;
 	case "EnemyDown":
 		bullet.y += bullet.game.clockTick * bullet.speed;
-		if(bullet.y > 800){
+		if(bullet.y > 700){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDownLeft":
 		bullet.y += bullet.game.clockTick * bullet.speed;
 		bullet.x -= bullet.game.clockTick * 20;
-		if(bullet.y > 800){
+		if(bullet.y > 700){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDownRight":
 		bullet.y += bullet.game.clockTick * bullet.speed;
 		bullet.x += bullet.game.clockTick * 20;
-		if(bullet.y > 800){
+		if(bullet.y > 700){
 			bullet.removeFromWorld = true;
 		}
 		break;
