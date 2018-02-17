@@ -276,18 +276,13 @@ Reimu.prototype.update = function () {
 		this.isShooting = true;
 		this.bulletY = that.y;
 	}
-	if(this.game.z) {
-		if(!this.slow) {
-				
-			this.slow = true;
-			this.speed = 100;
-		}
+	if(this.game.c) 
+	{
+		this.speed = 100;
 	}
-	if(this.game.c) {
-		if(this.slow) {
-			this.slow = false;
-			this.speed = 200;
-		}
+	if(!this.game.c) 
+	{ // If the left arrow key is pressed.
+		this.speed = 200;
 	}
 	
 	if(this.game.left) { // If the left arrow key is pressed.
