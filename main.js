@@ -96,22 +96,22 @@ Animation.prototype.drawEnemyFrame = function (tick, ctx, x, y, left, right) {
                  this.frameHeight * this.scale); // sprite scale; y
 };
 Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
-    this.elapsedTime += tick;
+    /*this.elapsedTime += tick;
     if (this.isDone()) {
         if (this.loop) this.elapsedTime = 0;
     }
-    
+    */
     
     var frame = this.currentFrame();
-    var xindex = 0;
-    var yindex = 0;
+    var xindex = frame % this.sheetWidth;
+    var yindex = Math.floor(frame/this.sheetWidth);
     
     
     
-    /*.drawImage(this.spriteSheet,
-                 0, 0, 76, 76, x, y, // sprite position on screen.
-                 this.frameWidth * this.scale, // sprite scale; x
-                 this.frameHeight * this.scale); // sprite scale; y*/
+    ctx.drawImage(this.spriteSheet,
+                 xindex * this.frameWidth, yindex * this.frameHeight, 76, 76, x, y, // sprite position on screen.
+                 105, // sprite scale; x
+				105); // sprite scale; y
 };
 
 /*Animation.prototype.drawEnemy2Frame = function(tick, ctx, x, y) {
@@ -392,7 +392,7 @@ Enemy2.prototype.update = function() {
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
 		
 	}
-	this.y -= this.game.clockTick * this.speed;
+	//this.y -= this.game.clockTick * this.speed;
 	
 	Entity.prototype.update.call(this);
 }
@@ -500,6 +500,71 @@ Enemy.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
+function Enemy3(game, spritesheet, x, y){
+	this.x = x;
+	this.y = y;
+	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation.
+	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
+	
+	this.speed = 185;
+	this.bulletSpeed = 230;
+	this.bulletY = 50;
+	this.shoot = false;
+	this.ctx = game.ctx;
+	Entity.call(this, game, x, y);
+};
+
+Enemy3.prototype = new Entity();
+Enemy3.prototype.constructor = Enemy;
+
+Enemy3.prototype.update = function () {
+	
+	if(this.shoot){
+		this.bulletY += this.game.clockTick * this.bulletSpeed;
+	}
+	this.y += 1;
+	if (this.y > 700) {
+		this.y = 0;
+	}
+	
+	
+	if (Math.floor(Math.random() * 60)> 50){
+		this.shoot = true;
+	}else{
+		this.shoot = false;
+	}
+	
+	bEnemy.forEach(function(element)
+	{
+		element.Enemyupdate();
+		element.draw();
+		//console.log("update");
+	});
+	
+	Entity.prototype.update.call(this);
+}
+
+Enemy3.prototype.draw = function () {
+
+
+	this.animation.drawEnemyFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
+	
+	if(this.shoot) {
+		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"), this.x, this.y + this.bulletY);
+		tempEnemy.x = this.x+15;
+		tempEnemy.y = 50;
+		this.game.addEntity(tempEnemy);
+		
+		
+		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, 50);
+		bEnemy.push(tempEnemy);
+		
+		//console.log("shooting");
+	}
+	
+    Entity.prototype.draw.call(this);
+};
+
 
 AM.queueDownload("./img/desert_background.jpg");
 AM.queueDownload("./img/reimu_hakurei.png");
@@ -518,11 +583,11 @@ AM.downloadAll(function () {
 
     gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/desert_background.jpg")));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
-	gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/mini.png"), 400, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
     gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
 	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
 	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
-	gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/mini.png"), 400, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
     
     console.log("All Done!");
 });
