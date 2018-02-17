@@ -141,10 +141,10 @@ $(document).ready(function() {
 Background.prototype.draw = function () {
 };
 
-function updateBullet(type, bullet)
+function updateBullet(bullet)
 {
 	//switch cases for all different types of patterns
-	switch(type){
+	switch(bullet.bulletType){
 	
 	case "Reimu":
 		bullet.y -= bullet.game.clockTick * bullet.speed;
@@ -152,8 +152,14 @@ function updateBullet(type, bullet)
 	case "EnemyDown":
 		bullet.y += bullet.game.clockTick * bullet.speed;
 		break;
-	
-	
+	case "EnemyDownLeft":
+		bullet.y += bullet.game.clockTick * bullet.speed;
+		bullet.x -= bullet.game.clockTick * 20;
+		break;
+	case "EnemyDownRight":
+		bullet.y += bullet.game.clockTick * bullet.speed;
+		bullet.x += bullet.game.clockTick * 20;
+		break;
 	}
 }
 
@@ -180,13 +186,14 @@ function ReimuBullet(game, spritesheet) {
 	this.speed = 450;
 	this.X;
 	this.Y;
+	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
 	Entity.call(this, game, 400, 550);
 }
 
 ReimuBullet.prototype.update = function() {
     //this.y -= this.game.clockTick * this.speed;
-	updateBullet("Reimu", this)
+	updateBullet(this)
     
     Entity.prototype.update.call(this);
 }
@@ -205,12 +212,13 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.speed = Math.floor((Math.random() * 10) * 7)+ 55;
 	this.x = x;
 	this.y = y;
+	this.bulletType = "EnemyDown";
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
 }
 
 EnemyBullet.prototype.Enemyupdate = function() {
-	updateBullet("EnemyDown", this);
+	updateBullet(this);
 	//this.y += this.game.clockTick * this.speed;
     
     Entity.prototype.update.call(this);
@@ -428,11 +436,21 @@ Enemy.prototype.draw = function () {
 		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
 		tempEnemy.x = this.x+15;
 		tempEnemy.y = this.y+50;
+		tempEnemy.bulletType = "EnemyDownLeft";
 		this.game.addEntity(tempEnemy);
+		//this.shoot = false;
+		
+		//trying 2 bullet
+		tempEnemy2 = new EnemyBullet(this.game, AM.getAsset("./img/battle.png"), this.x, this.y + this.bulletY);
+		tempEnemy2.x = this.x+15;
+		tempEnemy2.y = this.y+50;
+		tempEnemy2.bulletType = "EnemyDownRight";
+		this.game.addEntity(tempEnemy2);
 		this.shoot = false;
 		
 		//this.animation.drawEnemyCircle(this.game.clockTick, this.ctx, this.x, 50);
 		bEnemy.push(tempEnemy);
+		bEnemy.push(tempEnemy2);
 		
 		
 		//console.log("shooting");
