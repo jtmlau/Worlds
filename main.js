@@ -1,6 +1,12 @@
 
 var AM = new AssetManager();
 
+function distance(a, b) {
+    var difX = a.x - b.x;
+    var difY = a.y - b.y;
+    return Math.sqrt(difX * difX + difY * difY);
+};
+
 function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
     this.frameWidth = frameWidth;
@@ -114,13 +120,6 @@ Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
 				105); // sprite scale; y
 };
 
-/*Animation.prototype.drawEnemy2Frame = function(tick, ctx, x, y) {
-	this.elapseTime += tick;
-	var frame = this.currentFrame();
-	var xindex = frame % this.sheetWidth;
-    var yindex = 0;
-	ctx.drawImage
-    */
 Animation.prototype.currentFrame = function () {
     return Math.floor(this.elapsedTime / this.frameDuration);
 };
@@ -199,6 +198,7 @@ function Reimu(game, spritesheet) {
     this.speed = 200;
     this.bulletSpeed = 230;
     this.bulletY = this.y;
+    this.radius = 3;
     this.isShooting = false;
 	this.slow = false;
     this.moveRight = false;
@@ -212,11 +212,30 @@ function Reimu(game, spritesheet) {
 ReimuBullet.prototype = new Entity();
 ReimuBullet.prototype.constructor = ReimuBullet;
 
+/*ReimuBullet.prototype.collideRight = function () {
+    return this.x + this.radius > 800;
+};
+ReimuBullet.prototype.collideLeft = function () {
+    return this.x - this.radius < 0;
+};
+ReimuBullet.prototype.collideBottom = function () {
+    return this.y + this.radius > 800;
+};
+ReimuBullet.prototype.collideTop = function () {
+    return this.y - this.radius < 0;
+};
+
+ReimuBullet.prototype.collide = function (other) {
+    return distance(this, other) < this.radius + other.radius;
+};
+*/
+
 function ReimuBullet(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
 	this.speed = 450;
 	this.X;
 	this.Y;
+	this.radius = 2;
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
 	Entity.call(this, game, 400, 550);
@@ -240,14 +259,32 @@ EnemyBullet.prototype.constructor = EnemyBullet;
 
 function EnemyBullet(game, spritesheet, x, y) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-	this.speed = Math.floor((Math.random() * 10) * 7)+ 55;
+	this.speed = Math.floor((Math.random() * 10) * 7) + 55;
 	this.x = x;
 	this.y = y;
 	this.bulletType = "EnemyDown";
+	this.radius = 4;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
 	Entity.call(this, game, x, y);
 }
+
+/*EnemyBullet.prototype.collideRight = function () {
+    return this.x + this.radius > 800;
+};
+EnemyBullet.prototype.collideLeft = function () {
+    return this.x - this.radius < 0;
+};
+EnemyBullet.prototype.collideBottom = function () {
+    return this.y + this.radius > 800;
+};
+EnemyBullet.prototype.collideTop = function () {
+    return this.y - this.radius < 0;
+};*/
+
+EnemyBullet.prototype.collide = function (other) {
+    return distance(this, other) < this.radius + other.radius;
+};
 
 EnemyBullet.prototype.Enemyupdate = function() {
 	updateBullet(this);
@@ -268,8 +305,28 @@ Reimu.prototype.constructor = Reimu;
 b = [];
 bEnemy = [];
 
+Reimu.prototype.collideRight = function () {
+    return this.x + this.radius > 800;
+};
+Reimu.prototype.collideLeft = function () {
+    return this.x - this.radius < 0;
+};
+
+Reimu.prototype.collideBottom = function () {
+    return this.y + this.radius > 800;
+};
+Reimu.prototype.collideTop = function () {
+    return this.y - this.radius < 0;
+};
+
+Reimu.prototype.collide = function (other) {
+    return distance(this, other) < this.radius + other.radius;
+};
+
 Reimu.prototype.update = function () {
-		
+	
+	Entity.prototype.update.call(this);
+	
 	var that = this;
 	
 	if(this.game.space) { // If the space key is pressed.
@@ -347,9 +404,16 @@ Reimu.prototype.update = function () {
 		element.draw();
 	});
 	
-
 	
-	Entity.prototype.update.call(this);
+	
+	for (var i = 0; i < this.game.entities.length; i++) {
+        var ent = this.game.entities[i];
+        if (this != ent && this.collide(ent)) {
+            this.removeFromWorld = true;
+            ent.removeFromWorld = true;
+        };
+    };
+
 };
 
 Reimu.prototype.draw = function () {
@@ -378,11 +442,6 @@ Reimu.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
-//function Enemy(game, spritesheet){
-//	this.animation = new Animation(spritesheet, 32, 47, 261, 0.75, 8, true, 1.5); // Creates an Enemy animation.
-//	this.speed = 185;
-//	
-//};
 function Enemy2(game, spritesheet, x, y) {
 	this.x = x;
 	this.y = y;
@@ -392,13 +451,33 @@ function Enemy2(game, spritesheet, x, y) {
 	this.speed = 200;
 	this.bulletSpeed = 250;
 	this.bulletY = 50;
+	this.radius = 5;
 	this.shoot = false;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
 };
 Enemy2.prototype = new Entity();
 Enemy2.prototype.constructor = Enemy2;
+
+Enemy2.prototype.collideRight = function () {
+    return this.x + this.radius > 800;
+};
+Enemy2.prototype.collideLeft = function () {
+    return this.x - this.radius < 0;
+};
+Enemy2.prototype.collideBottom = function () {
+    return this.y + this.radius > 800;
+};
+Enemy2.prototype.collideTop = function () {
+    return this.y - this.radius < 0;
+};
+
+Enemy2.prototype.collide = function (other) {
+    return distance(this, other) < this.radius + other.radius;
+};
+
 Enemy2.prototype.update = function() {
+	Entity.prototype.update.call(this);
 	//if this.timer 
 	if(this.shoot) {
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
@@ -406,8 +485,15 @@ Enemy2.prototype.update = function() {
 	}
 	//this.y -= this.game.clockTick * this.speed;
 	
-	Entity.prototype.update.call(this);
+	for (var i = 0; i < this.game.entities.length; i++) {
+        var ent = this.game.entities[i];
+        if (this != ent && this.collide(ent)) {
+            this.removeFromWorld = true;
+            ent.removeFromWorld = true;
+        };
+    };
 }
+
 Enemy2.prototype.draw = function() {
 	this.animation.drawEnemy2Frame(this.game.clockTick, this.ctx, this.ctx, this.x, this.y);
 	Entity.prototype.draw.call(this);
@@ -423,6 +509,7 @@ function Enemy(game, spritesheet, x, y){
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 230;
 	this.bulletY = 50;
+	this.radius = 5;
 	this.shoot = false;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
@@ -431,7 +518,26 @@ function Enemy(game, spritesheet, x, y){
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
+Enemy.prototype.collideRight = function () {
+    return this.x + this.radius > 800;
+};
+Enemy.prototype.collideLeft = function () {
+    return this.x - this.radius < 0;
+};
+Enemy.prototype.collideBottom = function () {
+    return this.y + this.radius > 800;
+};
+Enemy.prototype.collideTop = function () {
+    return this.y - this.radius < 0;
+};
+
+Enemy.prototype.collide = function (other) {
+    return distance(this, other) < this.radius + other.radius;
+};
+
 Enemy.prototype.update = function () {
+	Entity.prototype.update.call(this);
+	
 	//this.speed = Math.floor(Math.random() * 10)*100);
 	if(this.shoot){
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
@@ -475,8 +581,14 @@ Enemy.prototype.update = function () {
 		
 	});
 	
+	for (var i = 0; i < this.game.entities.length; i++) {
+        var ent = this.game.entities[i];
+        if (this != ent && this.collide(ent)) {
+            this.removeFromWorld = true;
+            ent.removeFromWorld = true;
+        };
+    };
 	
-	Entity.prototype.update.call(this);
 }
 
 Enemy.prototype.draw = function () {
@@ -504,8 +616,6 @@ Enemy.prototype.draw = function () {
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
 		
-		
-		
 		//console.log("shooting");
 	}
 	
@@ -517,7 +627,7 @@ function Enemy3(game, spritesheet, x, y){
 	this.y = y;
 	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation.
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
-	
+	this.radius = 5;
 	this.speed = 185;
 	this.bulletSpeed = 230;
 	this.bulletY = this.y + 50;
@@ -529,7 +639,25 @@ function Enemy3(game, spritesheet, x, y){
 Enemy3.prototype = new Entity();
 Enemy3.prototype.constructor = Enemy3;
 
+Enemy3.prototype.collideRight = function () {
+    return this.x + this.radius > 800;
+};
+Enemy3.prototype.collideLeft = function () {
+    return this.x - this.radius < 0;
+};
+Enemy3.prototype.collideBottom = function () {
+    return this.y + this.radius > 800;
+};
+Enemy3.prototype.collideTop = function () {
+    return this.y - this.radius < 0;
+};
+
+Enemy3.prototype.collide = function (other) {
+    return distance(this, other) < this.radius + other.radius;
+};
+
 Enemy3.prototype.update = function () {
+	Entity.prototype.update.call(this);
 	
 	if(this.shoot){
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
@@ -553,7 +681,13 @@ Enemy3.prototype.update = function () {
 		//console.log("update");
 	});
 	
-	Entity.prototype.update.call(this);
+	for (var i = 0; i < this.game.entities.length; i++) {
+        var ent = this.game.entities[i];
+        if (this != ent && this.collide(ent)) {
+            this.removeFromWorld = true;
+            ent.removeFromWorld = true;
+        };
+    };
 }
 
 Enemy3.prototype.draw = function () {
@@ -592,10 +726,9 @@ AM.downloadAll(function () {
     var gameEngine = new GameEngine();
     gameEngine.init(ctx);
     gameEngine.start();
+    
+    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 
-    gameEngine.addEntity(new Background(gameEngine, AM.getAsset("./img/desert_background.jpg")));
-    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png")));
-	
     gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
 	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
 	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
