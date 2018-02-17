@@ -64,6 +64,10 @@ GameEngine.prototype.startInput = function () {
     		that.space = true;
     		break;
     		
+    	case "ShiftLeft":
+    		that.shift = true;
+    		break;
+    		
     	case "KeyW":
     		that.up = true;
     		break;
@@ -96,6 +100,10 @@ GameEngine.prototype.startInput = function () {
     	{
     	case "Space":
     		that.space = false;
+    		break;
+    		
+    	case "ShiftLeft":
+    		that.shift = false;
     		break;
     		
     	case "KeyW":
