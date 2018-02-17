@@ -107,14 +107,12 @@ Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
     
     
     var frame = this.currentFrame();
-    var xindex = 1042 + ((frame % this.sheetWidth)* this.frameWidth);
+    var xindex = 1045 + ((frame % this.sheetWidth)* 32);
     var yindex = 980;
-    
-    
     
     ctx.drawImage(this.spriteSheet,
     		xindex, 980,  // (x,y) source from sheet
-            this.frameWidth, this.frameHeight, // (x,y) size of sprite.
+            32, 35, // (x,y) size of sprite.
             300, 50, // sprite position on screen.
             this.frameWidth * this.scale, // sprite scale; x
             this.frameHeight * this.scale); // sprite scale; y
