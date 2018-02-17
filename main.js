@@ -141,6 +141,22 @@ $(document).ready(function() {
 Background.prototype.draw = function () {
 };
 
+function updateBullet(type, bullet)
+{
+	//switch cases for all different types of patterns
+	switch(type){
+	
+	case "Reimu":
+		bullet.y -= bullet.game.clockTick * bullet.speed;
+		break;
+	case "EnemyDown":
+		bullet.y += bullet.game.clockTick * bullet.speed;
+		break;
+	
+	
+	}
+}
+
 function Reimu(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
@@ -169,7 +185,8 @@ function ReimuBullet(game, spritesheet) {
 }
 
 ReimuBullet.prototype.update = function() {
-    this.y -= this.game.clockTick * this.speed;
+    //this.y -= this.game.clockTick * this.speed;
+	updateBullet("Reimu", this)
     
     Entity.prototype.update.call(this);
 }
@@ -193,7 +210,8 @@ function EnemyBullet(game, spritesheet, x, y) {
 }
 
 EnemyBullet.prototype.Enemyupdate = function() {
-	this.y += this.game.clockTick * this.speed;
+	updateBullet("EnemyDown", this);
+	//this.y += this.game.clockTick * this.speed;
     
     Entity.prototype.update.call(this);
 }
@@ -236,8 +254,6 @@ Reimu.prototype.update = function () {
 			this.bulletAnimation.elapsedTime = 0;
 			this.isShooting = false;
 		}
-		
-		
 		
 		//loop?
 		
