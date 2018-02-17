@@ -209,6 +209,7 @@ function updateBullet(bullet)
 		}
 		break;
 	}
+	
 }
 
 function enemyMovement(the_enemy)
@@ -233,6 +234,12 @@ function enemyMovement(the_enemy)
 			if(the_enemy.y >1000) {
 				the_enemy.removeFromWorld = true;
 			}
+			break;
+		case "ClockwiseCircle":
+			angle = 0.1 * the_enemy.currentState;
+			the_enemy.x += (1+angle)*Math.cos(angle);
+			the_enemy.y += (1+angle)*Math.sin(angle);
+			the_enemy.currentState++;
 			break;
 	}
 }
@@ -500,6 +507,7 @@ function Enemy(game, spritesheet, x, y){
 	this.bulletInterval = 0;
 	this.isEnemy = true;
 	this.shoot = false;
+	this.currentState = 0;
 	this.killScore = 100;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
@@ -516,12 +524,14 @@ Enemy.prototype.update = function () {
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
 	}
 	
+	if(this.x > 300 && this.x < 400)
+	{
+		this.enemyType = "ClockwiseCircle";
+	}
 	
 	
 	//should update enemy movement
 	enemyMovement(this);
-	
-	
 	//OLD MOVING LEFT RIGHT CODE
 	
 	/*if(this.x <= 0 ){
@@ -713,35 +723,9 @@ Enemy3.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
-
-AM.queueDownload("./img/desert_background.jpg");
-AM.queueDownload("./img/reimu_hakurei.png");
-AM.queueDownload("./img/enemy.png")
-AM.queueDownload("./img/mini.png")
-AM.queueDownload("./img/battle.png")
-
-
-AM.downloadAll(function () {
-    var canvas = document.getElementById("gameWorld");
-    var ctx = canvas.getContext("2d");
-
-    var gameEngine = new GameEngine();
-    gameEngine.init(ctx);
-    gameEngine.start();
-    
-    gameEngine.gameScore = gameScore;
-    
-    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
-
-    /*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
-	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
-	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
-    
-    for(var i = 2000; i<=2500; i+=100)
+function spawnEnemies(gameEngine)
+{
+	for(var i = 2000; i<=2500; i+=100)
     {
     	setTimeout(function()
 	    {
@@ -791,6 +775,37 @@ AM.downloadAll(function () {
     		gameEngine.addEntity(tempEnemy2);
 	    }, i);
     }
+}
+
+AM.queueDownload("./img/desert_background.jpg");
+AM.queueDownload("./img/reimu_hakurei.png");
+AM.queueDownload("./img/enemy.png")
+AM.queueDownload("./img/mini.png")
+AM.queueDownload("./img/battle.png")
+
+
+AM.downloadAll(function () {
+    var canvas = document.getElementById("gameWorld");
+    var ctx = canvas.getContext("2d");
+
+    var gameEngine = new GameEngine();
+    gameEngine.init(ctx);
+    gameEngine.start();
+    
+    gameEngine.gameScore = gameScore;
+    
+    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+
+    /*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
+	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
+	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
+    
+    spawnEnemies(gameEngine)
+    
 //	for(var i = 10000; i<=10500; i+=100)
 //    {
 //    	setTimeout(function()
