@@ -68,19 +68,19 @@ GameEngine.prototype.startInput = function () {
     		that.shift = true;
     		break;
     		
-    	case "KeyW":
+    	case "ArrowUp":
     		that.up = true;
     		break;
     		
-    	case "KeyA":
+    	case "ArrowLeft":
     		that.left = true;
     		break;
     		
-    	case "KeyS":
+    	case "ArrowDown":
     		that.down = true;
     		break;
     		
-    	case "KeyD":
+    	case "ArrowRight":
     		that.right = true;
     		break;
     		
@@ -107,19 +107,19 @@ GameEngine.prototype.startInput = function () {
     		that.shift = false;
     		break;
     		
-    	case "KeyW":
+    	case "ArrowUp":
     		that.up = false;
     		break;
     		
-    	case "KeyA":
+    	case "ArrowLeft":
     		that.left = false;
     		break;
     		
-    	case "KeyS":
+    	case "ArrowDown":
     		that.down = false;
     		break;
     		
-    	case "KeyD":
+    	case "ArrowRight":
     		that.right = false;
     		break;
     		
