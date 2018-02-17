@@ -986,7 +986,7 @@ Menu.prototype.draw = function(ctx) {
 	if(this.game.play) return;
 	if(!this.game.play) {
 		
-		ctx.drawImage(this.sprite, 0, 0);
+		//ctx.drawImage(this.sprite, 0, 0);
 		ctx.font = "24pt Times New Roman";
 		ctx.fillStyle = "white";
 		ctx.fillText("Space to start", 200, 200);
@@ -1017,7 +1017,7 @@ AM.downloadAll(function () {
     gameEngine.start();
     
     gameEngine.gameScore = gameScore;
-    gameEngine.showOutlines = true;
+    //gameEngine.showOutlines = true;
     
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 
