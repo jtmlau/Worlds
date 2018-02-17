@@ -83,10 +83,6 @@ GameEngine.prototype.startInput = function () {
     	case "KeyD":
     		that.right = true;
     		break;
-    	
-    	case "ShiftLeft":
-    		that.shift = true;
-    		break;
     	}
     	
     	e.preventDefault();
@@ -121,9 +117,6 @@ GameEngine.prototype.startInput = function () {
     	case "KeyD":
     		that.right = false;
     		break;
-    	case "ShiftLeft":
-    		that.shift = false;
-    		break;
     	}
     	
     	e.preventDefault();
@@ -148,6 +141,10 @@ GameEngine.prototype.draw = function () {
 };
 
 GameEngine.prototype.update = function () {
+	var canvas = document.getElementById("hud");
+	var ctx = canvas.getContext("2d");
+
+	ctx.strokeText("Score: " + this.gameScore , 0, 50);
     var entitiesCount = this.entities.length;
 
     for (var i = 0; i < entitiesCount; i++) {
@@ -164,9 +161,15 @@ GameEngine.prototype.update = function () {
         }
     }
     
+
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.font="20px Sans-Serif";
+    
+    
     this.gameScore = this.gameScore + 1;
     
-    //console.log(this.gameScore);
+    ctx.strokeText("Score: " + this.gameScore , 0, 50);
+    
     
     if(this.gameScore > 20000) this.gameEnd = true;
     
@@ -176,6 +179,8 @@ GameEngine.prototype.update = function () {
         }
     	this.clockTick = 0;
     }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     //console.log(this.entities.length)
 };
 
