@@ -338,7 +338,7 @@ function Reimu(game, spritesheet) {
     this.moveUp = false;
     this.moveDown = false;
     this.ctx = game.ctx;
-    Entity.call(this, game, 300, 550);
+    Entity.call(this, game, 268, 550);
 }
 
 ReimuBullet.prototype = new Entity();
@@ -352,7 +352,7 @@ function ReimuBullet(game, spritesheet) {
 	this.radius = 2;
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
-	Entity.call(this, game, 300, 550);
+	Entity.call(this, game, 268, 550);
 }
 
 ReimuBullet.prototype.update = function() {
@@ -917,7 +917,7 @@ function spawnEnemies(gameEngine)
 	{
 	setTimeout(function()
 			{
-				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -80);
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowLeft";
 				tempEnemy.attackType = "FullSpread";
@@ -931,7 +931,7 @@ function spawnEnemies(gameEngine)
 	{
 	setTimeout(function()
 			{
-				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -80);
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -50);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowRight";
 				tempEnemy.attackType = "FullSpread";
