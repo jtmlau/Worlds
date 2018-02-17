@@ -155,6 +155,8 @@ Animation.prototype.isDone = function () {
 function Background(game, spritesheet) {
 	this.x = 0;
 	this.y = 0;
+	this.centerX = 0;
+	this.centerY = 0;
 	this.spritesheet = spritesheet;
 	this.game = game;
 	this.speed = 2;
@@ -353,7 +355,9 @@ function Reimu(game, spritesheet) {
     this.speed = 350;
     this.bulletSpeed = 230;
     this.bulletY = this.y;
-    this.radius = 3;
+    this.centerX = 23;
+    this.centerY = 28;
+    this.radius = 4;
     this.isShooting = false;
 	this.slow = false;
 	this.isHero = true;
@@ -374,7 +378,13 @@ function ReimuBullet(game, spritesheet) {
 	this.speed = 450;
 	this.X;
 	this.Y;
+<<<<<<< HEAD
 	this.radius = 2;
+=======
+	this.centerX = 7;
+	this.centerY = 6;
+	this.radius = 6;
+>>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
 	Entity.call(this, game, 268, 550);
@@ -401,8 +411,14 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.speed = Math.floor((Math.random() * 12) * 3);//	 + 55;
 	this.x = x;
 	this.y = y;
+	this.centerX = 11;
+	this.centerY = 11;
 	this.bulletType = "EnemyDown";
+<<<<<<< HEAD
 	this.radius = 2;
+=======
+	this.radius = 11;
+>>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.isEnemy = true;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -612,13 +628,19 @@ function Enemy(game, spritesheet, x, y){
 	this.enemyType = "StraightLeft";
 	this.nextType = "StraightLeft";
 	this.attackType = "Star";
+	this.centerX = 16;
+	this.centerY = 24;
 	this.waiting = false;
 	this.maxShot = 12;
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
 	this.bulletY = 50;
+<<<<<<< HEAD
 	this.radius = 5;
+=======
+	this.radius = 15;
+>>>>>>> 1507b8de98195697ca6d33955d781ccb1514d1ef
 	this.count = 0;
 	this.bulletInterval = 0;
 	this.isEnemy = true;
