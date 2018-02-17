@@ -259,7 +259,7 @@ EnemyBullet.prototype.constructor = EnemyBullet;
 
 function EnemyBullet(game, spritesheet, x, y) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-	this.speed = Math.floor((Math.random() * 10) * 7) + 55;
+	this.speed = Math.floor((Math.random() * 10) * 7);//	 + 55;
 	this.x = x;
 	this.y = y;
 	this.bulletType = "EnemyDown";
@@ -306,7 +306,7 @@ b = [];
 bEnemy = [];
 
 Reimu.prototype.collideRight = function () {
-    return this.x + this.radius > 800;
+    return this.x + this.radius > 600;
 };
 Reimu.prototype.collideLeft = function () {
     return this.x - this.radius < 0;
@@ -519,13 +519,13 @@ Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
 
 Enemy.prototype.collideRight = function () {
-    return this.x + this.radius > 800;
+    return this.x + this.radius > 600;
 };
 Enemy.prototype.collideLeft = function () {
     return this.x - this.radius < 0;
 };
 Enemy.prototype.collideBottom = function () {
-    return this.y + this.radius > 800;
+    return this.y + this.radius > 600;
 };
 Enemy.prototype.collideTop = function () {
     return this.y - this.radius < 0;
@@ -548,7 +548,7 @@ Enemy.prototype.update = function () {
 		this.moveRight = true;
 		this.moveLeft= false;
 		this.x += this.game.clockTick * this.speed;
-	}else if(this.x >= 768){
+	}else if(this.x >= 568){
 		this.moveRight = false;
 		this.moveLeft = true;
 		
