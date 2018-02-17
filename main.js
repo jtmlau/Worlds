@@ -175,15 +175,15 @@ function updateBullet(bullet)
 		}
 		break;
 	case "EnemyDownLeft":
-		bullet.y += bullet.game.clockTick * bullet.speed;
-		bullet.x -= bullet.game.clockTick * 20;
+		bullet.y += bullet.game.clockTick * bullet.speed + 5;
+		bullet.x -= bullet.game.clockTick * 40;
 		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
 		break;
 	case "EnemyDownRight":
-		bullet.y += bullet.game.clockTick * bullet.speed;
-		bullet.x += bullet.game.clockTick * 20;
+		bullet.y += bullet.game.clockTick * bullet.speed + 5;
+		bullet.x += bullet.game.clockTick * 40;
 		if(bullet.y > 750 || bullet.x > 650 || bullet.x < -50){
 			bullet.removeFromWorld = true;
 		}
@@ -196,15 +196,13 @@ function enemyMovement(the_enemy)
 	switch(the_enemy.enemyType)
 	{
 		case "StraightRight":
-			the_enemy.x += the_enemy.game.clockTick * 500;
-			console.log("Enemy should move!");
+			the_enemy.x += the_enemy.game.clockTick * 650;
 			if(the_enemy.x > 1000) {
 				the_enemy.removeFromWorld = true;
 			}	
 			break;
 		case "StraightLeft":
-			the_enemy.x -= the_enemy.game.clockTick * 500;
-			console.log("Enemy should move!");
+			the_enemy.x -= the_enemy.game.clockTick * 650;
 			if(the_enemy.x < -200) {
 				the_enemy.removeFromWorld = true;
 			}	
@@ -467,9 +465,11 @@ function Enemy(game, spritesheet, x, y){
 	//this.moveLeft = false;
 	this.enemyType = "StraightLeft";
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
-	this.bulletSpeed = 200;
+	this.bulletSpeed = 400;
 	this.bulletY = 50;
 	this.radius = 5;
+	this.count = 0;
+	this.bulletInterval = 0;
 	this.isEnemy = true;
 	this.shoot = false;
 	this.killScore = 100;
@@ -520,10 +520,25 @@ Enemy.prototype.update = function () {
 		this.shoot = false;
 	}*/
 
-	if (Math.floor(Math.random() * 100)> 90) {
+	/*if (Math.floor(Math.random() * 100)> 90) {
 		this.shoot = true;
 	}else{
 		this.shoot = false;
+	}*/
+	
+	if(this.count < 12)
+	{
+		if(this.bulletInterval === 0)
+		{
+			this.shoot = true;
+			this.count++;
+			this.bulletInterval = 8;
+		}
+		else
+		{
+			this.shoot = false;
+		}
+		this.bulletInterval--;
 	}
 	
 	/*bEnemy.forEach(function(element)
@@ -689,7 +704,7 @@ AM.downloadAll(function () {
 	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
 	    }, i);
     }
-    for(var i = 8000; i<=8500; i+=100)
+    for(var i = 6000; i<=6500; i+=100)
     {
     	setTimeout(function()
 	    {
