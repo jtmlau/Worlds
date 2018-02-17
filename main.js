@@ -917,7 +917,7 @@ function spawnEnemies(gameEngine)
 	{
 	setTimeout(function()
 			{
-				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -80);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowLeft";
 				tempEnemy.attackType = "FullSpread";
@@ -931,7 +931,7 @@ function spawnEnemies(gameEngine)
 	{
 	setTimeout(function()
 			{
-				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -50);
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -80);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowRight";
 				tempEnemy.attackType = "FullSpread";
