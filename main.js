@@ -107,14 +107,12 @@ Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
     
     
     var frame = this.currentFrame();
-    var xindex = 1042 + ((frame % this.sheetWidth)* this.frameWidth);
+    var xindex = 1045 + ((frame % this.sheetWidth)* 32);
     var yindex = 980;
-    
-    
     
     ctx.drawImage(this.spriteSheet,
     		xindex, 980,  // (x,y) source from sheet
-            this.frameWidth, this.frameHeight, // (x,y) size of sprite.
+            32, 35, // (x,y) size of sprite.
             300, 50, // sprite position on screen.
             this.frameWidth * this.scale, // sprite scale; x
             this.frameHeight * this.scale); // sprite scale; y
@@ -406,11 +404,7 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.y = y;
 	this.centerX = 11;
 	this.centerY = 11;
-<<<<<<< HEAD
-	this.bulletType = "EnemyDown";
-=======
 	this.bulletType = "EnemyDown"
->>>>>>> 1e48e957247b50b2f7c9a8f290a7b4bff4df1f11
 	this.radius = 11;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
@@ -629,11 +623,7 @@ function Enemy(game, spritesheet, x, y){
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
 	this.bulletY = 50;
-<<<<<<< HEAD
-	this.radius = 15;
-=======
 	this.radius = 15
->>>>>>> 1e48e957247b50b2f7c9a8f290a7b4bff4df1f11
 	this.count = 0;
 	this.bulletInterval = bulletInterval = Math.floor(Math.random() * 11) + 1;
 	this.totalInterval = 12;
