@@ -343,7 +343,7 @@ Reimu.prototype.update = function () {
 		
 		//this.bulletY -= this.game.clockTick * this.bulletSpeed; // Bullet moves towards the top of the screen
 	}if(this.moveRight){
-		if(this.x < 750) {
+		if(this.x < 550) {
 		this.x += this.game.clockTick * this.speed; // Reimu moves right towards the side of the screen
 		}
 	}if(this.moveLeft){
@@ -355,7 +355,7 @@ Reimu.prototype.update = function () {
 		this.y -= this.game.clockTick * this.speed; // Reimu moves towards the top of the screen
 		}
 	}if(this.moveDown){
-		if(this.y < 600) {
+		if(this.y < 650) {
 		
 		
 		this.y += this.game.clockTick * this.speed; // Reimu moves towards the bottom of the screen
