@@ -16,6 +16,7 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.scale = scale;
 }
 
+
 Animation.prototype.drawReimuFrame = function (tick, ctx, x, y, left, right) {
     this.elapsedTime += tick;
     if (this.isDone()) {
@@ -888,18 +889,51 @@ function spawnEnemies(gameEngine)
     	    
 }
 
+function Menu(game, sprite) {
+	this.sprite = sprite;
+	Entity.call(this, game, 0, 0);
+}
+Menu.prototype = new Entity();
+Menu.prototype.constructor = Menu;
+Menu.prototype.reset = function() {
+		this.game.play = false;
+}
+Menu.update = function() {
+	if(this.game.space) {
+		this.game.play = true;
+	}
+}
+Menu.prototype.draw = function(ctx) {
+	if(this.game.play) return;
+	if(!this.game.play) {
+		
+		ctx.drawImage(this.sprite, 0, 0);
+		ctx.font = "24pt Times New Roman";
+		ctx.fillStyle = "white";
+		ctx.fillText("Space to start", 200, 200);
+		ctx.fillStyle = "black";
+		ctx.strokeText("Space to start", 200, 200);
+	}
+}
+
+
 AM.queueDownload("./img/desert_background.jpg");
 AM.queueDownload("./img/reimu_hakurei.png");
 AM.queueDownload("./img/enemy.png")
 AM.queueDownload("./img/mini.png")
 AM.queueDownload("./img/battle.png")
+AM.queueDownload("./img/menu.png")
 
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
+	var gameEngine = new GameEngine();
+	gameEngine.play = false;
+	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
+	gameEngine.addEntity(menu);
 
-    var gameEngine = new GameEngine();
+    
     gameEngine.init(ctx);
     gameEngine.start();
     
