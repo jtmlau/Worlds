@@ -79,9 +79,6 @@ GameEngine.prototype.startInput = function () {
     	case "KeyD":
     		that.right = true;
     		break;
-    	case "ShiftLeft":
-    		that.shift = true;
-    		break;
     	}
     	
     	e.preventDefault();
@@ -111,9 +108,6 @@ GameEngine.prototype.startInput = function () {
     		
     	case "KeyD":
     		that.right = false;
-    		break;
-    	case "ShiftLeft":
-    		that.shift = false;
     		break;
     	}
     	
