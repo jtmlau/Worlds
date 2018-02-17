@@ -222,7 +222,19 @@ function enemyMovement(the_enemy)
 				the_enemy.removeFromWorld = true;
 			}	
 			break;
+		case "StraightRightLoop":
+			the_enemy.x += the_enemy.game.clockTick * 650;
+			if(the_enemy.x > 1000) {
+				the_enemy.removeFromWorld = true;
+			}	
+			break;
 		case "StraightLeft":
+			the_enemy.x -= the_enemy.game.clockTick * 650;
+			if(the_enemy.x < -200) {
+				the_enemy.removeFromWorld = true;
+			}	
+			break;
+		case "StraightLeftLoop":
 			the_enemy.x -= the_enemy.game.clockTick * 650;
 			if(the_enemy.x < -200) {
 				the_enemy.removeFromWorld = true;
@@ -237,9 +249,25 @@ function enemyMovement(the_enemy)
 			break;
 		case "ClockwiseCircle":
 			angle = 0.1 * the_enemy.currentState;
-			the_enemy.x += (1+angle)*Math.cos(angle);
-			the_enemy.y += (1+angle)*Math.sin(angle);
+			the_enemy.x += 45 * the_enemy.game.clockTick * ((1+angle)*Math.cos(angle));
+			the_enemy.y += 45 *  the_enemy.game.clockTick * ((1+angle)*Math.sin(angle));
 			the_enemy.currentState++;
+			
+			if(the_enemy.currentState > 120)
+			{
+				the_enemy.enemyType = the_enemy.nextType;
+			}
+			break;
+		case "CounterClockwiseCircle":
+			angle = 0.1 * the_enemy.currentState;
+			the_enemy.x -= 45 * the_enemy.game.clockTick * ((1+angle)*Math.cos(angle));
+			the_enemy.y += 45 * the_enemy.game.clockTick * ((1+angle)*Math.sin(angle));
+			the_enemy.currentState++;
+			
+			if(the_enemy.currentState > 120)
+			{
+				the_enemy.enemyType = the_enemy.nextType;
+			}
 			break;
 	}
 }
@@ -250,7 +278,7 @@ function Reimu(game, spritesheet) {
     this.speed = 200;
     this.bulletSpeed = 230;
     this.bulletY = this.y;
-    this.radius = 3;
+    this.radius = -1;
     this.isShooting = false;
 	this.slow = false;
 	this.isHero = true;
@@ -499,6 +527,9 @@ function Enemy(game, spritesheet, x, y){
 	//this.moveRight = true;
 	//this.moveLeft = false;
 	this.enemyType = "StraightLeft";
+	this.nextType = "StraightLeft";
+	this.storedX = 0;
+	this.storedY = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 400;
 	this.bulletY = 50;
@@ -507,7 +538,7 @@ function Enemy(game, spritesheet, x, y){
 	this.bulletInterval = 0;
 	this.isEnemy = true;
 	this.shoot = false;
-	this.currentState = 0;
+	this.currentState = 60;
 	this.killScore = 100;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
@@ -526,7 +557,18 @@ Enemy.prototype.update = function () {
 	
 	if(this.x > 300 && this.x < 400)
 	{
-		this.enemyType = "ClockwiseCircle";
+		if(this.enemyType === "StraightRightLoop")
+		{
+			this.storedX = this.x;
+			this.storedY = this.y;
+			this.enemyType = "ClockwiseCircle";
+		}
+		if(this.enemyType === "StraightLeftLoop")
+		{
+			this.storedX = this.x;
+			this.storedY = this.y;
+			this.enemyType = "CounterClockwiseCircle";
+		}
 	}
 	
 	
@@ -749,7 +791,8 @@ function spawnEnemies(gameEngine)
     	setTimeout(function()
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 40);
-    		tempEnemy.enemyType = "StraightRight";
+    		tempEnemy.enemyType = "StraightRightLoop";
+    		tempEnemy.nextType = "StraightRight";
     		gameEngine.addEntity(tempEnemy);
 	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
 	    }, i);
@@ -759,7 +802,8 @@ function spawnEnemies(gameEngine)
     	setTimeout(function()
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 100);
-    		tempEnemy.enemyType = "StraightLeft";
+    		tempEnemy.enemyType = "StraightLeftLoop";
+    		tempEnemy.nextType = "StraightLeft";
     		gameEngine.addEntity(tempEnemy);
 	    }, i);
     }
