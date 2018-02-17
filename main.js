@@ -198,6 +198,18 @@ function updateBullet(bullet)
 	}
 }
 
+function enemyMovement(the_enemy)
+{
+	switch(the_enemy.enemyType)
+	{
+		case "StraightRight":
+			//this.x += this.game.clockTick * 30;
+			console.log("Enemy should move!");
+			
+			break;
+	}
+}
+
 function Reimu(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
@@ -340,11 +352,11 @@ Reimu.prototype.update = function () {
 		this.isShooting = true;
 		this.bulletY = that.y;
 	}
-	if(this.game.c) 
+	if(this.game.shift) 
 	{
 		this.speed = 100;
 	}
-	if(!this.game.c) 
+	if(!this.game.shift) 
 	{ // If the left arrow key is pressed.
 		this.speed = 200;
 	}
@@ -512,8 +524,9 @@ function Enemy(game, spritesheet, x, y){
 	this.x = x;
 	this.y = y;
 	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation
-	this.moveRight = true;
-	this.moveLeft = false;
+	//this.moveRight = true;
+	//this.moveLeft = false;
+	this.enemyType = "StraightRight";
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 200;
 	this.bulletY = 50;
@@ -553,7 +566,15 @@ Enemy.prototype.update = function () {
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
 	}
 	
-	if(this.x <= 0 ){
+	
+	
+	//should update enemy movement
+	enemyMovement(this);
+	
+	
+	//OLD MOVING LEFT RIGHT CODE
+	
+	/*if(this.x <= 0 ){
 		
 		this.moveRight = true;
 		this.moveLeft= false;
@@ -569,7 +590,7 @@ Enemy.prototype.update = function () {
 	
 	if(this.moveRight){
 		this.x += this.game.clockTick * this.speed;
-	}
+	}*/
 	/*firestart = Math.floor((Math.random() * 8) * 100);
 	if (this.x === firestart) {
 		this.shoot = true;
@@ -745,13 +766,18 @@ AM.downloadAll(function () {
     
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 
-    gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
+    /*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 400, 50));
 	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 10, 350));
 	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));
+	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
+    
+    setTimeout(function()
+    {
+    	gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 50, 100));
+    }, 2000);
     
     console.log("All Done!");
 });
