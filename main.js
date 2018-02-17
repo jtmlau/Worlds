@@ -278,10 +278,11 @@ function Reimu(game, spritesheet) {
     this.speed = 200;
     this.bulletSpeed = 230;
     this.bulletY = this.y;
-    this.radius = -1;
+    this.radius = 3;
     this.isShooting = false;
 	this.slow = false;
 	this.isHero = true;
+	this.canCollide = true;
     this.moveRight = false;
     this.moveLeft = false;
     this.moveUp = false;
@@ -360,6 +361,12 @@ Reimu.prototype.update = function () {
 		//console.log("update");
 		
 	});
+	
+	if(this.game.god){
+		this.canCollide = false;
+	} else{
+		this.canCollide = true;
+	}
 	
 	Entity.prototype.update.call(this);
 	
@@ -442,7 +449,7 @@ Reimu.prototype.update = function () {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && ent.isEnemy) {
+        if (this != ent && this.collide(ent) && ent.isEnemy && this.canCollide) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameEnd = true;
@@ -507,10 +514,11 @@ Enemy2.prototype.update = function() {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && !ent.isEnemy) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy && ent.canCollide) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
+            if(ent.isHero) this.game.gameEnd = true;
         };
     };
 }
@@ -631,7 +639,7 @@ Enemy.prototype.update = function () {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && !ent.isEnemy) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy && ent.canCollide) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
@@ -736,10 +744,11 @@ Enemy3.prototype.update = function () {
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && !ent.isEnemy) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy && ent.canCollide) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
+            if(ent.isHero) this.game.gameEnd = true;
         };
     };
 }

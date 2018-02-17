@@ -83,6 +83,11 @@ GameEngine.prototype.startInput = function () {
     	case "KeyD":
     		that.right = true;
     		break;
+    		
+    	case "KeyG":
+    		if(!that.god)that.god = true;
+    		else that.god = false;
+    		break;
     	}
     	
     	e.preventDefault();
@@ -117,6 +122,10 @@ GameEngine.prototype.startInput = function () {
     	case "KeyD":
     		that.right = false;
     		break;
+    		
+    	/*case "KeyG":
+    		that.god = false;
+    		break;*/
     	}
     	
     	e.preventDefault();
@@ -143,8 +152,10 @@ GameEngine.prototype.draw = function () {
 GameEngine.prototype.update = function () {
 	var canvas = document.getElementById("hud");
 	var ctx = canvas.getContext("2d");
-
-	ctx.strokeText("Score: " + this.gameScore , 0, 50);
+	
+	ctx.fillStyle = 'brown';
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	
     var entitiesCount = this.entities.length;
 
     for (var i = 0; i < entitiesCount; i++) {
@@ -160,15 +171,19 @@ GameEngine.prototype.update = function () {
             this.entities.splice(i, 1);
         }
     }
-    
 
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font="20px Sans-Serif";
+    ctx.save();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    var stringScore = "Score: " + this.gameScore;
+    ctx.fillStyle = 'black';
+    ctx.font="20px Arial";
+    var text_score = stringScore;
     
-    
+    ctx.fillText(stringScore, 0, 50);
     this.gameScore = this.gameScore + 1;
     
-    ctx.strokeText("Score: " + this.gameScore , 0, 50);
+    ctx.restore();
     
     
     if(this.gameScore > 20000) this.gameEnd = true;
