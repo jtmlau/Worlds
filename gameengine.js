@@ -155,57 +155,62 @@ GameEngine.prototype.update = function () {
 	var canvas = document.getElementById("hud");
 	var ctx = canvas.getContext("2d");
 	
+	if(this.space) this.play = true;
 	
-    var entitiesCount = this.entities.length;
+	if(this.play){
+		
+		var entitiesCount = this.entities.length;
 
-    for (var i = 0; i < entitiesCount; i++) {
-        var entity = this.entities[i];
+	    for (var i = 0; i < entitiesCount; i++) {
+	        var entity = this.entities[i];
 
-        if (!entity.removeFromWorld) {
-            entity.update();
-        }
-    }
+	        if (!entity.removeFromWorld) {
+	            entity.update();
+	        }
+	    }
 
-    for (var i = this.entities.length - 1; i >= 0; --i) {
-        if (this.entities[i].removeFromWorld) {
-            this.entities.splice(i, 1);
-        }
-    }
+	    for (var i = this.entities.length - 1; i >= 0; --i) {
+	        if (this.entities[i].removeFromWorld) {
+	            this.entities.splice(i, 1);
+	        }
+	    }
 
-    /*ctx.save();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    var stringScore = "Score: " + this.gameScore;
-    ctx.fillStyle = 'black';
-    ctx.font="20px Arial";
-    var text_score = stringScore;
-    
-    ctx.fillText(stringScore, 0, 50);*/
-    ctx.font = "20px Arial";
-    ctx.fillText("Controls", 150, 20);
-    ctx.fillText("G: God Mode", 10, 50);
-    ctx.fillText("Left: Left Arrow", 10, 100);
-    ctx.fillText("Up: Up Arrow", 10, 150);
-    ctx.fillText("Right: Right Arrow", 200, 100);
-    ctx.fillText("Down: Down Arrow", 200, 150);
-    
-    this.endGameScore = this.endGameScore + 1;
-    this.gameScore = this.gameScore + this.endGameScore;
-    //ctx.restore();
-    
-    //console.log(this.endGameScore);
-    
-    if(this.endGameScore > 3000) this.gameEnd = true;
-    
-    if (this.gameEnd){
-    	for (var i = this.entities.length - 1; i >= 0; --i) {
-    		this.entities.splice(i, 1);
-        }
-    	this.clockTick = 0;
-    }
+	    /*ctx.save();
+	    ctx.clearRect(0, 0, canvas.width, canvas.height);
+	    ctx.fillRect(0, 0, canvas.width, canvas.height);
+	    var stringScore = "Score: " + this.gameScore;
+	    ctx.fillStyle = 'black';
+	    ctx.font="20px Arial";
+	    var text_score = stringScore;
+	    
+	    ctx.fillText(stringScore, 0, 50);*/
+	    ctx.font = "20px Arial";
+	    ctx.fillText("Controls", 150, 20);
+	    ctx.fillText("G: God Mode", 10, 50);
+	    ctx.fillText("Left: Left Arrow", 10, 100);
+	    ctx.fillText("Up: Up Arrow", 10, 150);
+	    ctx.fillText("Right: Right Arrow", 200, 100);
+	    ctx.fillText("Down: Down Arrow", 200, 150);
+	    
+	    this.endGameScore = this.endGameScore + 1;
+	    this.gameScore = this.gameScore + this.endGameScore;
+	    //ctx.restore();
+	    
+	    //console.log(this.endGameScore);
+	    
+	    if(this.endGameScore > 3000) this.gameEnd = true;
+	    
+	    if (this.gameEnd){
+	    	for (var i = this.entities.length - 1; i >= 0; --i) {
+	    		this.entities.splice(i, 1);
+	        }
+	    	this.clockTick = 0;
+	    }
 
-    //ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //console.log(this.entities.length)
+	    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+	    //console.log(this.entities.length)
+	}
+    
 };
 
 GameEngine.prototype.loop = function () {
