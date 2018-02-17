@@ -10,9 +10,14 @@ window.requestAnimFrame = (function () {
 })();
 
 function distance(a, b) {
+//	
+//    var difX = a.centerX - b.centerX;
+//    var difY = a.centerY - b.centerY;
+//    return Math.sqrt(difX * difX + difY * difY);
 	
-    var difX = a.x - b.x;
-    var difY = a.y - b.y;
+
+    var difX = a.centerX + a.x - (b.x + b.centerX);
+    var difY = a.y + a.centerY - (b.y + b.centerY);
     return Math.sqrt(difX * difX + difY * difY);
 };
 
@@ -271,7 +276,7 @@ Entity.prototype.draw = function (ctx) {
         this.game.ctx.beginPath();
         this.game.ctx.fillstyle = "green";
         this.animation.frameWidth;
-        this.game.ctx.arc(this.x+this.animation.frameWidth, this.y, this.radius, 0, Math.PI * 2, false);
+        this.game.ctx.arc(this.x + this.centerX, this.y + this.centerY, this.radius, 0, Math.PI * 2, false);
         this.game.ctx.fill();
         this.game.ctx.closePath();
     }

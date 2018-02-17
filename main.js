@@ -130,6 +130,8 @@ Animation.prototype.isDone = function () {
 function Background(game, spritesheet) {
 	this.x = 0;
 	this.y = 0;
+	this.centerX = 0;
+	this.centerY = 0;
 	this.spritesheet = spritesheet;
 	this.game = game;
 	this.speed = 2;
@@ -328,7 +330,9 @@ function Reimu(game, spritesheet) {
     this.speed = 350;
     this.bulletSpeed = 230;
     this.bulletY = this.y;
-    this.radius = 3;
+    this.centerX = 23;
+    this.centerY = 28;
+    this.radius = 4;
     this.isShooting = false;
 	this.slow = false;
 	this.isHero = true;
@@ -349,6 +353,8 @@ function ReimuBullet(game, spritesheet) {
 	this.speed = 450;
 	this.X;
 	this.Y;
+	this.centerX = 7;
+	this.centerY = 6;
 	this.radius = 6;
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
@@ -376,8 +382,10 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.speed = Math.floor((Math.random() * 12) * 3);//	 + 55;
 	this.x = x;
 	this.y = y;
+	this.centerX = 11;
+	this.centerY = 11;
 	this.bulletType = "EnemyDown";
-	this.radius = 12;
+	this.radius = 11;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
 	this.removeFromWorld = false;
@@ -587,13 +595,15 @@ function Enemy(game, spritesheet, x, y){
 	this.enemyType = "StraightLeft";
 	this.nextType = "StraightLeft";
 	this.attackType = "Star";
+	this.centerX = 16;
+	this.centerY = 24;
 	this.waiting = false;
 	this.maxShot = 16;
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
 	this.bulletY = 50;
-	this.radius = 12;
+	this.radius = 15;
 	this.count = 0;
 	this.bulletInterval = 0;
 	this.isEnemy = true;
