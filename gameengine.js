@@ -159,16 +159,21 @@ GameEngine.prototype.draw = function () {
 GameEngine.prototype.update = function () {
 	var canvas = document.getElementById("hud");
 	var ctx = canvas.getContext("2d");
+	var bgImage = new Image();
+	bgImage.src = "./img/hud.png";
+	bgImage.onload = function(){
+		ctx.drawImage(bgImage, 0, 0);
+	}
 	
-	ctx.font = "20px Arial";
-    ctx.fillText("Controls", 150, 20);
-    ctx.fillText("G: God Mode", 10, 50);
-    ctx.fillText("Space: Shoot", 200, 50);
-    ctx.fillText("Shift: Slow speed", 100, 200);
-    ctx.fillText("Left Arrow: Left", 10, 100);
-    ctx.fillText("Up Arrow: Up", 10, 150);
-    ctx.fillText("Right Arrow: Right", 200, 100);
-    ctx.fillText("Down Arrow: Down", 200, 150);
+//	ctx.font = "20px Arial";
+//    ctx.fillText("Controls", 150, 20);
+//    ctx.fillText("G: God Mode", 10, 50);
+//    ctx.fillText("Space: Shoot", 200, 50);
+//    ctx.fillText("Shift: Slow speed", 100, 200);
+//    ctx.fillText("Left Arrow: Left", 10, 100);
+//    ctx.fillText("Up Arrow: Up", 10, 150);
+//    ctx.fillText("Right Arrow: Right", 200, 100);
+//    ctx.fillText("Down Arrow: Down", 200, 150);
     
 	if(this.space) this.play = true;
 	
@@ -206,7 +211,7 @@ GameEngine.prototype.update = function () {
 	    
 	    //console.log(this.endGameScore);
 	    
-	    if(this.endGameScore > 3000) this.gameEnd = true;
+	    if(this.endGameScore > 7400) this.gameEnd = true;
 		
 	    
 	    if (this.gameEnd){
@@ -216,7 +221,7 @@ GameEngine.prototype.update = function () {
 	    	this.clockTick = 0;
 	    	
 			ctx.font = "24pt Times New Roman";
-			if(this.endGameScore< 3000) {
+			if(this.endGameScore< 7400) {
 					
 				ctx.fillStyle = "white";
 				ctx.fillText("GAME OVER", 100, 400);
