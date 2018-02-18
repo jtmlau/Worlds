@@ -1624,7 +1624,7 @@ AM.downloadAll(function () {
 			[
 				'./audio/sennen.ogg',
 //				'./SFX/attack3.ogg',
-				'./SFX/dead.wav',
+				'./SFX/dead.ogg',
 			],
 			function(buffer) {
 				console.log("Callback");
