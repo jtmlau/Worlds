@@ -161,8 +161,9 @@ GameEngine.prototype.update = function () {
 	var ctx = canvas.getContext("2d");
 	var bgImage = new Image();
 	bgImage.src = "./img/hud.png";
-	
-	 ctx.drawImage(bgImage, 0, 0);
+	bgImage.onload = function(){
+		ctx.drawImage(bgImage, 0, 0);
+	}
 	
 //	ctx.font = "20px Arial";
 //    ctx.fillText("Controls", 150, 20);
