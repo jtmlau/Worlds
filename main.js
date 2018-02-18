@@ -957,7 +957,7 @@ function drawSpreads(enemy, attackPattern)
 	
 		if(soundBuffer != null)
 		{
-			playSound(soundBuffer[1]);
+			//playSound(soundBuffer[1]);
 		}
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
@@ -995,7 +995,7 @@ function drawSpreads(enemy, attackPattern)
 	
 		if(soundBuffer != null)
 		{
-			playSound(soundBuffer[1]);
+			//playSound(soundBuffer[1]);
 		}
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
@@ -1606,8 +1606,8 @@ AM.queueDownload("./img/menu.png")
 AM.queueDownload("./img/hud.png")
 
 AM.queueDownload("./audio/sennen.wav")
-AM.queueDownload("./SFX/attack3.wav")
-AM.queueDownload("./SFX/dead.wav")
+//AM.queueDownload("./SFX/attack3.wav")
+//AM.queueDownload("./SFX/dead.wav")
 
 
 
@@ -1623,8 +1623,8 @@ AM.downloadAll(function () {
 			audioCtx,
 			[
 				'./audio/sennen.wav',
-				'./SFX/attack3.wav',
-				'./SFX/dead.wav',
+//				'./SFX/attack3.wav',
+//				'./SFX/dead.wav',
 			],
 			function(buffer) {
 				console.log("Callback");
