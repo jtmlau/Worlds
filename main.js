@@ -228,7 +228,7 @@ function playSound(buffer) {
 	source.buffer = buffer;                    // tell the source which sound to play
 	source.connect(gainNode);
 	gainNode.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
-	gainNode.gain.value = 0.06;
+	gainNode.gain.value = 0.02;
 	source.start(0);  
 }
 
@@ -239,7 +239,7 @@ function playBGM(buffer)
 	source1.buffer = buffer;                    // tell the source which sound to play
 	source1.connect(gainNode1);
 	gainNode1.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
-	gainNode1.gain.value = 0.7;
+	gainNode1.gain.value = 0.25;
 	source1.start(0); 
 	
 	
