@@ -951,27 +951,27 @@ function drawSpreads(enemy, attackPattern)
 	}
 	if(attackPattern === "SecondaryStar")
 	{
-		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy.x = enemy.x+15;
 		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDown";
 		enemy.game.addEntity(tempEnemy);
-		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy2.x = enemy.x+15;
 		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyUpLeft";
 		enemy.game.addEntity(tempEnemy2);
-		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy3.x = enemy.x+15;
 		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyUpRight";
 		enemy.game.addEntity(tempEnemy3);
-		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy4.x = enemy.x+15;
 		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftDown";
 		enemy.game.addEntity(tempEnemy4);
-		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy5.x = enemy.x+15;
 		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyRightDown";
@@ -1275,6 +1275,7 @@ AM.queueDownload("./img/reimu_hakurei.png");
 AM.queueDownload("./img/enemy.png")
 AM.queueDownload("./img/mini.png")
 AM.queueDownload("./img/battle.png")
+AM.queueDownload("./img/battlepurple.png")
 AM.queueDownload("./img/menu.png")
 AM.queueDownload("./img/hud.png")
 
