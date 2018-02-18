@@ -1606,8 +1606,8 @@ AM.queueDownload("./img/menu.png")
 AM.queueDownload("./img/hud.png")
 
 AM.queueDownload("./audio/sennen.wav")
-AM.queueDownload("./SFX/Attack3.wav")
-AM.queueDownload("./SFX/Dead.wav")
+AM.queueDownload("./SFX/attack3.wav")
+AM.queueDownload("./SFX/dead.wav")
 
 
 
@@ -1623,8 +1623,8 @@ AM.downloadAll(function () {
 			audioCtx,
 			[
 				'./audio/sennen.wav',
-				'./SFX/Attack3.wav',
-				'./SFX/Dead.wav',
+				'./SFX/attack3.wav',
+				'./SFX/dead.wav',
 			],
 			function(buffer) {
 				console.log("Callback");
