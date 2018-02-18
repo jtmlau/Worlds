@@ -211,7 +211,7 @@ GameEngine.prototype.update = function () {
 	    
 	    //console.log(this.endGameScore);
 	    
-	    if(this.endGameScore > 3000) this.gameEnd = true;
+	    if(this.endGameScore > 7400) this.gameEnd = true;
 		
 	    
 	    if (this.gameEnd){
@@ -221,7 +221,7 @@ GameEngine.prototype.update = function () {
 	    	this.clockTick = 0;
 	    	
 			ctx.font = "24pt Times New Roman";
-			if(this.endGameScore< 3000) {
+			if(this.endGameScore< 7400) {
 					
 				ctx.fillStyle = "white";
 				ctx.fillText("GAME OVER", 100, 400);
