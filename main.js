@@ -214,6 +214,12 @@ BufferLoader.prototype.loadBuffer = function(url, index) {
 
     request.send();
 }
+
+
+BufferLoader.prototype.load = function() {
+  for (var i = 0; i < this.urlList.length; ++i)
+  this.loadBuffer(this.urlList[i], i);
+}
 	
 
 function playSound(buffer) {
@@ -974,7 +980,7 @@ function drawSpreads(enemy, attackPattern)
 	
 		if(soundBuffer != null)
 		{
-			//playSound(soundBuffer[1]);
+			playSound(soundBuffer[1]);
 		}
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
@@ -1012,7 +1018,7 @@ function drawSpreads(enemy, attackPattern)
 	
 		if(soundBuffer != null)
 		{
-			//playSound(soundBuffer[1]);
+			playSound(soundBuffer[1]);
 		}
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
