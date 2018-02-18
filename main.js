@@ -626,6 +626,12 @@ Reimu.prototype.update = function () {
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && ent.isEnemy && this.canCollide) {
+        	if(soundBuffer != null)
+    		{
+    			playBGM(soundBuffer[2]);
+    			this.music = true;
+    		}
+        	
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameEnd = true;
