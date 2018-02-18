@@ -1605,9 +1605,9 @@ AM.queueDownload("./img/battlepurple.png")
 AM.queueDownload("./img/menu.png")
 AM.queueDownload("./img/hud.png")
 
-AM.queueDownload("./audio/sennen.ogg")
-AM.queueDownload("./SFX/Attack3.ogg")
-AM.queueDownload("./SFX/Dead.ogg")
+AM.queueDownload("./audio/sennen.wav")
+AM.queueDownload("./SFX/Attack3.wav")
+AM.queueDownload("./SFX/Dead.wav")
 
 
 
@@ -1622,9 +1622,9 @@ AM.downloadAll(function () {
 	bufferLoader = new BufferLoader(
 			audioCtx,
 			[
-				'./audio/sennen.ogg',
-				'./SFX/Attack3.ogg',
-				'./SFX/Dead.ogg',
+				'./audio/sennen.wav',
+				'./SFX/Attack3.wav',
+				'./SFX/Dead.wav',
 			],
 			function(buffer) {
 				console.log("Callback");
