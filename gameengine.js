@@ -207,6 +207,7 @@ GameEngine.prototype.update = function () {
 	    //console.log(this.endGameScore);
 	    
 	    if(this.endGameScore > 3000) this.gameEnd = true;
+		
 	    
 	    if (this.gameEnd){
 	    	for (var i = this.entities.length - 1; i >= 0; --i) {
@@ -215,10 +216,19 @@ GameEngine.prototype.update = function () {
 	    	this.clockTick = 0;
 	    	
 			ctx.font = "24pt Times New Roman";
-			ctx.fillStyle = "white";
-			ctx.fillText("GAME OVER", 100, 400);
-			ctx.fillStyle = "black";
-			ctx.strokeText("GAME OVER", 100, 400);
+			if(this.endGameScore< 3000) {
+					
+				ctx.fillStyle = "white";
+				ctx.fillText("GAME OVER", 100, 400);
+				ctx.fillStyle = "black";
+				ctx.strokeText("GAME OVER", 100, 400);
+			}
+			else {
+				ctx.fillStyle = "white";
+				ctx.fillText("You won!", 100, 400);
+				ctx.fillStyle = "black";
+				ctx.strokeText("You won!", 100, 400);
+			}
 	    }
 
 	    //ctx.clearRect(0, 0, canvas.width, canvas.height);

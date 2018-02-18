@@ -1,4 +1,7 @@
-
+window.AudioContext = window.AudioContext || window.webkitAudioContext;
+var audioCtx = new AudioContext();
+var bufferLoader;
+var soundBuffer = null;
 var AM = new AssetManager();
 
 gameScore = 0;
@@ -113,7 +116,7 @@ Animation.prototype.drawEnemy2Frame = function (tick, ctx, x, y) {
     ctx.drawImage(this.spriteSheet,
     		xindex, 980,  // (x,y) source from sheet
             32, 35, // (x,y) size of sprite.
-            300, 50, // sprite position on screen.
+            x, y, // sprite position on screen.
             this.frameWidth * this.scale, // sprite scale; x
             this.frameHeight * this.scale); // sprite scale; y
 };
@@ -146,6 +149,78 @@ Animation.prototype.isDone = function () {
 };
 
 // no inheritance
+
+
+function BufferLoader(context, urlList, callback) {
+	  this.context = context;
+	  this.urlList = urlList;
+	  this.onload = callback;
+	  this.bufferList = new Array();
+	  this.loadCount = 0;
+	}
+
+	BufferLoader.prototype.loadBuffer = function(url, index) {
+	  // Load buffer asynchronously
+	  var request = new XMLHttpRequest();
+	  request.open("GET", url, true);
+	  request.responseType = "arraybuffer";
+
+	  var loader = this;
+
+	  request.onload = function() {
+	    // Asynchronously decode the audio file data in request.response
+	    loader.context.decodeAudioData(
+	      request.response,
+	      function(buffer) {
+	        if (!buffer) {
+	          alert('error decoding file data: ' + url);
+	          return;
+	        }
+	        loader.bufferList[index] = buffer;
+	        if (++loader.loadCount == loader.urlList.length)
+	          loader.onload(loader.bufferList);
+	      },
+	      function(error) {
+	        console.error('decodeAudioData error', error);
+	      }
+	    );
+	  }
+
+	  request.onerror = function() {
+	    alert('BufferLoader: XHR error');
+	  }
+
+	  request.send();
+	}
+
+	BufferLoader.prototype.load = function() {
+	  for (var i = 0; i < this.urlList.length; ++i)
+	  this.loadBuffer(this.urlList[i], i);
+	}
+	
+
+function playSound(buffer) {
+	var source = audioCtx.createBufferSource(); // creates a sound source
+	var gainNode = audioCtx.createGain();
+	source.buffer = buffer;                    // tell the source which sound to play
+	source.connect(gainNode);
+	gainNode.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	gainNode.gain.value = 0.06;
+	source.start(0);  
+}
+
+function playBGM(buffer)
+{
+	var source1 = audioCtx.createBufferSource(); // creates a sound source
+	var gainNode1 = audioCtx.createGain();
+	source1.buffer = buffer;                    // tell the source which sound to play
+	source1.connect(gainNode1);
+	gainNode1.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	gainNode1.gain.value = 0.7;
+	source1.start(0); 
+	
+	
+}
 
 function Background(game, spritesheet) {
 	this.x = 0;
@@ -362,6 +437,8 @@ function Reimu(game, spritesheet) {
     this.moveUp = false;
     this.moveDown = false;
     this.ctx = game.ctx;
+    this.spawned = false;
+    this.music = false;
     Entity.call(this, game, 268, 550);
 }
 
@@ -404,7 +481,7 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.y = y;
 	this.centerX = 11;
 	this.centerY = 11;
-	this.bulletType = "EnemyDown";
+	this.bulletType = "EnemyDown"
 	this.radius = 11;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
@@ -453,7 +530,28 @@ Reimu.prototype.update = function () {
 	if(this.game.space) { // If the space key is pressed.
 		this.isShooting = true;
 		this.bulletY = that.y;
+		
+		if(!this.spawned)
+		{
+			if(soundBuffer != null)
+			{
+				playBGM(soundBuffer[0]);
+				this.music = true;
+			}
+			
+			spawnEnemies(this.game);
+			this.spawned = true;
+		}
 	}
+	if(this.spawned && !this.music)
+	{
+		if(soundBuffer != null)
+		{
+			playBGM(soundBuffer[0]);
+			this.music = true;
+		}
+	}
+
 	if(this.game.shift) 
 	{
 		this.speed = 100;
@@ -565,46 +663,120 @@ Reimu.prototype.draw = function () {
 function Enemy2(game, spritesheet, x, y) {
 	this.x = x;
 	this.y = y;
-	this.animation = new Animation(spritesheet, 28, 32, 1350, .5, 8, true, 1.5);
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
-	this.timer = Math.floor((Math.random()*8) + 3);
-	this.speed = 200;
-	this.bulletSpeed = 200;
-	this.bulletY = 50;
-	this.radius = 5;
+	
+	this.animation = new Animation(spritesheet, 28, 32, 1350, .5, 8, true, 1.5);// Creates an Enemy animation
+	this.enemyType = "StraightLeft";
+	this.nextType = "StraightLeft";
+	this.attackType = "Star";
+	this.centerX = 16;
+	this.centerY = 24;
+	this.waiting = false;
+	this.maxShot = 12;
+	this.timer = 0;
+	this.speed = Math.floor((Math.random() * 10) + 10)*20;
+	this.bulletSpeed = 10;
+	this.bulletY = 23;
+	this.radius = 15
+	this.count = 0;
+	this.bulletInterval = bulletInterval = Math.floor(Math.random() * 11) + 1;
+	this.totalInterval = 12;
 	this.isEnemy = true;
 	this.shoot = false;
+	this.currentState = 60;
+	this.killScore = 100;
 	this.ctx = game.ctx;
-	this.killScore = 200;
 	Entity.call(this, game, x, y);
 };
 Enemy2.prototype = new Entity();
 Enemy2.prototype.constructor = Enemy2;
 
 Enemy2.prototype.update = function() {
-	Entity.prototype.update.call(this);
-	//if this.timer 
-	if(this.shoot) {
+Entity.prototype.update.call(this);
+	
+	//this.speed = Math.floor(Math.random() * 10)*100);
+	if(this.shoot){
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
-		
 	}
-	//this.y -= this.game.clockTick * this.speed;
+	
+	if(this.x > 300 && this.x < 400)
+	{
+		if(this.enemyType === "StraightRightLoop")
+		{
+			this.storedX = this.x;
+			this.storedY = this.y;
+			this.enemyType = "ClockwiseCircle";
+		}
+		if(this.enemyType === "StraightLeftLoop")
+		{
+			this.storedX = this.x;
+			this.storedY = this.y;
+			this.enemyType = "CounterClockwiseCircle";
+		}
+	}
+	
+	if(this.enemyType === "StraightDown")
+	{
+		if(this.y > 130)
+		{
+			this.waiting = false;
+			this.enemyType = "Stop";
+		}
+	}
+	
+	//should update enemy movement
+	enemyMovement(this)
+	
+	if(this.count < this.maxShot)
+	{
+		if(this.waiting === false)
+		{
+			if(this.bulletInterval === 0)
+			{
+				this.shoot = true;
+				this.count++;
+				this.bulletInterval = this.totalInterval;
+			}
+			else
+			{
+				this.shoot = false;
+			}
+			this.bulletInterval--;
+		}
+	}
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && !ent.isEnemy && ent.canCollide) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
             if(ent.isHero) this.game.gameEnd = true;
-        }
-        ;
+        };
     };
 }
 
 Enemy2.prototype.draw = function() {
-	this.animation.drawEnemy2Frame(this.game.clockTick, this.ctx, this.ctx, this.x, this.y);
-	Entity.prototype.draw.call(this);
+
+
+	this.animation.drawEnemy2Frame(this.game.clockTick, this.ctx, this.x, this.y);
+	
+	if(this.shoot) {
+		if(this.attackType === "Star")
+		{
+			drawSpreads(this, "Star");
+			this.shoot = false;
+		}
+		if(this.attackType === "FullSpread")
+		{
+			drawSpreads(this, "Star");
+			drawSpreads(this, "SecondaryStar");
+			this.shoot = false;
+		}
+		
+	}
+	
+    Entity.prototype.draw.call(this);
 };
 
 function Enemy(game, spritesheet, x, y){
@@ -736,7 +908,7 @@ function drawSpreads(enemy, attackPattern)
 	{
 		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy.x = enemy.x+15;
-		tempEnemy.y = enemy.y+50;
+		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDownLeft";
 		enemy.game.addEntity(tempEnemy);
 		//this.shoot = false;
@@ -744,29 +916,33 @@ function drawSpreads(enemy, attackPattern)
 		//trying 2 bullet
 		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy2.x = enemy.x+15;
-		tempEnemy2.y = enemy.y+50;
+		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyDownRight";
 		enemy.game.addEntity(tempEnemy2);
 		
 		//trying all bullet
 		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy3.x = enemy.x+15;
-		tempEnemy3.y = enemy.y+50;
+		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyRightUp";
 		enemy.game.addEntity(tempEnemy3);
 		
 		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy4.x = enemy.x+15;
-		tempEnemy4.y = enemy.y+50;
+		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftUp";
 		enemy.game.addEntity(tempEnemy4);
 		
 		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy5.x = enemy.x+15;
-		tempEnemy5.y = enemy.y+50;
+		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyUp";
 		enemy.game.addEntity(tempEnemy5);
 	
+		if(soundBuffer != null)
+		{
+			playSound(soundBuffer[1]);
+		}
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
 		bEnemy.push(tempEnemy3);
@@ -777,30 +953,34 @@ function drawSpreads(enemy, attackPattern)
 	{
 		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy.x = enemy.x+15;
-		tempEnemy.y = enemy.y+50;
+		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDown";
 		enemy.game.addEntity(tempEnemy);
 		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy2.x = enemy.x+15;
-		tempEnemy2.y = enemy.y+50;
+		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyUpLeft";
 		enemy.game.addEntity(tempEnemy2);
 		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy3.x = enemy.x+15;
-		tempEnemy3.y = enemy.y+50;
+		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyUpRight";
 		enemy.game.addEntity(tempEnemy3);
 		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy4.x = enemy.x+15;
-		tempEnemy4.y = enemy.y+50;
+		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftDown";
 		enemy.game.addEntity(tempEnemy4);
 		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
 		tempEnemy5.x = enemy.x+15;
-		tempEnemy5.y = enemy.y+50;
+		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyRightDown";
 		enemy.game.addEntity(tempEnemy5);
 	
+		if(soundBuffer != null)
+		{
+			playSound(soundBuffer[1]);
+		}
 		bEnemy.push(tempEnemy);
 		bEnemy.push(tempEnemy2);
 		bEnemy.push(tempEnemy3);
@@ -818,13 +998,25 @@ function Enemy3(game, spritesheet, x, y){
 	this.y = y;
 	this.animation = new Animation(spritesheet, 28, 30, 252, .5, 8, true, 1.5); // Creates an Enemy animation.
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
-	this.radius = 5;
+	this.enemyType = "StraightLeft";
+	this.nextType = "StraightLeft";
+	this.attackType = "Star";
+	this.centerX = 16;
+	this.centerY = 24;
+	this.waiting = false;
+	this.maxShot = 12;
+	this.timer = 0;
+	this.speed = Math.floor((Math.random() * 10) + 10)*20;
+	this.bulletSpeed = 10;
+	this.bulletY = 23;
+	this.radius = 15
+	this.count = 0;
+	this.bulletInterval = bulletInterval = Math.floor(Math.random() * 11) + 1;
+	this.totalInterval = 12;
 	this.isEnemy = true;
-	this.speed = 185;
-	this.bulletSpeed = 200;
-	this.bulletY = this.y + 50;
 	this.shoot = false;
-	this.killScore = 500;
+	this.currentState = 60;
+	this.killScore = 100;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
 };
@@ -835,24 +1027,60 @@ Enemy3.prototype.constructor = Enemy3;
 Enemy3.prototype.update = function () {
 	Entity.prototype.update.call(this);
 	
+	//this.speed = Math.floor(Math.random() * 10)*100);
 	if(this.shoot){
 		this.bulletY += this.game.clockTick * this.bulletSpeed;
 	}
-	this.y += 2;
-	if (this.y > 700) {
-		this.removeFromWorld = true;
+	
+	if(this.x > 300 && this.x < 400)
+	{
+		if(this.enemyType === "StraightRightLoop")
+		{
+			this.storedX = this.x;
+			this.storedY = this.y;
+			this.enemyType = "ClockwiseCircle";
+		}
+		if(this.enemyType === "StraightLeftLoop")
+		{
+			this.storedX = this.x;
+			this.storedY = this.y;
+			this.enemyType = "CounterClockwiseCircle";
+		}
 	}
 	
+	if(this.enemyType === "StraightDown")
+	{
+		if(this.y > 130)
+		{
+			this.waiting = false;
+			this.enemyType = "Stop";
+		}
+	}
 	
-	/*if (Math.floor(Math.random() * 60) > 50){
-		this.shoot = true;
-	}else{
-		this.shoot = false;
-	}*/
+	//should update enemy movement
+	enemyMovement(this)
+	
+	if(this.count < this.maxShot)
+	{
+		if(this.waiting === false)
+		{
+			if(this.bulletInterval === 0)
+			{
+				this.shoot = true;
+				this.count++;
+				this.bulletInterval = this.totalInterval;
+			}
+			else
+			{
+				this.shoot = false;
+			}
+			this.bulletInterval--;
+		}
+	}
 	
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
-        if (this != ent && this.collide(ent) && !ent.isEnemy && ent.canCollide) {
+        if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
@@ -867,16 +1095,18 @@ Enemy3.prototype.draw = function () {
 	this.animation.drawEnemy3Frame(this.game.clockTick, this.ctx, this.x, this.y);
 	
 	if(this.shoot) {
-		tempEnemy = new EnemyBullet(this.game, AM.getAsset("./img/reimu_hakurei.png"), this.x, this.y + this.bulletY);
-		tempEnemy.x = this.x+15;
-		tempEnemy.y = this.y + 50;
-		this.game.addEntity(tempEnemy);
+		if(this.attackType === "Star")
+		{
+			drawSpreads(this, "Star");
+			this.shoot = false;
+		}
+		if(this.attackType === "FullSpread")
+		{
+			drawSpreads(this, "Star");
+			drawSpreads(this, "SecondaryStar");
+			this.shoot = false;
+		}
 		
-		
-		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x, this.y);
-		bEnemy.push(tempEnemy);
-		
-		//console.log("shooting");
 	}
 	
     Entity.prototype.draw.call(this);
@@ -884,6 +1114,8 @@ Enemy3.prototype.draw = function () {
 
 function spawnEnemies(gameEngine)
 {
+	console.log("spawn");
+	
 	for(var i = 2000; i<=2500; i+=100)
     {
     	setTimeout(function()
@@ -949,7 +1181,7 @@ function spawnEnemies(gameEngine)
 	{
 	setTimeout(function()
 			{
-				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
+				tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowLeft";
 				tempEnemy.attackType = "FullSpread";
@@ -963,7 +1195,7 @@ function spawnEnemies(gameEngine)
 	{
 	setTimeout(function()
 			{
-				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 120, -50);
+				tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 120, -50);
 				tempEnemy.enemyType = "StraightDown";
 				tempEnemy.nextType = "SlowRight";
 				tempEnemy.attackType = "FullSpread";
@@ -976,7 +1208,7 @@ function spawnEnemies(gameEngine)
     
     setTimeout(function()
     {
-		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 180);
+		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
 		tempEnemy.enemyType = "StraightLeftLoop";
 		tempEnemy.nextType = "StraightLeft";
 		gameEngine.addEntity(tempEnemy);
@@ -984,7 +1216,7 @@ function spawnEnemies(gameEngine)
     
     setTimeout(function()
     {
-		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 180);
+		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
 		tempEnemy.enemyType = "StraightLeftLoop";
 		tempEnemy.nextType = "StraightLeft";
 		gameEngine.addEntity(tempEnemy);
@@ -992,13 +1224,22 @@ function spawnEnemies(gameEngine)
     
     setTimeout(function()
 	    {
-			tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 50);
+			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50);
 			tempEnemy.enemyType = "StraightRightLoop";
 			tempEnemy.nextType = "StraightRight";
 			gameEngine.addEntity(tempEnemy);
 	    }, 28000);
     	    
 }
+
+//function finishedLoading(bufferList)
+//{
+//	var source1 = context.createBufferSource();
+//	source1.buffer = bufferList[0];
+//	source1.connect(context.destination);
+//	source1.start(0);
+//}
+
 
 function Menu(game, sprite) {
 	this.sprite = sprite;
@@ -1012,7 +1253,6 @@ Menu.prototype.reset = function() {
 Menu.update = function() {
 	if(this.game.space) {
 		this.game.play = true;
-		spawnEnemies(this.gameEngine);
 	}
 }
 Menu.prototype.draw = function(ctx) {
@@ -1037,6 +1277,10 @@ AM.queueDownload("./img/mini.png")
 AM.queueDownload("./img/battle.png")
 AM.queueDownload("./img/menu.png")
 
+AM.queueDownload("./sennen.ogg")
+AM.queueDownload("./Attack3.ogg")
+AM.queueDownload("./Dead.ogg")
+
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
@@ -1045,7 +1289,20 @@ AM.downloadAll(function () {
 	gameEngine.play = false;
 	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
 	gameEngine.addEntity(menu);
-
+	
+	bufferLoader = new BufferLoader(
+			audioCtx,
+			[
+				'./sennen.ogg',
+				'./Attack3.ogg',
+				'./Dead.ogg',
+			],
+			function(buffer) {
+				console.log("Callback");
+				soundBuffer = buffer;
+			}
+			);
+	bufferLoader.load();
     
     gameEngine.init(ctx);
     gameEngine.start();
@@ -1055,13 +1312,16 @@ AM.downloadAll(function () {
     
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 
-    gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 50));
-	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 350));
+    //gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 50));
+	//gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 350));
 	/*gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 300, 100));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 100, 200));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 40, 50));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 120, 50));
 	gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/enemy.png"), 80, 50));*/
+    
+    
+    
     
 //	for(var i = 10000; i<=10500; i+=100)
 //    {
