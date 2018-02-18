@@ -1269,7 +1269,7 @@ Menu.prototype.draw = function(ctx) {
 }
 
 
-AM.queueDownload("./img/desert_background.jpg");
+AM.queueDownload("./img/blue_background.jpg");
 AM.queueDownload("./img/Touhou_pfb_sprites.png");
 AM.queueDownload("./img/reimu_hakurei.png");
 AM.queueDownload("./img/enemy.png")
