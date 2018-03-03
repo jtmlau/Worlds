@@ -539,7 +539,7 @@ Reimu.prototype.update = function () {
 				this.music = true;
 			}
 			
-			spawnEnemies(this.game, 3);
+			spawnEnemies(this.game, 0);
 			this.spawned = true;
 		}
 	}
@@ -1136,7 +1136,7 @@ Enemy3.prototype.draw = function () {
 function spawnEnemies(gameEngine, difficulty)
 {	
 	if (difficulty < 1) {
-		difficulty = 1;
+		difficulty = .5;
 	}
 	var spacing = 6/difficulty;
 	var interval = spacing * 50
