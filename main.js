@@ -422,7 +422,7 @@ function enemyMovement(the_enemy)
 function Reimu(game, spritesheet) {
 	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
-    this.speed = 350;
+    this.speed = 200;
     this.bulletSpeed = 230;
     this.bulletY = this.y;
     this.centerX = 23;
@@ -551,14 +551,14 @@ Reimu.prototype.update = function () {
 			this.music = true;
 		}
 	}
-
+ 
 	if(this.game.shift) 
 	{
 		this.speed = 100;
 	}
 	if(!this.game.shift) 
 	{ // If the left arrow key is pressed.
-		this.speed = 350;
+		this.speed = 250;
 	}
 	
 	if(this.game.left) { // If the left arrow key is pressed.
