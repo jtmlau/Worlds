@@ -666,6 +666,10 @@ Reimu.prototype.update = function () {
 		this.game.lives --;
 		if(this.game.lives > 0) {
 		restarter(gameEngine, ctx);
+		
+		} else {
+			//this.game.prototype.init(ctx);
+			starter();
 		}
 	}
 };
