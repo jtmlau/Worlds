@@ -663,7 +663,10 @@ Reimu.prototype.update = function () {
         };
     };
 	if(this.game.gameEnd) {
+		this.game.lives --;
+		if(this.game.lives > 0) {
 		restarter(gameEngine, ctx);
+		}
 	}
 };
 
@@ -790,7 +793,10 @@ Entity.prototype.update.call(this);
         };
     };
 	if(this.game.gameEnd) {
+		this.game.lives --;
+		if(this.game.lives > 0) {
 		restarter(gameEngine, ctx);
+		}
 	}
 }
 
@@ -919,7 +925,11 @@ Enemy.prototype.update = function () {
         };
     };
 	if(this.game.gameEnd) {
+		this.game.lives --;
+		if(this.game.lives > 0) {
+		
 		restarter(gameEngine, ctx);
+		}
 	}
 }
 
@@ -1140,7 +1150,10 @@ Enemy3.prototype.update = function () {
         };
     };
 	if (this.game.gameEnd) {
+		this.game.lives --;
+		if(this.game.lives > 0) {
 		restarter(gameEngine, ctx);
+		}
 	}
 }
 
@@ -1193,7 +1206,6 @@ function spawnEnemies(gameEngine, difficulty)
 				//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
 			}, i);
 		}
-		
 		
 		if (difficulty > 1) 
 		{
@@ -1660,7 +1672,7 @@ function spawnEnemies(gameEngine, difficulty)
 				}
 				
 		 }gameEngine.gameScore = 7400;
-	
+		
 }
 
 //function finishedLoading(bufferList)
@@ -1672,10 +1684,12 @@ function spawnEnemies(gameEngine, difficulty)
 //}
 
 function starter() {
+	
 	var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
 	var gameEngine = new GameEngine();
 	gameEngine.play = false;
+	gameEngine.lives = 5;
 	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
 	gameEngine.addEntity(menu);
 	
