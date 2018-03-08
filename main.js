@@ -562,7 +562,7 @@ Reimu.prototype.update = function () {
 				this.music = true;
 			}
 			
-			spawnEnemies(this.game);
+			spawnEnemies(this.game, 0);
 			this.spawned = true;
 		}
 	}
@@ -1156,12 +1156,18 @@ Enemy3.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
-function spawnEnemies(gameEngine)
-{
-	console.log("spawn");
+function spawnEnemies(gameEngine, difficulty)
+{	
+	if (difficulty < 1) {
+		difficulty = .5;
+	}
+	var spacing = 6/difficulty;
+	var interval = spacing * 50
 	
-	for(var i = 2000; i<=2500; i+=100)
-    {
+	console.log("spawn");
+
+	for(var i = 2000; i<=2500; i+=interval)
+	{
     	setTimeout(function()
 	    {
     		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 70);
@@ -1170,26 +1176,34 @@ function spawnEnemies(gameEngine)
 	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
 	    }, i);
     }
-    for(var i = 6000; i<=6500; i+=100)
-    {
-    	setTimeout(function()
-	    {
-    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 70);
-    		tempEnemy.enemyType = "StraightLeft";
-    		gameEngine.addEntity(tempEnemy);
-	    }, i);
-    }
-    for(var i = 8000; i<=8500; i+=100)
-    {
-    	setTimeout(function()
-	    {
-    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 40);
-    		tempEnemy.enemyType = "StraightRight";
-    		gameEngine.addEntity(tempEnemy);
-	    	//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
-	    }, i);
-    }
-    for(var i = 10000; i<=10500; i+=100)
+	
+	
+	if (difficulty > 1) 
+	{
+		for(var i = 6000; i<=6500; i+=100)
+		{
+			setTimeout(function()
+			{
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 70);
+				tempEnemy.enemyType = "StraightLeft";
+				gameEngine.addEntity(tempEnemy);
+			}, i);
+		}
+	}
+	if (difficulty > 1) 
+	{
+		for(var i = 8000; i<=8500; i+=interval)
+		{
+			setTimeout(function()
+			{
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 40);
+				tempEnemy.enemyType = "StraightRight";
+				gameEngine.addEntity(tempEnemy);
+				//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
+			}, i);
+		}
+	}
+    for(var i = 10000; i<=10500; i+=interval)
     {
     	setTimeout(function()
 	    {
@@ -1198,18 +1212,22 @@ function spawnEnemies(gameEngine)
     		gameEngine.addEntity(tempEnemy);
 	    }, i);
     }
-    for(var i = 12000; i<=12500; i+=100)
-    {
-    	setTimeout(function()
-	    {
-    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
-    		tempEnemy.enemyType = "StraightLeft";
-    		tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
-    		tempEnemy2.enemyType = "StraightRight";
-    		gameEngine.addEntity(tempEnemy);
-    		gameEngine.addEntity(tempEnemy2);
-	    }, i);
-    }
+	
+	if(difficulty > 1)
+		{
+		for(var i = 12000; i<=12500; i+=interval)
+		{
+			setTimeout(function()
+			{
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
+				tempEnemy.enemyType = "StraightLeft";
+				tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
+				tempEnemy2.enemyType = "StraightRight";
+				gameEngine.addEntity(tempEnemy);
+				gameEngine.addEntity(tempEnemy2);
+			}, i);
+		}
+	}
     
 //    setTimeout(function()
 //	{
@@ -1220,21 +1238,22 @@ function spawnEnemies(gameEngine)
 //		tempEnemy.maxShot = 20
 //		gameEngine.addEntity(tempEnemy);
 //	}, 16500);
-    
-    for(var i = 16500; i<=26000; i+=4600)
+    if (difficulty > 1) 
 	{
-	setTimeout(function()
-			{
-				tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50);
-				tempEnemy.enemyType = "StraightDown";
-				tempEnemy.nextType = "SlowLeft";
-				tempEnemy.attackType = "FullSpread";
-				tempEnemy.waiting = true;
-				tempEnemy.maxShot = 20
-				gameEngine.addEntity(tempEnemy);
-			}, i);
-	}
-    
+		for(var i = 16500; i<=26000; i+=4600)
+		{
+		setTimeout(function()
+				{
+					tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50);
+					tempEnemy.enemyType = "StraightDown";
+					tempEnemy.nextType = "SlowLeft";
+					tempEnemy.attackType = "FullSpread";
+					tempEnemy.waiting = true;
+					tempEnemy.maxShot = 20
+					gameEngine.addEntity(tempEnemy);
+				}, i);
+		}
+    }
     for(var i = 18800; i<=29000; i+=4600)
 	{
 	setTimeout(function()
@@ -1249,15 +1268,16 @@ function spawnEnemies(gameEngine)
 			}, i);
 	}
     
-    
-    setTimeout(function()
-    {
-		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
-		tempEnemy.enemyType = "StraightLeftLoop";
-		tempEnemy.nextType = "StraightLeft";
-		gameEngine.addEntity(tempEnemy);
-    }, 21000);
-    
+    if (difficulty > 1) 
+	{
+		setTimeout(function()
+		{
+			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
+			tempEnemy.enemyType = "StraightLeftLoop";
+			tempEnemy.nextType = "StraightLeft";
+			gameEngine.addEntity(tempEnemy);
+		}, 21000);
+	}
     setTimeout(function()
     {
 		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
@@ -1265,23 +1285,28 @@ function spawnEnemies(gameEngine)
 		tempEnemy.nextType = "StraightLeft";
 		gameEngine.addEntity(tempEnemy);
     }, 25500);
-    
-    setTimeout(function()
-	    {
-			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50);
-			tempEnemy.enemyType = "StraightRightLoop";
-			tempEnemy.nextType = "StraightRight";
+    if (difficulty > 1) 
+	{
+		setTimeout(function()
+			{
+				tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50);
+				tempEnemy.enemyType = "StraightRightLoop";
+				tempEnemy.nextType = "StraightRight";
+				gameEngine.addEntity(tempEnemy);
+			}, 28000);
+		
+    }
+	if(difficulty > 1)
+	{	setTimeout(function()
+		{
+			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
+			tempEnemy.enemyType = "StraightLeftLoop";
+			tempEnemy.nextType = "StraightLeft";
+			tempEnemy.attackType = "Star";
 			gameEngine.addEntity(tempEnemy);
-	    }, 28000);
-    
-    setTimeout(function()
-    {
-		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
-		tempEnemy.enemyType = "StraightLeftLoop";
-		tempEnemy.nextType = "StraightLeft";
-		tempEnemy.attackType = "Star";
-		gameEngine.addEntity(tempEnemy);
-    }, 32000);
+		}, 32000);
+	}
+	
     setTimeout(function()
     {
 		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 50);
@@ -1290,14 +1315,17 @@ function spawnEnemies(gameEngine)
 		tempEnemy.attackType = "SecondaryStar";
 		gameEngine.addEntity(tempEnemy);
 	}, 32800);
-	setTimeout(function()
-    {
-		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 270);
-		tempEnemy.enemyType = "StraightLeftLoop";
-		tempEnemy.nextType = "StraightLeft";
-		tempEnemy.attackType = "Star";
-		gameEngine.addEntity(tempEnemy);
-    }, 33600);
+	if (difficulty > 1) 
+	{
+		setTimeout(function()
+		{
+			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 270);
+			tempEnemy.enemyType = "StraightLeftLoop";
+			tempEnemy.nextType = "StraightLeft";
+			tempEnemy.attackType = "Star";
+			gameEngine.addEntity(tempEnemy);
+		}, 33600);
+	}
 	setTimeout(function()
     {
 		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 100);
@@ -1306,30 +1334,33 @@ function spawnEnemies(gameEngine)
 		tempEnemy.attackType = "SecondaryStar";
 		gameEngine.addEntity(tempEnemy);
     }, 34400);
-	setTimeout(function()
-    {
-		tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
-		tempEnemy.enemyType = "StraightLeftLoop";
-		tempEnemy.nextType = "StraightLeft";
-		tempEnemy.attackType = "Star";
-		gameEngine.addEntity(tempEnemy);
-    }, 35200);
-	
-    for(var i = 38000; i<=48000; i+=4600)
+	if (difficulty > 1) 
 	{
-	setTimeout(function()
-			{
-				tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 120, -50);
-				tempEnemy.enemyType = "StraightDown";
-				tempEnemy.nextType = "SlowRight";
-				tempEnemy.attackType = "FullSpread";
-				tempEnemy.waiting = true;
-				tempEnemy.maxShot = 20
-				gameEngine.addEntity(tempEnemy);
-			}, i);
+		setTimeout(function()
+		{
+			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
+			tempEnemy.enemyType = "StraightLeftLoop";
+			tempEnemy.nextType = "StraightLeft";
+			tempEnemy.attackType = "Star";
+			gameEngine.addEntity(tempEnemy);
+		}, 35200);
 	}
-    
-    for(var i = 41000; i<=50000; i+=2300)
+    if(difficulty > 1) 
+	{	for(var i = 38000; i<=48000; i+=(interval * 46))
+		{
+		setTimeout(function()
+				{
+					tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 120, -50);
+					tempEnemy.enemyType = "StraightDown";
+					tempEnemy.nextType = "SlowRight";
+					tempEnemy.attackType = "FullSpread";
+					tempEnemy.waiting = true;
+					tempEnemy.maxShot = 20
+					gameEngine.addEntity(tempEnemy);
+				}, i);
+		}
+    }
+    for(var i = 41000; i<=50000; i+=(interval * 23))
 	{
 	setTimeout(function()
 			{
@@ -1339,21 +1370,21 @@ function spawnEnemies(gameEngine)
 				gameEngine.addEntity(tempEnemy);
 			}, i);
 	}
-    
-    for(var i = 52000; i<=52500; i+=100)
-    {
-    	setTimeout(function()
-	    {
-    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
-    		tempEnemy.enemyType = "StraightLeft";
-    		tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
-    		tempEnemy2.enemyType = "StraightRight";
-    		tempEnemy2.attackType = "SecondaryStar";
-    		gameEngine.addEntity(tempEnemy);
-    		gameEngine.addEntity(tempEnemy2);
-	    }, i);
+    if (difficulty > 1) {
+		for(var i = 52000; i<=52500; i+=(interval))
+		{
+			setTimeout(function()
+			{
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
+				tempEnemy.enemyType = "StraightLeft";
+				tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
+				tempEnemy2.enemyType = "StraightRight";
+				tempEnemy2.attackType = "SecondaryStar";
+				gameEngine.addEntity(tempEnemy);
+				gameEngine.addEntity(tempEnemy2);
+			}, i);
+		}
     }
-    
     setTimeout(function()
     	    {
     			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 180);
@@ -1394,20 +1425,21 @@ function spawnEnemies(gameEngine)
     			tempEnemy.attackType = "Star";
     			gameEngine.addEntity(tempEnemy);
     	    }, 58200);
-    		
-    		for(var i = 60000; i<=90000; i+=4600)
-    		{
-    		setTimeout(function()
-    				{
-    					tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50);
-    					tempEnemy.enemyType = "StraightDown";
-    					tempEnemy.nextType = "SlowLeft";
-    					tempEnemy.attackType = "FullSpread";
-    					tempEnemy.waiting = true;
-    					tempEnemy.maxShot = 20
-    					gameEngine.addEntity(tempEnemy);
-    				}, i);
-    		}
+    		if (difficulty > 1) {
+				for(var i = 60000; i<=90000; i+=4600)
+				{
+				setTimeout(function()
+						{
+							tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50);
+							tempEnemy.enemyType = "StraightDown";
+							tempEnemy.nextType = "SlowLeft";
+							tempEnemy.attackType = "FullSpread";
+							tempEnemy.waiting = true;
+							tempEnemy.maxShot = 20
+							gameEngine.addEntity(tempEnemy);
+						}, i);
+				}
+			}
     	    
     	    for(var i = 62500; i<=90500; i+=4600)
     		{
@@ -1475,21 +1507,22 @@ function spawnEnemies(gameEngine)
     					gameEngine.addEntity(tempEnemy);
     				}, i);
     		}
+			if (difficulty > 1) {
 	
-    	    for(var i = 99000; i<=99500; i+=100)
-    	    {
-    	    	setTimeout(function()
-    		    {
-    	    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
-    	    		tempEnemy.enemyType = "StraightLeft";
-    	    		tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
-    	    		tempEnemy2.enemyType = "StraightRight";
-    	    		tempEnemy2.attackType = "SecondaryStar";
-    	    		gameEngine.addEntity(tempEnemy);
-    	    		gameEngine.addEntity(tempEnemy2);
-    		    }, i);
+				for(var i = 99000; i<=99500; i+=100)
+				{
+					setTimeout(function()
+					{
+						tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
+						tempEnemy.enemyType = "StraightLeft";
+						tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
+						tempEnemy2.enemyType = "StraightRight";
+						tempEnemy2.attackType = "SecondaryStar";
+						gameEngine.addEntity(tempEnemy);
+						gameEngine.addEntity(tempEnemy2);
+					}, i);
+				}
     	    }
-    	    
     	    setTimeout(function()
     	    {
     			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
@@ -1535,21 +1568,21 @@ function spawnEnemies(gameEngine)
     				tempEnemy.nextType = "StraightRight";
     				gameEngine.addEntity(tempEnemy);
     		    }, 107000);
-    	    
-    	    for(var i = 109000; i<=109500; i+=100)
-    	    {
-    	    	setTimeout(function()
-    		    {
-    	    		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
-    	    		tempEnemy.enemyType = "StraightLeft";
-    	    		tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
-    	    		tempEnemy2.enemyType = "StraightRight";
-    	    		tempEnemy2.attackType = "SecondaryStar";
-    	    		gameEngine.addEntity(tempEnemy);
-    	    		gameEngine.addEntity(tempEnemy2);
-    		    }, i);
-    	    }
-    	    
+    	    if (difficulty > 1) {
+				for(var i = 109000; i<=109500; i+=100)
+				{
+					setTimeout(function()
+					{
+						tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40);
+						tempEnemy.enemyType = "StraightLeft";
+						tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100);
+						tempEnemy2.enemyType = "StraightRight";
+						tempEnemy2.attackType = "SecondaryStar";
+						gameEngine.addEntity(tempEnemy);
+						gameEngine.addEntity(tempEnemy2);
+					}, i);
+				}
+			}
     	    setTimeout(function()
     	    {
     			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
