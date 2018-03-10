@@ -257,7 +257,7 @@ function playDeath(buffer)
 	}
 	else
 	{
-		gainNode2.gain.value = 0.02;
+		gainNode2.gain.value = 0.2;
 	}
 	source2.start(0);  
 }
@@ -501,6 +501,7 @@ function Reimu(game, spritesheet) {
     this.spawned = false;
     this.music = false;
     this.muteFired = false;
+    this.removeOnDeath = true;
     Entity.call(this, game, 268, 550);
 }
 
@@ -517,6 +518,7 @@ function ReimuBullet(game, spritesheet) {
 	this.radius = 6
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
+	this.removeOnDeath = true;
 	Entity.call(this, game, 268, 550);
 }
 
@@ -547,6 +549,7 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.radius = 11;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
+	this.removeOnDeath = true;
 	this.removeFromWorld = false;
 	Entity.call(this, game, x, y);
 }
@@ -648,7 +651,7 @@ Reimu.prototype.update = function () {
 				}
 				if(gainNode2 != null)
 				{
-					gainNode2.gain.value = 0.02;
+					gainNode2.gain.value = 0.2;
 				}
 				mute = false;
 			}
@@ -741,22 +744,40 @@ Reimu.prototype.update = function () {
     			playDeath(soundBuffer[2]);
     		}
         	
+        	this.game.lives--;
+        	
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
-            this.game.gameEnd = true;
-			
+            
+          //remove all enemies and bullets on death?
+        	for (var i = 0; i < this.game.entities.length; i++) 
+        	{
+                if(this.game.entities[i].removeOnDeath)
+                {
+                	this.game.entities[i].removeFromWorld = true;
+                }
+        	}
+            
+			if(this.game.lives < 1)
+			{
+				this.game.gameEnd = true;
+			}
+			else
+			{
+				restarter(gameEngine, ctx);
+			}
         };
     };
-	if(this.game.gameEnd) {
-		this.game.lives --;
-		if(this.game.lives > 0) {
-		restarter(gameEngine, ctx);
-		
-		} else {
-			//this.game.prototype.init(ctx);
-			starter();
-		}
-	}
+//	if(this.game.gameEnd) {
+//		this.game.lives--;
+//		if(this.game.lives > 0) {
+//		restarter(gameEngine, ctx);
+//		
+//		} else {
+//			//this.game.prototype.init(ctx);
+//			starter();
+//		}
+//	}
 };
 
 Reimu.prototype.draw = function () {
@@ -794,6 +815,7 @@ function Enemy2(game, spritesheet, x, y) {
 	this.enemyType = "StraightLeft";
 	this.nextType = "StraightLeft";
 	this.attackType = "Star";
+	this.removeOnDeath = true;
 	this.centerX = 16;
 	this.centerY = 24;
 	this.waiting = false;
@@ -877,7 +899,31 @@ Entity.prototype.update.call(this);
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
-            if(ent.isHero) this.game.gameEnd = true;
+            
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	
+            	this.game.lives--;
+            	
+            	if(this.game.lives < 1)
+    			{
+    				this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				restarter(gameEngine, ctx);
+    			}
+            }
 			
         };
     };
@@ -930,6 +976,7 @@ function Enemy(game, spritesheet, x, y){
 	this.centerY = 24;
 	this.waiting = false;
 	this.maxShot = 12;
+	this.removeOnDeath = true;
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
@@ -1010,13 +1057,37 @@ Enemy.prototype.update = function () {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
-            if(ent.isHero) this.game.gameEnd = true;
+            
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	
+            	this.game.lives--;
+            	
+            	if(this.game.lives < 1)
+    			{
+    				this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				restarter(gameEngine, ctx);
+    			}
+            }
+			
         };
     };
 	if(this.game.gameEnd) {
 		this.game.lives --;
 		if(this.game.lives > 0) {
-		
 		restarter(gameEngine, ctx);
 		}
 	}
@@ -1166,6 +1237,7 @@ function Enemy3(game, spritesheet, x, y){
 	this.isEnemy = true;
 	this.shoot = false;
 	this.currentState = 60;
+	this.removeOnDeath = true;
 	this.killScore = 100;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
@@ -1235,10 +1307,34 @@ Enemy3.prototype.update = function () {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
-            if(ent.isHero) this.game.gameEnd = true;
+            
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	this.game.lives--;
+            	
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	if(this.game.lives < 1)
+    			{
+    				this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				restarter(gameEngine, ctx);
+    			}
+            }
+			
         };
     };
-	if (this.game.gameEnd) {
+	if(this.game.gameEnd) {
 		this.game.lives --;
 		if(this.game.lives > 0) {
 		restarter(gameEngine, ctx);
@@ -1273,6 +1369,7 @@ Enemy3.prototype.draw = function () {
 	
     Entity.prototype.draw.call(this);
 };
+
 
 function spawnEnemies(gameEngine, difficulty)
 {	
@@ -1805,14 +1902,28 @@ function starter() {
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
 function restarter(gameEngine, ctx) {
-	gameEngine.init(ctx);
-    gameEngine.start();
+	//gameEngine.init(ctx);
+    //gameEngine.start();
     
-    gameEngine.gameScore = 0;
-	gameEngine.entities = [];
+    //gameEngine.gameScore = 0;
+	//gameEngine.entities = [];
     //gameEngine.showOutlines = true;
     
-    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+	//gameEngine.entities = [];
+	
+	
+	//I want to set a timeout here to delay the respawn, but it freezes everything else because single threaded
+//	setTimeout(function()
+//    {
+//		gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+//    }, 500);
+    
+	gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+    
+    //This code actually causes timestop for the bullets!!!!!!!!! good to know
+    /*
+    b = [];
+    bEnemy = [];*/
 }
 	
 function Menu(game, sprite) {
