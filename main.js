@@ -1080,6 +1080,7 @@ Enemy.prototype.update = function () {
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
+			if(this.hp > 0) {
 				this.hp--;
 				if(!ent.isHero) {
 					ent.removeFromWorld = true;
