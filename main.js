@@ -601,6 +601,7 @@ Reimu.prototype.update = function () {
 			this.bombs--;
 			//DO BOMB STUFF
 		}
+	}
 	if(this.game.z) { // If the space key is pressed.
 		this.isShooting = true;
 		this.bulletY = that.y;
@@ -919,7 +920,7 @@ Entity.prototype.update.call(this);
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
-            
+            }
             //i dont think we need this anymore?
             if(ent.isHero) 
             {
@@ -1086,7 +1087,7 @@ Enemy.prototype.update = function () {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
-            
+            }
             //i dont think we need this anymore?
             if(ent.isHero) 
             {
@@ -1344,7 +1345,7 @@ Enemy3.prototype.update = function () {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
-            
+            }
             //i dont think we need this anymore?
             if(ent.isHero) 
             {

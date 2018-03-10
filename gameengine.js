@@ -104,6 +104,7 @@ GameEngine.prototype.startInput = function () {
 			break;
 		case "KeyX":
 			that.x = true;
+			break;
 		case "KeyM":
 			if(!muteFired)
 			{
