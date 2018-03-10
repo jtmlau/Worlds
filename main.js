@@ -600,12 +600,23 @@ Reimu.prototype.update = function () {
 		if(this.bombs > 0) {
 			this.bombs--;
 			//DO BOMB STUFF
+			
+			for (var i = 0; i < this.game.entities.length; i++) 
+        	{
+                if(this.game.entities[i].isEnemy)
+                {
+                	this.game.entities[i].removeFromWorld = true;
+                }
+        	}
 		}
 	}
 	if(this.game.z) { // If the space key is pressed.
 		this.isShooting = true;
 		this.bulletY = that.y;
-		
+	}
+	
+	if(this.game.space)
+	{
 		if(!this.spawned)
 		{
 			if(soundBuffer != null)
@@ -621,6 +632,7 @@ Reimu.prototype.update = function () {
 			
 		}
 	}
+	
 	if(this.spawned && !this.music)
 	{
 		if(soundBuffer != null)
