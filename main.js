@@ -5,7 +5,9 @@ var soundBuffer = null;
 var gainNode = null;
 var gainNode2 = null;
 var gainNode1 = null;
+var gameEngine = null;
 var mute = false;
+var stopSpawn = false;
 var AM = new AssetManager();
 
 gameScore = 0;
@@ -603,9 +605,12 @@ Reimu.prototype.update = function () {
 				playBGM(soundBuffer[0]);
 				this.music = true;
 			}
+			//stopSpawn = false;
 			
 			spawnEnemies(this.game, 2);
+			console.log("Calling spawn enemies");
 			this.spawned = true;
+			
 		}
 	}
 	if(this.spawned && !this.music)
@@ -760,11 +765,11 @@ Reimu.prototype.update = function () {
             
 			if(this.game.lives < 1)
 			{
-				this.game.gameEnd = true;
+				restart(gameEngine, ctx);
 			}
 			else
 			{
-				restarter(gameEngine, ctx);
+				spawnReimu(gameEngine, ctx);
 			}
         };
     };
@@ -917,11 +922,11 @@ Entity.prototype.update.call(this);
             	
             	if(this.game.lives < 1)
     			{
-    				this.game.gameEnd = true;
+            		restart(gameEngine, ctx);
     			}
     			else
     			{
-    				restarter(gameEngine, ctx);
+    				spawnReimu(gameEngine, ctx);
     			}
             }
 			
@@ -930,7 +935,7 @@ Entity.prototype.update.call(this);
 	if(this.game.gameEnd) {
 		this.game.lives --;
 		if(this.game.lives > 0) {
-		restarter(gameEngine, ctx);
+			spawnReimu(gameEngine, ctx);
 		}
 	}
 }
@@ -1075,11 +1080,11 @@ Enemy.prototype.update = function () {
             	
             	if(this.game.lives < 1)
     			{
-    				this.game.gameEnd = true;
+            		restart(gameEngine, ctx);
     			}
     			else
     			{
-    				restarter(gameEngine, ctx);
+    				spawnReimu(gameEngine, ctx);
     			}
             }
 			
@@ -1088,7 +1093,7 @@ Enemy.prototype.update = function () {
 	if(this.game.gameEnd) {
 		this.game.lives --;
 		if(this.game.lives > 0) {
-		restarter(gameEngine, ctx);
+			spawnReimu(gameEngine, ctx);
 		}
 	}
 }
@@ -1324,11 +1329,11 @@ Enemy3.prototype.update = function () {
             	
             	if(this.game.lives < 1)
     			{
-    				this.game.gameEnd = true;
+            		restart(gameEngine, ctx);
     			}
     			else
     			{
-    				restarter(gameEngine, ctx);
+    				spawnReimu(gameEngine, ctx);
     			}
             }
 			
@@ -1337,7 +1342,7 @@ Enemy3.prototype.update = function () {
 	if(this.game.gameEnd) {
 		this.game.lives --;
 		if(this.game.lives > 0) {
-		restarter(gameEngine, ctx);
+			spawnReimu(gameEngine, ctx);
 		}
 	}
 }
@@ -1373,14 +1378,16 @@ Enemy3.prototype.draw = function () {
 
 function spawnEnemies(gameEngine, difficulty)
 {	
+	console.log("Starting Spawn enemies function");
+	
 	//while(!gameEngine.gamEnd) {
 		if (difficulty < 1) {
 			difficulty = .5;
 		}
 		var spacing = 6/difficulty;
-		var interval = spacing * 50
+		var interval = spacing * 50;
 		
-		console.log("spawn");
+		
 
 		for(var i = 2000; i<=2500; i+=interval)
 		{
@@ -1418,7 +1425,6 @@ function spawnEnemies(gameEngine, difficulty)
 				}, i);
 			}
 		}
-		
 		for(var i = 10000; i<=10500; i+=interval)
 		{
 			setTimeout(function()
@@ -1428,8 +1434,6 @@ function spawnEnemies(gameEngine, difficulty)
 				gameEngine.addEntity(tempEnemy);
 			}, i);
 		}
-		
-		
 		if (difficulty > 2) {	
 			for(var i = 12000; i<=12500; i+=interval)
 			{
@@ -1454,7 +1458,7 @@ function spawnEnemies(gameEngine, difficulty)
 	//		tempEnemy.maxShot = 20
 	//		gameEngine.addEntity(tempEnemy);
 	//	}, 16500);
-	   
+		
 			for(var i = 16500; i<=26000; i+= 4600)
 			{
 			setTimeout(function()
@@ -1502,7 +1506,6 @@ function spawnEnemies(gameEngine, difficulty)
 				gameEngine.addEntity(tempEnemy);
 			}, 25500);
 		}
-		
 			setTimeout(function()
 				{
 					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50);
@@ -1510,8 +1513,6 @@ function spawnEnemies(gameEngine, difficulty)
 					tempEnemy.nextType = "StraightRight";
 					gameEngine.addEntity(tempEnemy);
 				}, 28000);
-			
-		
 		if(difficulty > 1)
 		{	setTimeout(function()
 			{
@@ -1522,7 +1523,6 @@ function spawnEnemies(gameEngine, difficulty)
 				gameEngine.addEntity(tempEnemy);
 			}, 32000);
 		}
-		
 		setTimeout(function()
 		{
 			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 50);
@@ -1590,7 +1590,6 @@ function spawnEnemies(gameEngine, difficulty)
 					}, i);
 			}
 		}
-	   
 			for(var i = 52000; i<=52500; i+=(interval))
 			{
 				setTimeout(function()
@@ -1604,7 +1603,6 @@ function spawnEnemies(gameEngine, difficulty)
 					gameEngine.addEntity(tempEnemy2);
 				}, i);
 			}
-		
 		 if (difficulty > 1) {
 			 {
 			setTimeout(function()
@@ -1669,8 +1667,6 @@ function spawnEnemies(gameEngine, difficulty)
 							}, i);
 					}
 				}
-			   
-					 
 					for(var i = 62500; i<=90500; i+=4600)
 					{
 					setTimeout(function()
@@ -1684,7 +1680,6 @@ function spawnEnemies(gameEngine, difficulty)
 								gameEngine.addEntity(tempEnemy);
 							}, i);
 					}
-				 
 				if (difficulty > 2) {
 					setTimeout(function()
 					{
@@ -1710,6 +1705,7 @@ function spawnEnemies(gameEngine, difficulty)
 					tempEnemy.nextType = "StraightRight";
 					gameEngine.addEntity(tempEnemy);
 				}, 71000);
+				
 				 if (difficulty > 1) {
 					for(var i = 80000; i<=90500; i+=4600)
 					{
@@ -1740,7 +1736,6 @@ function spawnEnemies(gameEngine, difficulty)
 						}, i);
 					}
 				}
-				
 				if (difficulty > 1) {
 		
 					for(var i = 99000; i<=99500; i+=100)
@@ -1789,7 +1784,6 @@ function spawnEnemies(gameEngine, difficulty)
 							gameEngine.addEntity(tempEnemy2);
 						}, i);
 					}
-				
 				 if (difficulty > 1) {
 				setTimeout(function()
 				{
@@ -1823,7 +1817,6 @@ function spawnEnemies(gameEngine, difficulty)
 						}, i);
 					}
 				}
-				
 				setTimeout(function()
 				{
 					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180);
@@ -1873,7 +1866,7 @@ function starter() {
 	
 	var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
-	var gameEngine = new GameEngine();
+	gameEngine = new GameEngine();
 	gameEngine.play = false;
 	gameEngine.lives = 5;
 	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
@@ -1901,30 +1894,54 @@ function starter() {
     
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
-function restarter(gameEngine, ctx) {
-	//gameEngine.init(ctx);
-    //gameEngine.start();
-    
-    //gameEngine.gameScore = 0;
-	//gameEngine.entities = [];
-    //gameEngine.showOutlines = true;
-    
-	//gameEngine.entities = [];
+function restart(gameEngine, ctx) {
+	gameEngine.play = false;
 	
+	if(gainNode != null)
+	{
+		gainNode.gain.value = 0;
+	}
+	if(gainNode1 != null)
+	{
+		gainNode1.gain.value = 0;
+	}
+	if(gainNode2 != null)
+	{
+		gainNode2.gain.value = 0;
+	}
 	
-	//I want to set a timeout here to delay the respawn, but it freezes everything else because single threaded
-//	setTimeout(function()
-//    {
-//		gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
-//    }, 500);
-    
-	gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
-    
-    //This code actually causes timestop for the bullets!!!!!!!!! good to know
-    /*
-    b = [];
-    bEnemy = [];*/
+	gainNode = null
+	gainNode1 = null;
+	gainNode2 = null;
+	
+	stopSpawn = true;
+	
+	gameEngine.lives = 5;
+	
+	temp = new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500);
+	temp.spawned = false;
+	
+	gameEngine.addEntity(temp);
+	gameEngine.gameScore = 0;
+	
+	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
+	gameEngine.addEntity(menu);
+	
 }
+
+function spawnReimu(gameEngine, ctx) {
+	gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+	
+	
+}
+
+function timeStop()
+{
+	//This code actually causes timestop for the bullets!!!!!!!!! good to know
+    
+    b = [];
+    bEnemy = [];
+	}
 	
 function Menu(game, sprite) {
 	this.sprite = sprite;
