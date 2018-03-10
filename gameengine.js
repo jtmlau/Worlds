@@ -69,6 +69,8 @@ GameEngine.prototype.startInput = function () {
     	
     	switch(e.code)
     	{
+		case "KeyZ":
+			that.z = true;
     	case "Space":
     		that.space = true;
     		break;
@@ -119,6 +121,7 @@ GameEngine.prototype.startInput = function () {
 	{
     	switch(e.code)
     	{
+		
     	case "Space":
     		that.space = false;
     		break;
@@ -146,6 +149,9 @@ GameEngine.prototype.startInput = function () {
     	/*case "KeyG":
     		that.god = false;
     		break;*/
+		case "KeyZ":
+			that.z = false;
+			break;
 		case "KeyR":
 			that.r = false;
 			break;

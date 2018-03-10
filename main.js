@@ -590,7 +590,7 @@ Reimu.prototype.update = function () {
 	
 	var that = this;
 	
-	if(this.game.space) { // If the space key is pressed.
+	if(this.game.z) { // If the space key is pressed.
 		this.isShooting = true;
 		this.bulletY = that.y;
 		
@@ -701,7 +701,7 @@ Reimu.prototype.update = function () {
 		this.moveUp = false;
 	}if(!this.game.down) { // If the down arrow key is pressed.
 		this.moveDown = false;
-	}if(!this.game.space) {
+	}if(!this.game.z) {
 		this.isShooting = false;
 	}
 	
