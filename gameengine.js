@@ -55,6 +55,8 @@ GameEngine.prototype.start = function () {
 GameEngine.prototype.startInput = function () {
     console.log('Starting input');
     
+    var muteFired = false;
+    
     var that = this;
     
     this.ctx.canvas.addEventListener("keydown", function (e)
@@ -98,7 +100,15 @@ GameEngine.prototype.startInput = function () {
 		case "KeyR":
 			that.r = true;
 			break;
+		case "KeyM":
+			if(!muteFired)
+			{
+				that.m = true;
+				muted = true;
+			}
+			break;
     	}
+    	
     	
     	e.preventDefault();
     	
@@ -138,6 +148,10 @@ GameEngine.prototype.startInput = function () {
     		break;*/
 		case "KeyR":
 			that.r = false;
+			break;
+		case "KeyM":
+			that.m = false;
+			muteFired = false;
 			break;
     	}
     	

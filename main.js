@@ -2,6 +2,10 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var audioCtx = new AudioContext();
 var bufferLoader;
 var soundBuffer = null;
+var gainNode = null;
+var gainNode2 = null;
+var gainNode1 = null;
+var mute = false;
 var AM = new AssetManager();
 
 gameScore = 0;
@@ -224,22 +228,56 @@ BufferLoader.prototype.load = function() {
 
 function playSound(buffer) {
 	var source = audioCtx.createBufferSource(); // creates a sound source
-	var gainNode = audioCtx.createGain();
+	gainNode = audioCtx.createGain();
 	source.buffer = buffer;                    // tell the source which sound to play
 	source.connect(gainNode);
 	gainNode.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
-	gainNode.gain.value = 0.02;
+	if(mute)
+	{
+		gainNode.gain.value = 0;
+	}
+	else
+	{
+		gainNode.gain.value = 0.02;
+	}
+	
+	source.start(0);  
+}
+
+function playDeath(buffer)
+{
+	var source = audioCtx.createBufferSource(); // creates a sound source
+	gainNode2 = audioCtx.createGain();
+	source.buffer = buffer;                    // tell the source which sound to play
+	source.connect(gainNode);
+	gainNode2.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	if(mute)
+	{
+		gainNode2.gain.value = 0;
+	}
+	else
+	{
+		gainNode2.gain.value = 0.02;
+	}
 	source.start(0);  
 }
 
 function playBGM(buffer)
 {
 	var source1 = audioCtx.createBufferSource(); // creates a sound source
-	var gainNode1 = audioCtx.createGain();
+	gainNode1 = audioCtx.createGain();
 	source1.buffer = buffer;                    // tell the source which sound to play
 	source1.connect(gainNode1);
 	gainNode1.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
-	gainNode1.gain.value = 0.25;
+	if(mute)
+	{
+		gainNode1.gain.value = 0;
+	}
+	else
+	{
+		gainNode1.gain.value = 0.25;
+	}
+	
 	source1.start(0); 
 	
 	
@@ -462,6 +500,7 @@ function Reimu(game, spritesheet) {
     this.ctx = game.ctx;
     this.spawned = false;
     this.music = false;
+    this.muteFired = false;
     Entity.call(this, game, 268, 550);
 }
 
@@ -575,6 +614,33 @@ Reimu.prototype.update = function () {
 		}
 	}
 
+	if(this.game.m)
+	{
+		if(!muteFired)
+		{
+			if(!mute)
+			{
+				console.log("Muted!");
+				gainNode.gain.value = 0;
+				gainNode1.gain.value = 0;
+				mute = true;
+			}
+			else if(mute)
+			{
+				console.log("Unmuted!");
+				gainNode.gain.value = 0.02;
+				gainNode1.gain.value = 0.25;
+				mute = false;
+			}
+			
+			muteFired = true;
+		}
+	}
+	else if(!this.game.m)
+	{
+		muteFired = false;
+	}
+	
 	if(this.game.shift) 
 	{
 		this.speed = 100;
@@ -652,7 +718,7 @@ Reimu.prototype.update = function () {
         if (this != ent && this.collide(ent) && ent.isEnemy && this.canCollide) {
         	if(soundBuffer != null)
     		{
-    			playBGM(soundBuffer[2]);
+    			playDeath(soundBuffer[2]);
     			this.music = true;
     		}
         	
