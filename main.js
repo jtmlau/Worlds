@@ -482,6 +482,7 @@ function enemyMovement(the_enemy)
 
 function Reimu(game, spritesheet, hp) {
 	this.hp = hp;
+	this.bombs = 3;
 	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
     this.speed = 350;
@@ -589,7 +590,12 @@ Reimu.prototype.update = function () {
 	Entity.prototype.update.call(this);
 	
 	var that = this;
-	
+	if(this.game.x) {
+		this.game.x = false;
+		if(this.bombs > 0) {
+			this.bombs--;
+			//DO BOMB STUFF
+		}
 	if(this.game.z) { // If the space key is pressed.
 		this.isShooting = true;
 		this.bulletY = that.y;
@@ -606,6 +612,7 @@ Reimu.prototype.update = function () {
 			this.spawned = true;
 		}
 	}
+	
 	if(this.spawned && !this.music)
 	{
 		if(soundBuffer != null)
