@@ -95,9 +95,6 @@ GameEngine.prototype.startInput = function () {
     		if(!that.god)that.god = true;
     		else that.god = false;
     		break;
-		case "KeyR":
-			that.r = true;
-			break;
     	}
     	
     	e.preventDefault();
@@ -136,9 +133,6 @@ GameEngine.prototype.startInput = function () {
     	/*case "KeyG":
     		that.god = false;
     		break;*/
-		case "KeyR":
-			that.r = false;
-			break;
     	}
     	
     	e.preventDefault();
