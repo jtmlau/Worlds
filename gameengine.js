@@ -224,15 +224,15 @@ GameEngine.prototype.update = function () {
 			if(this.endGameScore< 7400) {
 					
 				ctx.fillStyle = "white";
-				ctx.fillText("GAME OVER", 100, 400);
+				ctx.fillText("GAME OVER", 100, 450);
 				ctx.fillStyle = "black";
-				ctx.strokeText("GAME OVER", 100, 400);
+				ctx.strokeText("GAME OVER", 100, 450);
 			}
 			else {
 				ctx.fillStyle = "white";
-				ctx.fillText("You won!", 100, 400);
+				ctx.fillText("You won!", 120, 450);
 				ctx.fillStyle = "black";
-				ctx.strokeText("You won!", 100, 400);
+				ctx.strokeText("You won!", 120, 450);
 			}
 	    }
 

@@ -240,9 +240,7 @@ function playBGM(buffer)
 	source1.connect(gainNode1);
 	gainNode1.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
 	gainNode1.gain.value = 0.25;
-	source1.start(0); 
-	
-	
+	source1.start(0); 	
 }
 
 function Background(game, spritesheet) {
@@ -376,13 +374,13 @@ function enemyMovement(the_enemy)
 			}
 		case "StraightRight":
 			the_enemy.x += the_enemy.game.clockTick * 650;
-			if(the_enemy.x > 1000) {
+			if(the_enemy.x > 710) {
 				the_enemy.removeFromWorld = true;
 			}	
 			break;
 		case "SlowRight":
 			the_enemy.x += the_enemy.game.clockTick * 400;
-			if(the_enemy.x > 1000) {
+			if(the_enemy.x > 710) {
 				the_enemy.removeFromWorld = true;
 			}	
 			break;
@@ -394,13 +392,13 @@ function enemyMovement(the_enemy)
 			break;
 		case "StraightLeft":
 			the_enemy.x -= the_enemy.game.clockTick * 650;
-			if(the_enemy.x < -200) {
+			if(the_enemy.x < -120) {
 				the_enemy.removeFromWorld = true;
 			}	
 			break;
 		case "SlowLeft":
 			the_enemy.x -= the_enemy.game.clockTick * 400;
-			if(the_enemy.x < -200) {
+			if(the_enemy.x < -120) {
 				the_enemy.removeFromWorld = true;
 			}	
 			break;
@@ -443,7 +441,7 @@ function enemyMovement(the_enemy)
 }
 
 function Reimu(game, spritesheet) {
-	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
+	this.animation = new Animation(spritesheet, 32, 47, 261, .1, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
     this.speed = 350;
     this.bulletSpeed = 230;
@@ -558,7 +556,7 @@ Reimu.prototype.update = function () {
 		{
 			if(soundBuffer != null)
 			{
-				playBGM(soundBuffer[0]);
+				//playBGM(soundBuffer[0]);
 				this.music = true;
 			}
 			
@@ -570,7 +568,7 @@ Reimu.prototype.update = function () {
 	{
 		if(soundBuffer != null)
 		{
-			playBGM(soundBuffer[0]);
+			//playBGM(soundBuffer[0]);
 			this.music = true;
 		}
 	}
