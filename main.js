@@ -246,10 +246,10 @@ function playSound(buffer) {
 
 function playDeath(buffer)
 {
-	var source2 = audioCtx.createBufferSource(); // creates a sound source
+	var source = audioCtx.createBufferSource(); // creates a sound source
 	gainNode2 = audioCtx.createGain();
-	source2.buffer = buffer;                    // tell the source which sound to play
-	source2.connect(gainNode2);
+	source.buffer = buffer;                    // tell the source which sound to play
+	source.connect(gainNode);
 	gainNode2.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
 	if(mute)
 	{
@@ -259,7 +259,7 @@ function playDeath(buffer)
 	{
 		gainNode2.gain.value = 0.02;
 	}
-	source2.start(0);  
+	source.start(0);  
 }
 
 function playBGM(buffer)
@@ -622,35 +622,15 @@ Reimu.prototype.update = function () {
 			if(!mute)
 			{
 				console.log("Muted!");
-				if(gainNode != null)
-				{
-					gainNode.gain.value = 0;
-				}
-				if(gainNode1 != null)
-				{
-					gainNode1.gain.value = 0;
-				}
-				if(gainNode2 != null)
-				{
-					gainNode2.gain.value = 0;
-				}
+				gainNode.gain.value = 0;
+				gainNode1.gain.value = 0;
 				mute = true;
 			}
 			else if(mute)
 			{
 				console.log("Unmuted!");
-				if(gainNode != null)
-				{
-					gainNode.gain.value = 0.02;
-				}
-				if(gainNode1 != null)
-				{
-					gainNode1.gain.value = 0.25;
-				}
-				if(gainNode2 != null)
-				{
-					gainNode2.gain.value = 0.02;
-				}
+				gainNode.gain.value = 0.02;
+				gainNode1.gain.value = 0.25;
 				mute = false;
 			}
 			
@@ -740,6 +720,7 @@ Reimu.prototype.update = function () {
         	if(soundBuffer != null)
     		{
     			playDeath(soundBuffer[2]);
+    			this.music = true;
     		}
         	
             this.removeFromWorld = true;
