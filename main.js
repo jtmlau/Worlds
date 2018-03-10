@@ -859,6 +859,9 @@ Entity.prototype.update.call(this);
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
 			if (this.hp > 0) {
 				this.hp--;
+				if(!ent.isHero) {
+					ent.removeFromWorld = true;
+				}
 			} else {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
@@ -997,6 +1000,9 @@ Enemy.prototype.update = function () {
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
 			if(this.hp > 0) {
 				this.hp--;
+				if(!ent.isHero) {
+					ent.removeFromWorld = true;
+				}
 			} else {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
@@ -1227,6 +1233,9 @@ Enemy3.prototype.update = function () {
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
 			if(this.hp > 0) {
 				this.hp--;
+				if(!ent.isHero) {
+					ent.removeFromWorld = true;
+				}
 			} else {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
@@ -1278,7 +1287,7 @@ function spawnEnemies(gameEngine, difficulty)
 			difficulty = .5;
 			
 		}
-		var hp = 7;//Math.ceil(difficulty/2);
+		var hp = difficulty;//Math.ceil(difficulty/2);
 		var spacing = 6/difficulty;
 		var interval = spacing * 50
 		
