@@ -5,7 +5,9 @@ var soundBuffer = null;
 var gainNode = null;
 var gainNode2 = null;
 var gainNode1 = null;
+var gameEngine = null;
 var mute = false;
+var stopSpawn = false;
 var AM = new AssetManager();
 
 gameScore = 0;
@@ -246,10 +248,10 @@ function playSound(buffer) {
 
 function playDeath(buffer)
 {
-	var source = audioCtx.createBufferSource(); // creates a sound source
+	var source2 = audioCtx.createBufferSource(); // creates a sound source
 	gainNode2 = audioCtx.createGain();
-	source.buffer = buffer;                    // tell the source which sound to play
-	source.connect(gainNode);
+	source2.buffer = buffer;                    // tell the source which sound to play
+	source2.connect(gainNode2);
 	gainNode2.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
 	if(mute)
 	{
@@ -257,9 +259,9 @@ function playDeath(buffer)
 	}
 	else
 	{
-		gainNode2.gain.value = 0.02;
+		gainNode2.gain.value = 0.2;
 	}
-	source.start(0);  
+	source2.start(0);  
 }
 
 function playBGM(buffer)
@@ -503,6 +505,7 @@ function Reimu(game, spritesheet, hp) {
     this.spawned = false;
     this.music = false;
     this.muteFired = false;
+    this.removeOnDeath = true;
     Entity.call(this, game, 268, 550);
 }
 
@@ -519,6 +522,7 @@ function ReimuBullet(game, spritesheet) {
 	this.radius = 6
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
+	this.removeOnDeath = true;
 	Entity.call(this, game, 268, 550);
 }
 
@@ -549,6 +553,7 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.radius = 11;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
+	this.removeOnDeath = true;
 	this.removeFromWorld = false;
 	Entity.call(this, game, x, y);
 }
@@ -607,12 +612,14 @@ Reimu.prototype.update = function () {
 				playBGM(soundBuffer[0]);
 				this.music = true;
 			}
+			//stopSpawn = false;
 			
 			spawnEnemies(this.game, 2);
+			console.log("Calling spawn enemies");
 			this.spawned = true;
+			
 		}
 	}
-	
 	if(this.spawned && !this.music)
 	{
 		if(soundBuffer != null)
@@ -629,15 +636,35 @@ Reimu.prototype.update = function () {
 			if(!mute)
 			{
 				console.log("Muted!");
-				gainNode.gain.value = 0;
-				gainNode1.gain.value = 0;
+				if(gainNode != null)
+				{
+					gainNode.gain.value = 0;
+				}
+				if(gainNode1 != null)
+				{
+					gainNode1.gain.value = 0;
+				}
+				if(gainNode2 != null)
+				{
+					gainNode2.gain.value = 0;
+				}
 				mute = true;
 			}
 			else if(mute)
 			{
 				console.log("Unmuted!");
-				gainNode.gain.value = 0.02;
-				gainNode1.gain.value = 0.25;
+				if(gainNode != null)
+				{
+					gainNode.gain.value = 0.02;
+				}
+				if(gainNode1 != null)
+				{
+					gainNode1.gain.value = 0.25;
+				}
+				if(gainNode2 != null)
+				{
+					gainNode2.gain.value = 0.2;
+				}
 				mute = false;
 			}
 			
@@ -727,25 +754,43 @@ Reimu.prototype.update = function () {
         	if(soundBuffer != null)
     		{
     			playDeath(soundBuffer[2]);
-    			this.music = true;
     		}
+        	
+        	this.game.lives--;
         	
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
-            this.game.gameEnd = true;
-			
+            
+          //remove all enemies and bullets on death?
+        	for (var i = 0; i < this.game.entities.length; i++) 
+        	{
+                if(this.game.entities[i].removeOnDeath)
+                {
+                	this.game.entities[i].removeFromWorld = true;
+                }
+        	}
+            
+			if(this.game.lives < 1)
+			{
+				//restart(gameEngine, ctx);
+				this.game.gameEnd = true;
+			}
+			else
+			{
+				spawnReimu(gameEngine, ctx);
+			}
         };
     };
-	if(this.game.gameEnd) {
-		this.game.lives --;
-		if(this.game.lives > 0) {
-		restarter(gameEngine, ctx);
-		
-		} else {
-			//this.game.prototype.init(ctx);
-			starter();
-		}
-	}
+//	if(this.game.gameEnd) {
+//		this.game.lives--;
+//		if(this.game.lives > 0) {
+//		restarter(gameEngine, ctx);
+//		
+//		} else {
+//			//this.game.prototype.init(ctx);
+//			starter();
+//		}
+//	}
 };
 
 Reimu.prototype.draw = function () {
@@ -784,6 +829,7 @@ function Enemy2(game, spritesheet, x, y, hp) {
 	this.enemyType = "StraightLeft";
 	this.nextType = "StraightLeft";
 	this.attackType = "Star";
+	this.removeOnDeath = true;
 	this.centerX = 16;
 	this.centerY = 24;
 	this.waiting = false;
@@ -873,15 +919,40 @@ Entity.prototype.update.call(this);
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
-			}
-            if(ent.isHero) this.game.gameEnd = true;
+            
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	
+            	this.game.lives--;
+            	
+            	if(this.game.lives < 1)
+    			{
+            		//restart(gameEngine, ctx);
+            		this.game.gameEnd = true;
+            		
+    			}
+    			else
+    			{
+    				spawnReimu(gameEngine, ctx);
+    			}
+            }
 			
         };
     };
 	if(this.game.gameEnd) {
 		this.game.lives --;
 		if(this.game.lives > 0) {
-		restarter(gameEngine, ctx);
+			spawnReimu(gameEngine, ctx);
 		}
 	}
 }
@@ -928,6 +999,7 @@ function Enemy(game, spritesheet, x, y, hp){
 	this.centerY = 24;
 	this.waiting = false;
 	this.maxShot = 12;
+	this.removeOnDeath = true;
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
@@ -1014,15 +1086,39 @@ Enemy.prototype.update = function () {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
-			}
-            if(ent.isHero) this.game.gameEnd = true;
+            
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	
+            	this.game.lives--;
+            	
+            	if(this.game.lives < 1)
+    			{
+            		//restart(gameEngine, ctx);
+            		this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				spawnReimu(gameEngine, ctx);
+    			}
+            }
+			
         };
     };
 	if(this.game.gameEnd) {
 		this.game.lives --;
 		if(this.game.lives > 0) {
-		
-		restarter(gameEngine, ctx);
+			spawnReimu(gameEngine, ctx);
 		}
 	}
 }
@@ -1172,6 +1268,7 @@ function Enemy3(game, spritesheet, x, y, hp){
 	this.isEnemy = true;
 	this.shoot = false;
 	this.currentState = 60;
+	this.removeOnDeath = true;
 	this.killScore = 100;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
@@ -1246,15 +1343,39 @@ Enemy3.prototype.update = function () {
 			} else {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
-			}
             this.game.gameScore += this.killScore;
-            if(ent.isHero) this.game.gameEnd = true;
+            
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	this.game.lives--;
+            	
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	if(this.game.lives < 1)
+    			{
+            		//restart(gameEngine, ctx);
+            		this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				spawnReimu(gameEngine, ctx);
+    			}
+            }
+			
         };
     };
-	if (this.game.gameEnd) {
+	if(this.game.gameEnd) {
 		this.game.lives --;
 		if(this.game.lives > 0) {
-		restarter(gameEngine, ctx);
+			spawnReimu(gameEngine, ctx);
 		}
 	}
 }
@@ -1287,18 +1408,19 @@ Enemy3.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
+
 function spawnEnemies(gameEngine, difficulty)
 {	
+	console.log("Starting Spawn enemies function");
+	
 	//while(!gameEngine.gamEnd) {
 		if (difficulty < 1) {
 			difficulty = .5;
-			
 		}
 		var hp = difficulty;//Math.ceil(difficulty/2);
 		var spacing = 6/difficulty;
 		var interval = spacing * 50
 		
-		console.log("spawn");
 
 		for(var i = 2000; i<=2500; i+=interval)
 		{
@@ -1791,7 +1913,7 @@ function starter() {
 	
 	var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
-	var gameEngine = new GameEngine();
+	gameEngine = new GameEngine();
 	gameEngine.play = false;
 	gameEngine.lives = 5;
 	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
@@ -1817,18 +1939,56 @@ function starter() {
     gameEngine.gameScore = 0;
     //gameEngine.showOutlines = true;
     
-    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500), 5);
+    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
-function restarter(gameEngine, ctx) {
-	gameEngine.init(ctx);
-    gameEngine.start();
-    
-    gameEngine.gameScore = 0;
-	gameEngine.entities = [];
-    //gameEngine.showOutlines = true;
-    
-    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500), 5);
+function restart(gameEngine, ctx) {
+	gameEngine.play = false;
+	
+	if(gainNode != null)
+	{
+		gainNode.gain.value = 0;
+	}
+	if(gainNode1 != null)
+	{
+		gainNode1.gain.value = 0;
+	}
+	if(gainNode2 != null)
+	{
+		gainNode2.gain.value = 0;
+	}
+	
+	gainNode = null
+	gainNode1 = null;
+	gainNode2 = null;
+	
+	stopSpawn = true;
+	
+	gameEngine.lives = 5;
+	
+	temp = new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500);
+	temp.spawned = false;
+	
+	gameEngine.addEntity(temp);
+	gameEngine.gameScore = 0;
+	
+	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
+	gameEngine.addEntity(menu);
+	
 }
+
+function spawnReimu(gameEngine, ctx) {
+	gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+	
+	
+}
+
+function timeStop()
+{
+	//This code actually causes timestop for the bullets!!!!!!!!! good to know
+    
+    b = [];
+    bEnemy = [];
+	}
 	
 function Menu(game, sprite) {
 	this.sprite = sprite;
