@@ -25,6 +25,36 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.scale = scale;
 }
 
+Animation.prototype.drawYuyukoFrame = function(tick, ctx, x, y) {
+	this.elapsedTime += tick;
+	if(this.isDone()) {
+		if(this.loop) this.elapsedTime =0;
+	}
+	var vindex =0;
+	var offset = 710;
+	var yoffset = 380;
+	
+		
+	var frame = this.currentFrame();
+	if ((frame < 3)) {
+		var xindex = 710 + (frame * 50);
+		var yindex = 380;
+		ctx.drawImage(this.spriteSheet, xindex,
+		yindex, this.frameWidth, this.frameHeight,
+		x, y, this.frameWidth * this.scale, this.frameHeight * this.scale);
+	} else {
+		var xindex = 715 +((frame - 3) * 50);
+		var yindex = 470;
+		ctx.drawImage(this.spriteSheet, xindex,
+		yindex, this.frameWidth, this.frameHeight,
+		x, y + 10	, this.frameWidth * this.scale, this.frameHeight * this.scale);	
+	}
+	
+	
+	
+	//yindex = Math.floor(frame/this.sheetWidth)
+	
+}
 
 Animation.prototype.drawReimuFrame = function (tick, ctx, x, y, left, right) {
     this.elapsedTime += tick;
@@ -175,7 +205,7 @@ BufferLoader.prototype.loadBuffer = function(url, index) {
 
     var loader = this;
 
-    request.onload = function() {
+			request.onload = function() {
         // Asynchronously decode the audio file data in request.response
         loader.context.decodeAudioData(
             request.response,
@@ -985,7 +1015,92 @@ Enemy2.prototype.draw = function() {
 	
     Entity.prototype.draw.call(this);
 };
+function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
+	this.hp = hp;
+	this.x = x;
+	this.y = y;
 
+	this.animation = new Animation(spritesheet, 40, 85, 1350, 1, 6, true, 1)
+	this.timer = 0;
+	this.speed = 80;
+	this.bulletSpeed = 10;
+	this.bulletY = 10;
+	this.radius = 15;
+	this.count = 0;
+	this.bulletInterval = 7;
+	this.isEnemy = true;
+	this.shoot = false;
+	this.killScore = 10000;
+	this.ctx = game.ctx;
+	Entity.call(this,game,x,y);
+};
+Yuyuko.prototype = new Entity();
+Yuyuko.prototype.constructor = Yuyuko;
+Yuyuko.prototype.update = function () {
+	Entity.prototype.update.call(this);
+	
+	
+	var gameEngine = this.game;
+	var ctx = this.ctx;
+	for (var i = 0; i < this.game.entities.length; i++) {
+        var ent = this.game.entities[i];
+        if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
+			if(this.hp > 0) {
+				this.hp--;
+				if(!ent.isHero) {
+					ent.removeFromWorld = true;
+				}
+			} else {
+            this.removeFromWorld = true;
+            ent.removeFromWorld = true;
+            this.game.gameScore += this.killScore;
+            }
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	
+            	this.game.lives--;
+            	
+            	if(this.game.lives < 1)
+    			{
+            		//restart(gameEngine, ctx);
+            		this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				spawnReimu(gameEngine, ctx);
+    			}
+            }
+			
+        };
+    };
+	if(this.game.gameEnd) {
+		this.game.lives --;
+		if(this.game.lives > 0) {
+			spawnReimu(gameEngine, ctx);
+		}
+	}
+}
+
+
+
+Yuyuko.prototype.draw = function () {
+
+
+	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	
+
+    Entity.prototype.draw.call(this);
+};
 function Enemy(game, spritesheet, x, y, hp){
 	this.hp = hp;
 	this.x = x;
@@ -1019,6 +1134,7 @@ function Enemy(game, spritesheet, x, y, hp){
 
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
+
 
 Enemy.prototype.update = function () {
 	Entity.prototype.update.call(this);
@@ -1939,7 +2055,7 @@ function starter() {
     
     gameEngine.gameScore = 0;
     //gameEngine.showOutlines = true;
-    
+    gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 10, 100));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
 function restart(gameEngine, ctx) {
