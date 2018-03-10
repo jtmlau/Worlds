@@ -5,6 +5,7 @@ var soundBuffer = null;
 var gainNode = null;
 var gainNode2 = null;
 var gainNode1 = null;
+var gainNode3 = null;
 var gameEngine = null;
 var mute = false;
 var stopSpawn = false;
@@ -281,8 +282,25 @@ function playBGM(buffer)
 	}
 	
 	source1.start(0); 
+}
+
+function playBomb(buffer)
+{
+	var source3 = audioCtx.createBufferSource(); // creates a sound source
+	gainNode3 = audioCtx.createGain();
+	source3.buffer = buffer;                    // tell the source which sound to play
+	source3.connect(gainNode3);
+	gainNode3.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	if(mute)
+	{
+		gainNode3.gain.value = 0;
+	}
+	else
+	{
+		gainNode3.gain.value = 0.14;
+	}
 	
-	
+	source3.start(0); 
 }
 
 function Background(game, spritesheet) {
@@ -601,6 +619,8 @@ Reimu.prototype.update = function () {
 			this.bombs--;
 			//DO BOMB STUFF
 			
+			playBomb(soundBuffer[3]);
+			
 			for (var i = 0; i < this.game.entities.length; i++) 
         	{
                 if(this.game.entities[i].isEnemy)
@@ -661,6 +681,10 @@ Reimu.prototype.update = function () {
 				{
 					gainNode2.gain.value = 0;
 				}
+				if(gainNode3 != null)
+				{
+					gainNode3.gain.value = 0;
+				}
 				mute = true;
 			}
 			else if(mute)
@@ -677,6 +701,10 @@ Reimu.prototype.update = function () {
 				if(gainNode2 != null)
 				{
 					gainNode2.gain.value = 0.2;
+				}
+				if(gainNode3 != null)
+				{
+					gainNode3.gain.value = 0.14;
 				}
 				mute = false;
 			}
@@ -1938,6 +1966,7 @@ function starter() {
 				'./audio/sennen.ogg',
 				'./audio/attack3.ogg',
 				'./audio/dead.ogg',
+				'./audio/spellcard.ogg',
 			],
 			function(buffer) {
 				console.log("Callback");
@@ -1968,6 +1997,10 @@ function restart(gameEngine, ctx) {
 	if(gainNode2 != null)
 	{
 		gainNode2.gain.value = 0;
+	}
+	if(gainNode3 != null)
+	{
+		gainNode3.gain.value = 0;
 	}
 	
 	gainNode = null
