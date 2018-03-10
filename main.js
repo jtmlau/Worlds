@@ -621,16 +621,35 @@ Reimu.prototype.update = function () {
 			if(!mute)
 			{
 				console.log("Muted!");
-				gainNode.gain.value = 0;
-				//gainNode1.gain.value = 0;
-				
+				if(gainNode != null)
+				{
+					gainNode.gain.value = 0;
+				}
+				if(gainNode1 != null)
+				{
+					gainNode1.gain.value = 0;
+				}
+				if(gainNode2 != null)
+				{
+					gainNode2.gain.value = 0;
+				}
 				mute = true;
 			}
 			else if(mute)
 			{
 				console.log("Unmuted!");
-				gainNode.gain.value = 0.02;
-				gainNode1.gain.value = 0.25;
+				if(gainNode != null)
+				{
+					gainNode.gain.value = 0.02;
+				}
+				if(gainNode1 != null)
+				{
+					gainNode1.gain.value = 0.25;
+				}
+				if(gainNode2 != null)
+				{
+					gainNode2.gain.value = 0.02;
+				}
 				mute = false;
 			}
 			
