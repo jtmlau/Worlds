@@ -29,7 +29,7 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.scale = scale;
 }
 
-Animation.prototype.drawYuyukoFrame = function(tick, ctx, x, y) {
+Animation.prototype.drawYuyukoFrame = function(tick, ctx, x, y, yuyuko) {
 	this.elapsedTime += tick;
 	if(this.isDone()) {
 		if(this.loop) this.elapsedTime =0;
@@ -40,21 +40,53 @@ Animation.prototype.drawYuyukoFrame = function(tick, ctx, x, y) {
 	
 		
 	var frame = this.currentFrame();
-	if ((frame < 3)) {
-		var xindex = 710 + (frame * 50);
-		var yindex = 380;
+	
+	if(yuyuko.isMoving)
+	{
+//		xindex = 710;
+//		yindex = 570;
+//		
+//		ctx.drawImage(this.spriteSheet, xindex,
+//				yindex, this.frameWidth, this.frameHeight,
+//				x, y, this.frameWidth * this.scale, this.frameHeight * this.scale);
+		
+		xindex = 815;
+		yindex = 470;
+		
 		ctx.drawImage(this.spriteSheet, xindex,
-		yindex, this.frameWidth, this.frameHeight,
-		x, y, this.frameWidth * this.scale, this.frameHeight * this.scale);
-	} else {
-		var xindex = 715 +((frame - 3) * 50);
-		var yindex = 470;
-		ctx.drawImage(this.spriteSheet, xindex,
-		yindex, this.frameWidth, this.frameHeight,
-		x, y + 10	, this.frameWidth * this.scale, this.frameHeight * this.scale);	
+				yindex, this.frameWidth, this.frameHeight,
+				x, y, this.frameWidth * this.scale, this.frameHeight * this.scale);
+	}
+	else if(yuyuko.startMove)
+	{
+		if ((frame < 3)) {
+			var xindex = 710 + (frame * 50);
+			var yindex = 380;
+			ctx.drawImage(this.spriteSheet, xindex,
+			yindex, this.frameWidth, this.frameHeight,
+			x, y, this.frameWidth * this.scale, this.frameHeight * this.scale);
+		} else{
+			var xindex = 715 +((frame - 3) * 50);
+			var yindex = 470;
+			ctx.drawImage(this.spriteSheet, xindex,
+			yindex, this.frameWidth, this.frameHeight,
+			x, y + 10	, this.frameWidth * this.scale, this.frameHeight * this.scale);	
+		}
+		if(frame == 5)
+		{
+			yuyuko.isMoving = true;
+		}
 	}
 	
-	
+	if(!yuyuko.startMove & !yuyuko.isMoving)
+	{
+		xindex = 710;
+		yindex = 380;
+		
+		ctx.drawImage(this.spriteSheet, xindex,
+				yindex, this.frameWidth, this.frameHeight,
+				x, y, this.frameWidth * this.scale, this.frameHeight * this.scale);
+	}
 	
 	//yindex = Math.floor(frame/this.sheetWidth)
 	
@@ -537,7 +569,7 @@ function Reimu(game, spritesheet, hp) {
 	this.hp = hp;
 	this.bombs = 3;
 	
-	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
+	this.animation = new Animation(spritesheet, 32, 47, 261, .2, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
     this.speed = 350;
     this.bulletSpeed = 230;
@@ -656,14 +688,14 @@ Reimu.prototype.update = function () {
 			this.game.bombs = this.bombs;
 			//DO BOMB STUFF
 			if(soundBuffer != null)
-		{
-			playBomb(soundBuffer[3]);
-		}
+			{
+				playBomb(soundBuffer[3]);
+			}
 			
 			
 			for (var i = 0; i < this.game.entities.length; i++) 
         	{
-                if(this.game.entities[i].isEnemy)
+                if(this.game.entities[i].isEnemy && !this.game.entities[i].bombImmune)
                 {
                 	this.game.entities[i].removeFromWorld = true;
                 }
@@ -687,6 +719,7 @@ Reimu.prototype.update = function () {
 			//stopSpawn = false;
 			
 			spawnEnemies(this.game, 2);
+			//spawnBoss(this.game);
 			console.log("Calling spawn enemies");
 			this.spawned = true;
 			
@@ -853,6 +886,10 @@ Reimu.prototype.update = function () {
             
 			if(this.game.lives < 1)
 			{
+				for (var i = 0; i < this.game.entities.length; i++) 
+	        	{
+	                	this.game.entities[i].removeFromWorld = true;
+	        	}
 				restart(gameEngine, ctx);
 				//this.game.gameEnd = true;
 			}
@@ -918,6 +955,7 @@ function Enemy2(game, spritesheet, x, y, hp) {
 	this.waiting = false;
 	this.maxShot = 12;
 	this.timer = 0;
+	this.bombImmune = false;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
 	this.bulletY = 23;
@@ -1068,19 +1106,37 @@ Enemy2.prototype.draw = function() {
 	
     Entity.prototype.draw.call(this);
 };
-function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
-	this.hp = hp;
+function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
+	this.hp = difficulty * 40;
+	this.phasehealth = this.hp/6;
+	this.phase = 6;
+	this.spritesheet = spritesheet;
 	this.x = x;
 	this.y = y;
-
-	this.animation = new Animation(spritesheet, 40, 85, 1350, 1, 6, true, 1)
+	this.floatnum = 6;
+	this.fanAlpha = 0.0;
+	this.animation = new Animation(spritesheet, 40, 85, 1350, .1, 6, true, 1.5)
+	this.fanimation = new Animation(spritesheet, 510, 260, 1350, 1, 1, true, 3) //x=710-1220 y = 640-900
+	this.fanout = true;
+	this.state = "Down";
 	this.timer = 0;
+	this.invul = true;
+	this.shoot = false;
 	this.speed = 80;
 	this.bulletSpeed = 10;
-	this.bulletY = 10;
-	this.radius = 15;
+	this.bulletY = 30;
+	this.radius = 50;
+	this.centerX = 37;
+    this.centerY = 70;
 	this.count = 0;
+	this.bombImmune = true;
+	this.startMove = false;
+	this.isMoving = false;
+	this.currentSpell = false;
 	this.bulletInterval = 7;
+	this.canCollide = true;
+	this.totalInterval = 15;
+	this.bulletInterval = this.totalInterval;
 	this.isEnemy = true;
 	this.shoot = false;
 	this.killScore = 10000;
@@ -1090,8 +1146,220 @@ function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
 Yuyuko.prototype = new Entity();
 Yuyuko.prototype.constructor = Yuyuko;
 Yuyuko.prototype.update = function () {
+	if(this.hp % this.phasehealth === 0 && this.hp/this.phasehealth > this.phase) {
+		this.phase --;
+		if(this.phase%3 ===0) {
+			this.fanout = true;
+		} else {
+			this.fanout = false;
+			this.fanAlpha = 0.0;
+		}
+		for (var i = 0; i < this.game.entities.length; i++) 
+        	{
+				if(!this.game.entities[i]===this) {
+					if(this.game.entities[i].isEnemy)
+					{
+						this.game.entities[i].removeFromWorld = true;
+					}
+				}
+        	}
+	}
 	Entity.prototype.update.call(this);
 	
+	//SHOOTING STUFF
+	if(this.shoot){
+		this.bulletY += this.game.clockTick * this.bulletSpeed;
+	}
+	
+	if(this.state === "Float" || this.state === "SideFloat")
+	{
+		if(this.bulletInterval === 0)
+		{
+			this.shoot = true;
+			this.count++;
+			this.bulletInterval = this.totalInterval;
+			
+		}
+		else
+		{
+			this.shoot = false;
+		}
+		this.bulletInterval--;
+	}
+	
+	if(this.state === "Down") {
+		this.startMove = true;
+		
+		this.y += 1
+		if (this.y > 100) {
+			this.invul = false;
+			this.state = "Float";
+		}
+	}
+	if(this.state === "MoveRight") {
+		if(this.x < 350) {
+			this.x++;
+		}
+		if(this.y > 50) {
+			this.y -= .5;
+		}
+		if(this.x > 346 && this.y < 60)
+		{
+			this.state = "SideFloat"
+		}
+		
+	}
+	if(this.state === "MoveLeft") {
+		if(this.x > 150) {
+			this.x--;
+		}
+		if(this.y > 50) {
+			this.y -= .5;
+		}
+		if(this.x < 158 && this.y < 60)
+		{
+			this.state = "SideFloat"
+		}
+	}
+	if(this.state === "SideFloat")
+	{
+		this.startMove = false;
+		this.isMoving = false;
+		
+		//console.log(this.state);
+//		if(this.floatnum % 2 === 1 && this.floatnum >= 0) {
+//			if(this.y <= 90) {
+//				this.floatnum--;
+//			}this.y-=.3;
+//		} 
+//		if (this.floatnum % 2 === 0 && this.floatnum >= 0) {
+//			if(this.y >= 110) {
+//				this.floatnum--;
+//			}this.y +=.3;
+//		}
+		
+		if(this.floatnum % 2 === 1) {
+			if(this.y <= 50) {
+				this.floatnum--;
+			}this.y-=.3;
+		} 
+		if (this.floatnum % 2 === 0) {
+			if(this.y >= 70) {
+				this.floatnum--;
+			}this.y +=.3;
+		}
+		if (this.floatnum === 0)
+		{
+			this.floatnum = 6;
+		}
+		
+		this.timer++;
+		
+		//console.log(this.timer);
+		
+		if(this.timer == 90)
+		{
+			if(this.currentSpell == false)
+			{
+				this. timer = 0;
+				this.state = "MoveCenter";
+				this.startMove = true;
+			}
+			
+			//console.log(this.state);
+			
+			this.timer = 0;
+		}
+	}
+	
+	if(this.state === "MoveCenter") {
+		if(this.x > 250) {
+			this.x--;
+		}
+		if(this.x < 250) {
+			this.x ++;
+		}
+		if(this.y > 100) {
+			this.y-=.5;
+		}
+		if(this.y < 100) {
+			this.y+=.5;
+		}
+		if(this.x < 252 && this.x > 248 && this.y >98 && this.y < 102) {
+			this.state = "Float";
+			//console.log("Center to float");
+		}
+	} 
+	if(this.state === "Float") {
+		this.startMove = false;
+		this.isMoving = false;
+		
+		//console.log(this.state);
+//		if(this.floatnum % 2 === 1 && this.floatnum >= 0) {
+//			if(this.y <= 90) {
+//				this.floatnum--;
+//			}this.y-=.3;
+//		} 
+//		if (this.floatnum % 2 === 0 && this.floatnum >= 0) {
+//			if(this.y >= 110) {
+//				this.floatnum--;
+//			}this.y +=.3;
+//		}
+		
+		if(this.floatnum % 2 === 1) {
+			if(this.y <= 90) {
+				this.floatnum--;
+			}this.y-=.3;
+		} 
+		if (this.floatnum % 2 === 0) {
+			if(this.y >= 110) {
+				this.floatnum--;
+			}this.y +=.3;
+		}
+		if (this.floatnum === 0)
+		{
+			this.floatnum = 6;
+		}
+		
+		this.timer++;
+		
+		//console.log(this.timer);
+		
+		if(this.timer == 130)
+		{
+			if(this.currentSpell == false)
+			{
+				timer = 0;
+				var random = Math.floor((Math.random() * 3) +1);
+				if(random == 1)
+				{
+					this.state = "MoveLeft";
+					this.startMove = true;
+				}
+				else if(random == 2)
+				{
+					this.state = "MoveRight";
+					this.startMove = true;
+				}
+				//console.log(random);
+			}
+			
+			//console.log(this.state);
+			
+			this.timer = 0;
+		}
+		
+//		if(this.floatnum < 0) {
+//			this.floatnum = 13;
+//			this.state = "Move"
+//			this.fanout = true;
+//		}
+		
+	}
+		
+		
+	
+
 	
 	var gameEngine = this.game;
 	var ctx = this.ctx;
@@ -1099,14 +1367,24 @@ Yuyuko.prototype.update = function () {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
 			if(this.hp > 0) {
-				this.hp--;
+				if(!this.invul)
+				{
+					this.hp--;
+				}
+				//console.log(this.hp);
 				if(!ent.isHero) {
 					ent.removeFromWorld = true;
 				}
-			} else {
-            this.removeFromWorld = true;
-            ent.removeFromWorld = true;
-            this.game.gameScore += this.killScore;
+			} else if(this.hp <= 0){
+				if(soundBuffer != null)
+				{
+					playBomb(soundBuffer[3]);
+				}
+	            this.removeFromWorld = true;
+	            ent.removeFromWorld = true;
+	            this.game.gameScore += this.killScore;
+	            gameEngine.win = true;
+	            gameEngine.gameEnd = true;
             }
             //i dont think we need this anymore?
             if(ent.isHero) 
@@ -1148,10 +1426,63 @@ Yuyuko.prototype.update = function () {
 
 Yuyuko.prototype.draw = function () {
 
-
-	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	//display hp?
+	
+	
+	
+	if(this.fanout) {
+		//x=710-1220 y = 640-900
+//		var xindex = 710;
+//		var yindex = 640;
+//		this.ctx.drawImage(this.spritesheet, xindex,
+//		yindex, 510, 260,
+//		this.x-320, this.y -130	, 510*1.4, 260*1.4);	
+		//this.fanimation.drawFan(this.ctx, this.x, this.y);
+		
+		var xindex = 710;
+		var yindex = 640;
+		if(this.fanAlpha < 1.1)
+		{
+			this.fanAlpha+= 0.004;
+			this.ctx.save();
+			this.ctx.globalAlpha = this.fanAlpha;
+			this.ctx.drawImage(this.spritesheet, xindex,
+				yindex, 510, 260,
+				this.x-320, this.y -130	, 510*1.4, 260*1.4);
+			this.ctx.restore();
+		}
+		else
+		{
+			this.ctx.drawImage(this.spritesheet, xindex,
+					yindex, 510, 260,
+					this.x-320, this.y -130	, 510*1.4, 260*1.4);
+		}
+	}
+	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y, this);
+	this.ctx.fillStyle = "pink";
+	//hp * 20 = 30 here, hp*30 = 20, *40 = 15
+	this.ctx.fillRect(0,0,(this.hp/100)*15,10); //change the 3rd argument to change lifebar length
 	
 
+	//draw attacks
+	if(this.shoot) {
+//		if(this.attackType === "Star")
+//		{
+//			drawSpreads(this, "Star");
+//		}
+//		if(this.attackType === "SecondaryStar")
+//		{
+//			drawSpreads(this, "SecondaryStar");
+//		}
+//		if(this.attackType === "FullSpread")
+//		{
+//			drawSpreads(this, "Star");
+//			drawSpreads(this, "SecondaryStar");
+//		}
+		drawSpreads(this, "Star");
+		this.shoot = false;
+	}
+	
     Entity.prototype.draw.call(this);
 };
 function Enemy(game, spritesheet, x, y, hp){
@@ -1174,6 +1505,7 @@ function Enemy(game, spritesheet, x, y, hp){
 	this.bulletSpeed = 10;
 	this.bulletY = 50;
 	this.radius = 15
+	this.bombImmune = false;
 	this.count = 0;
 	this.bulletInterval = bulletInterval = Math.floor(Math.random() * 11) + 1;
 	this.totalInterval = 12;
@@ -1325,10 +1657,16 @@ Enemy.prototype.draw = function () {
 
 function drawSpreads(enemy, attackPattern)
 {
+	var xoffset = 15;
+	if(enemy.bombImmune) //check if its yuyuko, change if theres other stuff
+	{
+		xoffset = 30
+	}
+	
 	if(attackPattern === "Star")
 	{
 		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy.x = enemy.x+15;
+		tempEnemy.x = enemy.x+xoffset;
 		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDownLeft";
 		enemy.game.addEntity(tempEnemy);
@@ -1336,26 +1674,26 @@ function drawSpreads(enemy, attackPattern)
 		
 		//trying 2 bullet
 		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy2.x = enemy.x+15;
+		tempEnemy2.x = enemy.x+xoffset;
 		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyDownRight";
 		enemy.game.addEntity(tempEnemy2);
 		
 		//trying all bullet
 		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy3.x = enemy.x+15;
+		tempEnemy3.x = enemy.x+xoffset;
 		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyRightUp";
 		enemy.game.addEntity(tempEnemy3);
 		
 		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy4.x = enemy.x+15;
+		tempEnemy4.x = enemy.x+xoffset;
 		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftUp";
 		enemy.game.addEntity(tempEnemy4);
 		
 		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy5.x = enemy.x+15;
+		tempEnemy5.x = enemy.x+xoffset;
 		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyUp";
 		enemy.game.addEntity(tempEnemy5);
@@ -1373,27 +1711,27 @@ function drawSpreads(enemy, attackPattern)
 	if(attackPattern === "SecondaryStar")
 	{
 		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy.x = enemy.x+15;
+		tempEnemy.x = enemy.x+xoffset;
 		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDown";
 		enemy.game.addEntity(tempEnemy);
 		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy2.x = enemy.x+15;
+		tempEnemy2.x = enemy.x+xoffset;
 		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyUpLeft";
 		enemy.game.addEntity(tempEnemy2);
 		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy3.x = enemy.x+15;
+		tempEnemy3.x = enemy.x+xoffset;
 		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyUpRight";
 		enemy.game.addEntity(tempEnemy3);
 		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy4.x = enemy.x+15;
+		tempEnemy4.x = enemy.x+xoffset;
 		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftDown";
 		enemy.game.addEntity(tempEnemy4);
 		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy5.x = enemy.x+15;
+		tempEnemy5.x = enemy.x+xoffset;
 		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyRightDown";
 		enemy.game.addEntity(tempEnemy5);
@@ -1433,6 +1771,7 @@ function Enemy3(game, spritesheet, x, y, hp){
 	this.bulletY = 23;
 	this.radius = 15
 	this.count = 0;
+	this.bombImmune = false;
 	this.bulletInterval = bulletInterval = Math.floor(Math.random() * 11) + 1;
 	this.totalInterval = 12;
 	this.isEnemy = true;
@@ -1581,7 +1920,7 @@ Enemy3.prototype.draw = function () {
 
 function spawnEnemies(gameEngine, difficulty)
 {	
-	console.log("Starting Spawn enemies function");
+	//console.log("Starting Spawn enemies function");
 	
 	//while(!gameEngine.gamEnd) {
 		if (difficulty < 1) {
@@ -2068,7 +2407,12 @@ function spawnEnemies(gameEngine, difficulty)
 					}
 				}
 				
-		 }gameEngine.gameScore = 7400;
+				tempID = setTimeout(function()
+				{
+					spawnBoss(gameEngine);
+				},116000); intervalIDs.push(tempID);
+				
+		 }
 		
 }
 
@@ -2089,10 +2433,13 @@ function stopSpawns()
 	});
 }
 
-function starter() {
-	
-	
-	
+function spawnBoss(gameEngine)
+{
+	gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 260, -200, 100));
+}
+
+function starter() 
+{	
 	var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
 	gameEngine = new GameEngine();
@@ -2118,22 +2465,26 @@ function starter() {
 	bufferLoader.load();
     
     gameEngine.init(ctx);
+    
+    //show bounding boxes
+    //gameEngine.showOutlines = true;
+    
     gameEngine.start();
     
     gameEngine.gameScore = 0;
     //gameEngine.showOutlines = true;
-    //gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 10, 100));
+    //gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 260, -200, 100));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
 function restart(gameEngine, ctx) {
-	stopSpawns();
+	
 	
 	bombCount = 3;
 	gameEngine.bombs = 3;
 	
+	//this removes all previous setinterval calls
+	stopSpawns();
 	intervalIDs = [];
-	
-	
 	
 	if(gainNode != null)
 	{

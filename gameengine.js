@@ -27,6 +27,7 @@ function GameEngine() {
     this.surfaceWidth = null;
     this.surfaceHeight = null;
     this.gameEnd = false;
+    this.win = false;
     this.gameScore = 0;
 };
 
@@ -250,7 +251,7 @@ GameEngine.prototype.update = function () {
 	    
 	    //console.log(this.endGameScore);
 	    
-	    if(this.endGameScore > 7400) this.gameEnd = true;
+	    //if(this.endGameScore > 7400) this.gameEnd = true;
 		
 	    
 	    if (this.gameEnd){
@@ -261,7 +262,7 @@ GameEngine.prototype.update = function () {
 	    	
 			ctx.font = "24pt Times New Roman";
 			
-			if(this.endGameScore< 7400) {
+			if(!this.win) {
 					
 				ctx.fillStyle = "white";
 				ctx.fillText("GAME OVER", 100, 460);
@@ -335,7 +336,7 @@ Entity.prototype.update = function () {
 Entity.prototype.draw = function (ctx) {
     if (this.game.showOutlines && this.radius) {
         this.game.ctx.beginPath();
-        this.game.ctx.fillstyle = "green";
+        this.game.ctx.fillStyle = 'white';
         this.animation.frameWidth;
         this.game.ctx.arc(this.x + this.centerX, this.y + this.centerY, this.radius, 0, Math.PI * 2, false);
         this.game.ctx.fill();
