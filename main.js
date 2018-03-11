@@ -11,6 +11,7 @@ var mute = false;
 var stopSpawn = false;
 var AM = new AssetManager();
 var bombCount = 0;
+var textDisplay = "";
 
 gameScore = 0;
 intervalIDs = [];
@@ -2097,6 +2098,7 @@ function starter() {
 	gameEngine = new GameEngine();
 	gameEngine.play = false;
 	gameEngine.lives = 5;
+	textDisplay = "Space to Start";
 	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
 	gameEngine.addEntity(menu);
 	gameEngine.bombs = 3;
@@ -2131,7 +2133,7 @@ function restart(gameEngine, ctx) {
 	
 	intervalIDs = [];
 	
-	gameEngine.play = false;
+	
 	
 	if(gainNode != null)
 	{
@@ -2165,6 +2167,9 @@ function restart(gameEngine, ctx) {
 	gameEngine.addEntity(temp);
 	gameEngine.gameScore = 0;
 	
+	gameEngine.play = false;
+	
+	textDisplay = "Space to Restart";
 	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
 	gameEngine.addEntity(menu);
 	
@@ -2209,9 +2214,9 @@ Menu.prototype.draw = function(ctx) {
 		//ctx.drawImage(this.sprite, 0, 0);
 		ctx.font = "24pt Times New Roman";
 		ctx.fillStyle = "white";
-		ctx.fillText("Space to start", 200, 200);
+		ctx.fillText(textDisplay, 200, 200);
 		ctx.fillStyle = "black";
-		ctx.strokeText("Space to start", 200, 200);
+		ctx.strokeText(textDisplay, 200, 200);
 	}
 }
 
