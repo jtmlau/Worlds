@@ -1237,6 +1237,15 @@ Yuyuko.prototype.update = function () {
 		this.fanout = true;
 		this.totalInterval = 7;
 		this.currentSpell = true;
+		this.invul = true;
+		
+		for (var i = 0; i < this.game.entities.length; i++) 
+    	{
+            if(this.game.entities[i].isEnemy && !this.game.entities[i].bombImmune)
+            {
+            	this.game.entities[i].removeFromWorld = true;
+            }
+    	}
 	}
 	
 	//SHOOTING STUFF
@@ -1552,6 +1561,8 @@ Yuyuko.prototype.draw = function () {
 //			drawSpreads(this, "Star");
 //			drawSpreads(this, "SecondaryStar");
 //		}
+		
+		this.invul = false;
 		drawSpreads(this, "Spell");
 		this.bulletDirection++;
 		this.shoot = false;
@@ -2236,7 +2247,7 @@ function spawnEnemies(gameEngine, difficulty)
 			{
 				tempID = setTimeout(function()
 					{
-						tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50, hp);
+						tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50, hp*5);
 						tempEnemy.enemyType = "StraightDown";
 						tempEnemy.nextType = "SlowLeft";
 						tempEnemy.attackType = "FullSpread";
@@ -2245,7 +2256,7 @@ function spawnEnemies(gameEngine, difficulty)
 						gameEngine.addEntity(tempEnemy);
 					}, i); intervalIDs.push(tempID);
 			}
-		if (difficulty > 2) {
+		
 			for(var i = 18800; i<=29000; i+=46 * interval)
 			{
 				tempID = setTimeout(function()
@@ -2258,7 +2269,7 @@ function spawnEnemies(gameEngine, difficulty)
 						tempEnemy.maxShot = 20
 						gameEngine.addEntity(tempEnemy);
 					}, i); intervalIDs.push(tempID);
-			}
+			
 		}
 		if (difficulty > 1) 
 		{
@@ -2340,8 +2351,11 @@ function spawnEnemies(gameEngine, difficulty)
 				gameEngine.addEntity(tempEnemy);
 			}, 35200); intervalIDs.push(tempID);
 		}
-		if(difficulty > 1) 
-		{	for(var i = 38000; i<=48000; i+=(interval * 46))
+		
+		b = [];
+		bEnemy = []
+		 
+			for(var i = 38000; i<=48000; i+=(interval * 46))
 			{
 			tempID = setTimeout(function()
 					{
@@ -2354,7 +2368,7 @@ function spawnEnemies(gameEngine, difficulty)
 						gameEngine.addEntity(tempEnemy);
 					}, i); intervalIDs.push(tempID);
 			}
-		}
+		
 		if (difficulty > 2) {
 			for(var i = 41000; i<=50000; i+=(interval * 23))
 			{
@@ -2636,6 +2650,16 @@ function spawnEnemies(gameEngine, difficulty)
 				
 				tempID = setTimeout(function()
 				{
+					for (var i = 0; i < gameEngine.entities.length; i++) 
+					{
+				        if(gameEngine.entities[i].isEnemy && !gameEngine.entities[i].bombImmune)
+				        {
+				        	gameEngine.entities[i].removeFromWorld = true;
+				        }
+					}
+					b = [];
+					bEnemy = [];
+					
 					spawnBoss(gameEngine);
 				},116000); intervalIDs.push(tempID);
 				
@@ -2662,9 +2686,10 @@ function stopSpawns()
 
 function spawnBoss(gameEngine)
 {
-	b = [];
-	bEnemy = [];
-	
+	if(soundBuffer != null)
+	{
+		playBGM(soundBuffer[4]);
+	}
 	gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 260, -200, 100));
 }
 
@@ -2686,6 +2711,7 @@ function starter()
 				'./audio/attack3.ogg',
 				'./audio/dead.ogg',
 				'./audio/spellcard.ogg',
+				'./audio/boss.ogg'
 			],
 			function(buffer) {
 				console.log("Callback");
@@ -2708,6 +2734,7 @@ function starter()
 }
 function restart(gameEngine, ctx) {
 	
+	gameEngine.play = false;
 	
 	bombCount = 3;
 	gameEngine.bombs = 3;
