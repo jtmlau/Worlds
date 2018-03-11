@@ -535,6 +535,7 @@ function enemyMovement(the_enemy)
 function Reimu(game, spritesheet, hp) {
 	this.hp = hp;
 	this.bombs = 3;
+	
 	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
     this.speed = 350;
@@ -552,6 +553,7 @@ function Reimu(game, spritesheet, hp) {
     this.moveUp = false;
     this.moveDown = false;
     this.ctx = game.ctx;
+	
     this.spawned = false;
     this.music = false;
     this.muteFired = false;
@@ -650,9 +652,13 @@ Reimu.prototype.update = function () {
 		if(this.bombs > 0) {
 			this.bombs--;
 			bombCount--;
+			this.game.bombs = this.bombs;
 			//DO BOMB STUFF
-			
+			if(soundBuffer != null)
+		{
 			playBomb(soundBuffer[3]);
+		}
+			
 			
 			for (var i = 0; i < this.game.entities.length; i++) 
         	{
@@ -995,6 +1001,7 @@ Entity.prototype.update.call(this);
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
+			this.game.gameScore +=7400;	
             }
             //i dont think we need this anymore?
             if(ent.isHero) 
@@ -2092,7 +2099,7 @@ function starter() {
 	gameEngine.lives = 5;
 	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
 	gameEngine.addEntity(menu);
-	
+	gameEngine.bombs = 3;
 	bufferLoader = new BufferLoader(
 			audioCtx,
 			[

@@ -196,6 +196,9 @@ GameEngine.prototype.update = function () {
 	bgImage.onload = function(){
 		ctx.drawImage(bgImage, 0, 0);
 	}
+	ctx.font = "20pt Times New Roman";
+			
+				
 	
 //	ctx.font = "20px Arial";
 //    ctx.fillText("Controls", 150, 20);
@@ -210,7 +213,10 @@ GameEngine.prototype.update = function () {
 	if(this.space) this.play = true;
 	
 	if(this.play){
-		
+		ctx.fillStyle = "white";
+		ctx.fillText(this.lives, 100, 375);
+				
+		ctx.fillText(this.bombs, 100, 405);
 		var entitiesCount = this.entities.length;
 
 	    for (var i = 0; i < entitiesCount; i++) {
@@ -226,6 +232,7 @@ GameEngine.prototype.update = function () {
 	            this.entities.splice(i, 1);
 	        }
 	    }
+		
 
 	    /*ctx.save();
 	    ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -253,18 +260,19 @@ GameEngine.prototype.update = function () {
 	    	this.clockTick = 0;
 	    	
 			ctx.font = "24pt Times New Roman";
+			
 			if(this.endGameScore< 7400) {
 					
 				ctx.fillStyle = "white";
-				ctx.fillText("GAME OVER", 100, 400);
+				ctx.fillText("GAME OVER", 100, 460);
 				ctx.fillStyle = "black";
-				ctx.strokeText("GAME OVER", 100, 400);
+				ctx.strokeText("GAME OVER", 100, 460);
 			}
 			else {
 				ctx.fillStyle = "white";
-				ctx.fillText("You won!", 100, 400);
+				ctx.fillText("You won!", 100, 460);
 				ctx.fillStyle = "black";
-				ctx.strokeText("You won!", 100, 400);
+				ctx.strokeText("You won!", 100, 460);
 			}
 	    }
 
