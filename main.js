@@ -2,9 +2,17 @@ window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var audioCtx = new AudioContext();
 var bufferLoader;
 var soundBuffer = null;
+var gainNode = null;
+var gainNode2 = null;
+var gainNode1 = null;
+var gainNode3 = null;
+var gameEngine = null;
+var mute = false;
+var stopSpawn = false;
 var AM = new AssetManager();
 
 gameScore = 0;
+intervalIDs = [];
 
 function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
@@ -19,6 +27,36 @@ function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDurati
     this.scale = scale;
 }
 
+Animation.prototype.drawYuyukoFrame = function(tick, ctx, x, y) {
+	this.elapsedTime += tick;
+	if(this.isDone()) {
+		if(this.loop) this.elapsedTime =0;
+	}
+	var vindex =0;
+	var offset = 710;
+	var yoffset = 380;
+	
+		
+	var frame = this.currentFrame();
+	if ((frame < 3)) {
+		var xindex = 710 + (frame * 50);
+		var yindex = 380;
+		ctx.drawImage(this.spriteSheet, xindex,
+		yindex, this.frameWidth, this.frameHeight,
+		x, y, this.frameWidth * this.scale, this.frameHeight * this.scale);
+	} else {
+		var xindex = 715 +((frame - 3) * 50);
+		var yindex = 470;
+		ctx.drawImage(this.spriteSheet, xindex,
+		yindex, this.frameWidth, this.frameHeight,
+		x, y + 10	, this.frameWidth * this.scale, this.frameHeight * this.scale);	
+	}
+	
+	
+	
+	//yindex = Math.floor(frame/this.sheetWidth)
+	
+}
 
 Animation.prototype.drawReimuFrame = function (tick, ctx, x, y, left, right) {
     this.elapsedTime += tick;
@@ -225,24 +263,80 @@ BufferLoader.prototype.load = function() {
 function playSound(buffer) {
 	var source = audioCtx.createBufferSource(); // creates a sound source
 	var gainNode = audioCtx.createGain();
+	gainNode = audioCtx.createGain();
 	source.buffer = buffer;                    // tell the source which sound to play
 	source.connect(gainNode);
 	gainNode.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
 	gainNode.gain.value = 0.02;
+	if(mute)
+	{
+		gainNode.gain.value = 0;
+	}
+	else
+	{
+		gainNode.gain.value = 0.02;
+	}
+	
 	source.start(0);  
+}
+
+function playDeath(buffer)
+{
+	var source2 = audioCtx.createBufferSource(); // creates a sound source
+	gainNode2 = audioCtx.createGain();
+	source2.buffer = buffer;                    // tell the source which sound to play
+	source2.connect(gainNode2);
+	gainNode2.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	if(mute)
+	{
+		gainNode2.gain.value = 0;
+	}
+	else
+	{
+		gainNode2.gain.value = 0.2;
+	}
+	source2.start(0);  
 }
 
 function playBGM(buffer)
 {
 	var source1 = audioCtx.createBufferSource(); // creates a sound source
 	var gainNode1 = audioCtx.createGain();
+	gainNode1 = audioCtx.createGain();
 	source1.buffer = buffer;                    // tell the source which sound to play
 	source1.connect(gainNode1);
 	gainNode1.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
 	gainNode1.gain.value = 0.25;
 	source1.start(0); 
+	if(mute)
+	{
+		gainNode1.gain.value = 0;
+	}
+	else
+	{
+		gainNode1.gain.value = 0.25;
+	}
 	
+	source1.start(0); 
+}
+
+function playBomb(buffer)
+{
+	var source3 = audioCtx.createBufferSource(); // creates a sound source
+	gainNode3 = audioCtx.createGain();
+	source3.buffer = buffer;                    // tell the source which sound to play
+	source3.connect(gainNode3);
+	gainNode3.connect(audioCtx.destination);       // connect the source to the context's destination (the speakers)
+	if(mute)
+	{
+		gainNode3.gain.value = 0;
+	}
+	else
+	{
+		gainNode3.gain.value = 0.14;
+	}
 	
+	source3.start(0); 
 }
 
 function Background(game, spritesheet) {
@@ -443,6 +537,9 @@ function enemyMovement(the_enemy)
 }
 
 function Reimu(game, spritesheet) {
+function Reimu(game, spritesheet, hp) {
+	this.hp = hp;
+	this.bombs = 3;
 	this.animation = new Animation(spritesheet, 32, 47, 261, .5, 8, true, 1.5); // Creates the Reimu animation.
 	this.bulletAnimation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
     this.speed = 350;
@@ -462,6 +559,8 @@ function Reimu(game, spritesheet) {
     this.ctx = game.ctx;
     this.spawned = false;
     this.music = false;
+    this.muteFired = false;
+    this.removeOnDeath = true;
     Entity.call(this, game, 268, 550);
 }
 
@@ -478,6 +577,7 @@ function ReimuBullet(game, spritesheet) {
 	this.radius = 6
 	this.bulletType = "Reimu";
 	this.ctx = game.ctx;
+	this.removeOnDeath = true;
 	Entity.call(this, game, 268, 550);
 }
 
@@ -508,6 +608,7 @@ function EnemyBullet(game, spritesheet, x, y) {
 	this.radius = 11;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
+	this.removeOnDeath = true;
 	this.removeFromWorld = false;
 	Entity.call(this, game, x, y);
 }
@@ -551,9 +652,31 @@ Reimu.prototype.update = function () {
 	var that = this;
 	
 	if(this.game.space) { // If the space key is pressed.
+	if(this.game.x) {
+		this.game.x = false;
+		if(this.bombs > 0) {
+			this.bombs--;
+			//DO BOMB STUFF
+			
+			playBomb(soundBuffer[3]);
+			
+			for (var i = 0; i < this.game.entities.length; i++) 
+        	{
+                if(this.game.entities[i].isEnemy)
+                {
+                	this.game.entities[i].removeFromWorld = true;
+                }
+        	}
+		}
+	}
+	if(this.game.z) { // If the space key is pressed.
 		this.isShooting = true;
 		this.bulletY = that.y;
 		
+	}
+	
+	if(this.game.space)
+	{
 		if(!this.spawned)
 		{
 			if(soundBuffer != null)
@@ -561,11 +684,19 @@ Reimu.prototype.update = function () {
 				playBGM(soundBuffer[0]);
 				this.music = true;
 			}
+			//stopSpawn = false;
 			
+<<<<<<< HEAD
 			spawnEnemies(this.game);
+=======
+			spawnEnemies(this.game, 2);
+			console.log("Calling spawn enemies");
+>>>>>>> restart
 			this.spawned = true;
+			
 		}
 	}
+	
 	if(this.spawned && !this.music)
 	{
 		if(soundBuffer != null)
@@ -575,6 +706,61 @@ Reimu.prototype.update = function () {
 		}
 	}
 
+	if(this.game.m)
+	{
+		if(!muteFired)
+		{
+			if(!mute)
+			{
+				console.log("Muted!");
+				if(gainNode != null)
+				{
+					gainNode.gain.value = 0;
+				}
+				if(gainNode1 != null)
+				{
+					gainNode1.gain.value = 0;
+				}
+				if(gainNode2 != null)
+				{
+					gainNode2.gain.value = 0;
+				}
+				if(gainNode3 != null)
+				{
+					gainNode3.gain.value = 0;
+				}
+				mute = true;
+			}
+			else if(mute)
+			{
+				console.log("Unmuted!");
+				if(gainNode != null)
+				{
+					gainNode.gain.value = 0.02;
+				}
+				if(gainNode1 != null)
+				{
+					gainNode1.gain.value = 0.25;
+				}
+				if(gainNode2 != null)
+				{
+					gainNode2.gain.value = 0.2;
+				}
+				if(gainNode3 != null)
+				{
+					gainNode3.gain.value = 0.14;
+				}
+				mute = false;
+			}
+			
+			muteFired = true;
+		}
+	}
+	else if(!this.game.m)
+	{
+		muteFired = false;
+	}
+	
 	if(this.game.shift) 
 	{
 		this.speed = 100;
@@ -635,6 +821,7 @@ Reimu.prototype.update = function () {
 	}if(!this.game.down) { // If the down arrow key is pressed.
 		this.moveDown = false;
 	}if(!this.game.space) {
+	}if(!this.game.z) {
 		this.isShooting = false;
 	}
 	
@@ -646,6 +833,8 @@ Reimu.prototype.update = function () {
 	
 	
 	
+	var gameEngine =this.game;
+	var ctx = this.ctx;
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && ent.isEnemy && this.canCollide) {
@@ -653,14 +842,45 @@ Reimu.prototype.update = function () {
     		{
     			playBGM(soundBuffer[2]);
     			this.music = true;
+    			playDeath(soundBuffer[2]);
     		}
+        	
+        	this.game.lives--;
         	
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
-            this.game.gameEnd = true;
+            
+          //remove all enemies and bullets on death?
+        	for (var i = 0; i < this.game.entities.length; i++) 
+        	{
+                if(this.game.entities[i].removeOnDeath)
+                {
+                	this.game.entities[i].removeFromWorld = true;
+                }
+        	}
+            
+			if(this.game.lives < 1)
+			{
+				restart(gameEngine, ctx);
+				//this.game.gameEnd = true;
+			}
+			else
+			{
+				spawnReimu(gameEngine, ctx);
+			}
         };
     };
 
+//	if(this.game.gameEnd) {
+//		this.game.lives--;
+//		if(this.game.lives > 0) {
+//		restarter(gameEngine, ctx);
+//		
+//		} else {
+//			//this.game.prototype.init(ctx);
+//			starter();
+//		}
+//	}
 };
 
 Reimu.prototype.draw = function () {
@@ -683,6 +903,8 @@ Reimu.prototype.draw = function () {
 		this.animation.drawBulletFrame(this.game.clockTick, this.ctx, this.x+25, this.bulletY); 
 		b.push(temp);
 		b.push(temp2);
+		
+		
 	}
 		
 	this.animation.drawReimuFrame(this.game.clockTick, this.ctx, this.x, this.y, this.moveLeft, this.moveRight);
@@ -690,6 +912,8 @@ Reimu.prototype.draw = function () {
 };
 
 function Enemy2(game, spritesheet, x, y) {
+function Enemy2(game, spritesheet, x, y, hp) {
+	this.hp = hp;
 	this.x = x;
 	this.y = y;
 	this.bulletAnimation = new Animation("./img/reimu_hakurei.png", 15, 12, 261, 1, 4, true, 1.5)
@@ -698,6 +922,7 @@ function Enemy2(game, spritesheet, x, y) {
 	this.enemyType = "StraightLeft";
 	this.nextType = "StraightLeft";
 	this.attackType = "Star";
+	this.removeOnDeath = true;
 	this.centerX = 16;
 	this.centerY = 24;
 	this.waiting = false;
@@ -774,15 +999,57 @@ Entity.prototype.update.call(this);
 		}
 	}
 	
+	var gameEngine = this.game;
+	var ctx = this.ctx;
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
+			if (this.hp > 0) {
+				this.hp--;
+				if(!ent.isHero) {
+					ent.removeFromWorld = true;
+				}
+			} else {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
             if(ent.isHero) this.game.gameEnd = true;
+            }
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	
+            	this.game.lives--;
+            	
+            	if(this.game.lives < 1)
+    			{
+            		restart(gameEngine, ctx);
+            		//this.game.gameEnd = true;
+            		
+    			}
+    			else
+    			{
+    				spawnReimu(gameEngine, ctx);
+    			}
+            }
+			
         };
     };
+//	if(this.game.gameEnd) {
+//		this.game.lives --;
+//		if(this.game.lives > 0) {
+//			spawnReimu(gameEngine, ctx);
+//		}
+//	}
 }
 
 Enemy2.prototype.draw = function() {
@@ -812,8 +1079,94 @@ Enemy2.prototype.draw = function() {
 	
     Entity.prototype.draw.call(this);
 };
+function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
+	this.hp = hp;
+	this.x = x;
+	this.y = y;
 
-function Enemy(game, spritesheet, x, y){
+	this.animation = new Animation(spritesheet, 40, 85, 1350, 1, 6, true, 1)
+	this.timer = 0;
+	this.speed = 80;
+	this.bulletSpeed = 10;
+	this.bulletY = 10;
+	this.radius = 15;
+	this.count = 0;
+	this.bulletInterval = 7;
+	this.isEnemy = true;
+	this.shoot = false;
+	this.killScore = 10000;
+	this.ctx = game.ctx;
+	Entity.call(this,game,x,y);
+};
+Yuyuko.prototype = new Entity();
+Yuyuko.prototype.constructor = Yuyuko;
+Yuyuko.prototype.update = function () {
+	Entity.prototype.update.call(this);
+	
+	
+	var gameEngine = this.game;
+	var ctx = this.ctx;
+	for (var i = 0; i < this.game.entities.length; i++) {
+        var ent = this.game.entities[i];
+        if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
+			if(this.hp > 0) {
+				this.hp--;
+				if(!ent.isHero) {
+					ent.removeFromWorld = true;
+				}
+			} else {
+            this.removeFromWorld = true;
+            ent.removeFromWorld = true;
+            this.game.gameScore += this.killScore;
+            }
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	
+            	this.game.lives--;
+            	
+            	if(this.game.lives < 1)
+    			{
+            		restart(gameEngine, ctx);
+            		//this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				spawnReimu(gameEngine, ctx);
+    			}
+            }
+			
+        };
+    };
+//	if(this.game.gameEnd) {
+//		this.game.lives --;
+//		if(this.game.lives > 0) {
+//			spawnReimu(gameEngine, ctx);
+//		}
+//	}
+}
+
+
+
+Yuyuko.prototype.draw = function () {
+
+
+	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y);
+	
+
+    Entity.prototype.draw.call(this);
+};
+function Enemy(game, spritesheet, x, y, hp){
+	this.hp = hp;
 	this.x = x;
 	this.y = y;
 	this.animation = new Animation(spritesheet, 32, 48, 640, 0.75, 8, true, 1.5); // Creates an Enemy animation
@@ -826,6 +1179,7 @@ function Enemy(game, spritesheet, x, y){
 	this.centerY = 24;
 	this.waiting = false;
 	this.maxShot = 12;
+	this.removeOnDeath = true;
 	this.timer = 0;
 	this.speed = Math.floor((Math.random() * 10) + 10)*20;
 	this.bulletSpeed = 10;
@@ -844,6 +1198,7 @@ function Enemy(game, spritesheet, x, y){
 
 Enemy.prototype = new Entity();
 Enemy.prototype.constructor = Enemy;
+
 
 Enemy.prototype.update = function () {
 	Entity.prototype.update.call(this);
@@ -899,16 +1254,57 @@ Enemy.prototype.update = function () {
 		}
 	}
 	
+	var gameEngine = this.game;
+	var ctx = this.ctx;
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
+			if(this.hp > 0) {
+				this.hp--;
+				if(!ent.isHero) {
+					ent.removeFromWorld = true;
+				}
+			} else {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
             if(ent.isHero) this.game.gameEnd = true;
+            }
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	
+            	this.game.lives--;
+            	
+            	if(this.game.lives < 1)
+    			{
+            		restart(gameEngine, ctx);
+            		//this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				spawnReimu(gameEngine, ctx);
+    			}
+            }
+			
         };
     };
 	
+//	if(this.game.gameEnd) {
+//		this.game.lives --;
+//		if(this.game.lives > 0) {
+//			spawnReimu(gameEngine, ctx);
+//		}
+//	}
 }
 
 
@@ -1033,6 +1429,8 @@ function drawSpreads(enemy, attackPattern)
 
 
 function Enemy3(game, spritesheet, x, y){
+function Enemy3(game, spritesheet, x, y, hp){
+	this.hp = hp;
 	this.x = x;
 	this.y = y;
 	this.animation = new Animation(spritesheet, 28, 30, 252, .5, 8, true, 1.5); // Creates an Enemy animation.
@@ -1055,6 +1453,7 @@ function Enemy3(game, spritesheet, x, y){
 	this.isEnemy = true;
 	this.shoot = false;
 	this.currentState = 60;
+	this.removeOnDeath = true;
 	this.killScore = 100;
 	this.ctx = game.ctx;
 	Entity.call(this, game, x, y);
@@ -1117,15 +1516,55 @@ Enemy3.prototype.update = function () {
 		}
 	}
 	
+	var gameEngine = this.game;
+	var ctx = this.ctx;
 	for (var i = 0; i < this.game.entities.length; i++) {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
+			if(this.hp > 0) {
+				this.hp--;
+				if(!ent.isHero) {
+					ent.removeFromWorld = true;
+				}
+			} else {
             this.removeFromWorld = true;
             ent.removeFromWorld = true;
             this.game.gameScore += this.killScore;
             if(ent.isHero) this.game.gameEnd = true;
+            }
+            //i dont think we need this anymore?
+            if(ent.isHero) 
+            {
+            	this.game.lives--;
+            	
+            	//remove all enemies and bullets on death?
+            	for (var i = 0; i < this.game.entities.length; i++) 
+            	{
+                    if(this.game.entities[i].removeOnDeath)
+                    {
+                    	this.game.entities[i].removeFromWorld = true;
+                    }
+            	}
+            	
+            	if(this.game.lives < 1)
+    			{
+            		restart(gameEngine, ctx);
+            		//this.game.gameEnd = true;
+    			}
+    			else
+    			{
+    				spawnReimu(gameEngine, ctx);
+    			}
+            }
+			
         };
     };
+//	if(this.game.gameEnd) {
+//		this.game.lives --;
+//		if(this.game.lives > 0) {
+//			spawnReimu(gameEngine, ctx);
+//		}
+//	}
 }
 
 Enemy3.prototype.draw = function () {
@@ -1156,6 +1595,7 @@ Enemy3.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 };
 
+<<<<<<< HEAD
 function spawnEnemies(gameEngine)
 {
 	console.log("spawn");
@@ -1332,11 +1772,194 @@ function spawnEnemies(gameEngine)
     for(var i = 41000; i<=50000; i+=2300)
 	{
 	setTimeout(function()
+=======
+
+function spawnEnemies(gameEngine, difficulty)
+{	
+	console.log("Starting Spawn enemies function");
+	
+	//while(!gameEngine.gamEnd) {
+		if (difficulty < 1) {
+			difficulty = .5;
+		}
+		var hp = difficulty;//Math.ceil(difficulty/2);
+		var spacing = 6/difficulty;
+		var interval = spacing * 50
+		var tempID = 0;
+		
+
+		for(var i = 2000; i<=2500; i+=interval)
+		{
+			tempID = setTimeout(function()
+			{
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 70, hp);
+				tempEnemy.enemyType = "StraightRight";
+				gameEngine.addEntity(tempEnemy);
+				//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
+			}, i); intervalIDs.push(tempID);
+		}
+		
+		if (difficulty > 1) 
+		{
+			for(var i = 6000; i<=6500; i+=interval)
 			{
 				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 60);
+				tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 70, hp);
+					tempEnemy.enemyType = "StraightLeft";
+					gameEngine.addEntity(tempEnemy);
+				}, i); intervalIDs.push(tempID);
+			}
+		}
+		if (difficulty > 1) 
+		{
+			for(var i = 8000; i<=8500; i+=interval)
+			{
+				tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 40, hp);
+					tempEnemy.enemyType = "StraightRight";
+					gameEngine.addEntity(tempEnemy);
+					//gameEngine.addEntity(new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 80));
+				}, i); intervalIDs.push(tempID);
+			}
+		}
+		
+		for(var i = 10000; i<=10500; i+=interval)
+		{
+			tempID = setTimeout(function()
+			{
+				tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 100,hp);
 				tempEnemy.enemyType = "StraightLeft";
 				tempEnemy.attackType = "Star"
 				gameEngine.addEntity(tempEnemy);
+			}, i); intervalIDs.push(tempID);
+		}
+		
+		
+		if (difficulty > 2) {	
+			for(var i = 12000; i<=12500; i+=interval)
+			{
+				tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40, hp);
+					tempEnemy.enemyType = "StraightLeft";
+					tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100, hp);
+					tempEnemy2.enemyType = "StraightRight";
+					gameEngine.addEntity(tempEnemy);
+					gameEngine.addEntity(tempEnemy2);
+				}, i); intervalIDs.push(tempID);
+			}
+			
+		}
+	//    setTimeout(function()
+	//	{
+	//		tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 480, -50);
+	//		tempEnemy.enemyType = "StraightDown";
+	//		tempEnemy.nextType = "SlowLeft";
+	//		tempEnemy.waiting = true;
+	//		tempEnemy.maxShot = 20
+	//		gameEngine.addEntity(tempEnemy);
+	//	}, 16500);
+	   
+			for(var i = 16500; i<=26000; i+= 4600)
+			{
+				tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50, hp);
+						tempEnemy.enemyType = "StraightDown";
+						tempEnemy.nextType = "SlowLeft";
+						tempEnemy.attackType = "FullSpread";
+						tempEnemy.waiting = true;
+						tempEnemy.maxShot = 20
+						gameEngine.addEntity(tempEnemy);
+					}, i); intervalIDs.push(tempID);
+			}
+		if (difficulty > 2) {
+			for(var i = 18800; i<=29000; i+=46 * interval)
+			{
+				tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 120, -50, hp);
+						tempEnemy.enemyType = "StraightDown";
+						tempEnemy.nextType = "SlowRight";
+						tempEnemy.attackType = "FullSpread";
+						tempEnemy.waiting = true;
+						tempEnemy.maxShot = 20
+						gameEngine.addEntity(tempEnemy);
+					}, i); intervalIDs.push(tempID);
+			}
+		}
+		if (difficulty > 1) 
+		{
+			tempID = setTimeout(function()
+			{
+				tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+				tempEnemy.enemyType = "StraightLeftLoop";
+				tempEnemy.nextType = "StraightLeft";
+				gameEngine.addEntity(tempEnemy);
+			}, 21000); intervalIDs.push(tempID);
+		}
+		if (difficulty > 2) {
+			tempID = setTimeout(function()
+			{
+				tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+				tempEnemy.enemyType = "StraightLeftLoop";
+				tempEnemy.nextType = "StraightLeft";
+				gameEngine.addEntity(tempEnemy);
+			}, 25500); intervalIDs.push(tempID);
+		}
+		
+		tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50, hp);
+					tempEnemy.enemyType = "StraightRightLoop";
+					tempEnemy.nextType = "StraightRight";
+					gameEngine.addEntity(tempEnemy);
+				}, 28000); intervalIDs.push(tempID);
+			
+		
+		if(difficulty > 1)
+		{	tempID = setTimeout(function()
+			{
+				tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+				tempEnemy.enemyType = "StraightLeftLoop";
+				tempEnemy.nextType = "StraightLeft";
+				tempEnemy.attackType = "Star";
+				gameEngine.addEntity(tempEnemy);
+			}, 32000); intervalIDs.push(tempID);
+		}
+		
+		tempID = setTimeout(function()
+		{
+			tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 50, hp);
+			tempEnemy.enemyType = "StraightLeftLoop";
+			tempEnemy.nextType = "StraightLeft";
+			tempEnemy.attackType = "SecondaryStar";
+			gameEngine.addEntity(tempEnemy);
+		}, 32800); intervalIDs.push(tempID);
+		if (difficulty > 1) 
+		{
+			tempID = setTimeout(function()
+			{
+				tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 270, hp);
+				tempEnemy.enemyType = "StraightLeftLoop";
+				tempEnemy.nextType = "StraightLeft";
+				tempEnemy.attackType = "Star";
+				gameEngine.addEntity(tempEnemy);
+			}, 33600); intervalIDs.push(tempID);
+		}
+		if (difficulty > 2) {
+			tempID = setTimeout(function()
+>>>>>>> restart
+			{
+				tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 100, hp);
+				tempEnemy.enemyType = "StraightLeftLoop";
+				tempEnemy.nextType = "StraightLeft";
+				tempEnemy.attackType = "SecondaryStar";
+				gameEngine.addEntity(tempEnemy);
+<<<<<<< HEAD
 			}, i);
 	}
     
@@ -1579,6 +2202,317 @@ function spawnEnemies(gameEngine)
     	    		gameEngine.addEntity(tempEnemy2);
     		    }, i);
     	    }
+=======
+			}, 34400); intervalIDs.push(tempID);
+		}
+		if (difficulty > 1) 
+		{
+			tempID = setTimeout(function()
+			{
+				tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+				tempEnemy.enemyType = "StraightLeftLoop";
+				tempEnemy.nextType = "StraightLeft";
+				tempEnemy.attackType = "Star";
+				gameEngine.addEntity(tempEnemy);
+			}, 35200); intervalIDs.push(tempID);
+		}
+		if(difficulty > 1) 
+		{	for(var i = 38000; i<=48000; i+=(interval * 46))
+			{
+			tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 120, -50, hp);
+						tempEnemy.enemyType = "StraightDown";
+						tempEnemy.nextType = "SlowRight";
+						tempEnemy.attackType = "FullSpread";
+						tempEnemy.waiting = true;
+						tempEnemy.maxShot = 20
+						gameEngine.addEntity(tempEnemy);
+					}, i); intervalIDs.push(tempID);
+			}
+		}
+		if (difficulty > 2) {
+			for(var i = 41000; i<=50000; i+=(interval * 23))
+			{
+				tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 60, hp);
+						tempEnemy.enemyType = "StraightLeft";
+						tempEnemy.attackType = "Star"
+						gameEngine.addEntity(tempEnemy);
+					}, i); intervalIDs.push(tempID);
+			}
+		}
+	   
+			for(var i = 52000; i<=52500; i+=(interval))
+			{
+				tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40, hp);
+					tempEnemy.enemyType = "StraightLeft";
+					tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100, hp);
+					tempEnemy2.enemyType = "StraightRight";
+					tempEnemy2.attackType = "SecondaryStar";
+					gameEngine.addEntity(tempEnemy);
+					gameEngine.addEntity(tempEnemy2);
+				}, i); intervalIDs.push(tempID);
+			}
+		
+		 if (difficulty > 1) {
+			 {
+				 tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 180, hp);
+						tempEnemy.enemyType = "StraightRightLoop";
+						tempEnemy.nextType = "StraightRight";
+						tempEnemy.attackType = "Star";
+						gameEngine.addEntity(tempEnemy);
+					}, 55000); intervalIDs.push(tempID);
+			 }
+		if (difficulty > 2 ) {
+			tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50, hp);
+					tempEnemy.enemyType = "StraightRightLoop";
+					tempEnemy.nextType = "StraightRight";
+					tempEnemy.attackType = "SecondaryStar";
+					gameEngine.addEntity(tempEnemy);
+				}, 55800); intervalIDs.push(tempID);
+		}
+			 if (difficulty > 1) {
+				 tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 270, hp);
+					tempEnemy.enemyType = "StraightRightLoop";
+					tempEnemy.nextType = "StraightRight";
+					tempEnemy.attackType = "Star";
+					gameEngine.addEntity(tempEnemy);
+				}, 56600); intervalIDs.push(tempID);
+			 }
+			 tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 100, hp);
+					tempEnemy.enemyType = "StraightRightLoop";
+					tempEnemy.nextType = "StraightRight";
+					tempEnemy.attackType = "SecondaryStar";
+					gameEngine.addEntity(tempEnemy);
+				}, 56400); intervalIDs.push(tempID);
+			 if (difficulty > 1) {
+				 tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 180, hp);
+					tempEnemy.enemyType = "StraightRightLoop";
+					tempEnemy.nextType = "StraightRight";
+					tempEnemy.attackType = "Star";
+					gameEngine.addEntity(tempEnemy);
+				}, 58200); intervalIDs.push(tempID);
+			 }
+				if (difficulty > 1) {
+					for(var i = 60000; i<=90000; i+=4600)
+					{
+						tempID = setTimeout(function()
+							{
+								tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 480, -50, hp);
+								tempEnemy.enemyType = "StraightDown";
+								tempEnemy.nextType = "SlowLeft";
+								tempEnemy.attackType = "FullSpread";
+								tempEnemy.waiting = true;
+								tempEnemy.maxShot = 20
+								gameEngine.addEntity(tempEnemy);
+							}, i); intervalIDs.push(tempID);
+					}
+				}
+			   
+					 
+					for(var i = 62500; i<=90500; i+=4600)
+					{
+						tempID = setTimeout(function()
+							{
+								tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 120, -50, hp);
+								tempEnemy.enemyType = "StraightDown";
+								tempEnemy.nextType = "SlowRight";
+								tempEnemy.attackType = "FullSpread";
+								tempEnemy.waiting = true;
+								tempEnemy.maxShot = 20
+								gameEngine.addEntity(tempEnemy);
+							}, i); intervalIDs.push(tempID);
+					}
+				 
+				if (difficulty > 2) {
+					tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+						tempEnemy.enemyType = "StraightLeftLoop";
+						tempEnemy.nextType = "StraightLeft";
+						gameEngine.addEntity(tempEnemy);
+					}, 64000); intervalIDs.push(tempID);
+				}
+				 if (difficulty > 1) {
+					 tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+						tempEnemy.enemyType = "StraightLeftLoop";
+						tempEnemy.nextType = "StraightLeft";
+						gameEngine.addEntity(tempEnemy);
+					}, 68000); intervalIDs.push(tempID);
+				 }
+				 tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50, hp);
+					tempEnemy.enemyType = "StraightRightLoop";
+					tempEnemy.nextType = "StraightRight";
+					gameEngine.addEntity(tempEnemy);
+				}, 71000); intervalIDs.push(tempID);
+				 if (difficulty > 1) {
+					for(var i = 80000; i<=90500; i+=4600)
+					{
+						tempID = setTimeout(function()
+							{
+								tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 350, -50, hp);
+								tempEnemy.enemyType = "StraightDown";
+								tempEnemy.nextType = "SlowLeft";
+								tempEnemy.attackType = "FullSpread";
+								tempEnemy.waiting = true;
+								tempEnemy.maxShot = 20
+								gameEngine.addEntity(tempEnemy);
+							}, i); intervalIDs.push(tempID);
+					}
+				 }
+				  if (difficulty > 1) {
+				for(var i = 82000; i<=92500; i+=4600)
+				{
+					tempID = setTimeout(function()
+						{
+							tempEnemy = new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 270, -50, hp);
+							tempEnemy.enemyType = "StraightDown";
+							tempEnemy.nextType = "SlowRight";
+							tempEnemy.attackType = "FullSpread";
+							tempEnemy.waiting = true;
+							tempEnemy.maxShot = 20
+							gameEngine.addEntity(tempEnemy);
+						}, i); intervalIDs.push(tempID);
+					}
+				}
+				
+				if (difficulty > 1) {
+		
+					for(var i = 99000; i<=99500; i+=100)
+					{
+						tempID = setTimeout(function()
+						{
+							tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40, hp);
+							tempEnemy.enemyType = "StraightLeft";
+							tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100, hp);
+							tempEnemy2.enemyType = "StraightRight";
+							tempEnemy2.attackType = "SecondaryStar";
+							gameEngine.addEntity(tempEnemy);
+							gameEngine.addEntity(tempEnemy2);
+						}, i); intervalIDs.push(tempID);
+					}
+				}
+				 if (difficulty > 1) {
+					 tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+					tempEnemy.enemyType = "StraightLeftLoop";
+					tempEnemy.nextType = "StraightLeft";
+					gameEngine.addEntity(tempEnemy);
+				}, 103000); intervalIDs.push(tempID);
+				 }
+				 if (difficulty > 2) {
+					 tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50, hp);
+						tempEnemy.enemyType = "StraightRightLoop";
+						tempEnemy.nextType = "StraightRight";
+						gameEngine.addEntity(tempEnemy);
+					}, 103000); intervalIDs.push(tempID);
+				 }
+				
+					for(var i = 104000; i<=104500; i+=interval)
+					{
+						tempID = setTimeout(function()
+						{
+							tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40, hp);
+							tempEnemy.enemyType = "StraightLeft";
+							tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100, hp);
+							tempEnemy2.enemyType = "StraightRight";
+							tempEnemy2.attackType = "SecondaryStar";
+							gameEngine.addEntity(tempEnemy);
+							gameEngine.addEntity(tempEnemy2);
+						}, i); intervalIDs.push(tempID);
+					}
+				
+				 if (difficulty > 1) {
+					 tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+					tempEnemy.enemyType = "StraightLeftLoop";
+					tempEnemy.nextType = "StraightLeft";
+					gameEngine.addEntity(tempEnemy);
+				}, 107000); intervalIDs.push(tempID);
+				 }
+				if (difficulty > 2) {
+					tempID = 	setTimeout(function()
+						{
+							tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50, hp);
+							tempEnemy.enemyType = "StraightRightLoop";
+							tempEnemy.nextType = "StraightRight";
+							gameEngine.addEntity(tempEnemy);
+						}, 107000); intervalIDs.push(tempID);
+				}
+				if (difficulty > 1) {
+					for(var i = 109000; i<=109500; i+=interval)
+					{
+						tempID = 	setTimeout(function()
+						{
+							tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40, hp);
+							tempEnemy.enemyType = "StraightLeft";
+							tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100, hp);
+							tempEnemy2.enemyType = "StraightRight";
+							tempEnemy2.attackType = "SecondaryStar";
+							gameEngine.addEntity(tempEnemy);
+							gameEngine.addEntity(tempEnemy2);
+						}, i); intervalIDs.push(tempID);
+					}
+				}
+				
+				tempID = setTimeout(function()
+				{
+					tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 650, 180, hp);
+					tempEnemy.enemyType = "StraightLeftLoop";
+					tempEnemy.nextType = "StraightLeft";
+					gameEngine.addEntity(tempEnemy);
+				}, 111200); intervalIDs.push(tempID);
+				 if (difficulty > 1) {
+					 tempID = setTimeout(function()
+					{
+						tempEnemy = new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), -50, 50, hp);
+						tempEnemy.enemyType = "StraightRightLoop";
+						tempEnemy.nextType = "StraightRight";
+						gameEngine.addEntity(tempEnemy);
+					}, 111200); intervalIDs.push(tempID);
+				 }
+				if(difficulty > 2)
+				{
+					for(var i = 115000; i<=115500; i+=interval	)
+					{
+						tempID = setTimeout(function()
+						{
+							tempEnemy = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), 650, 40, hp);
+							tempEnemy.enemyType = "StraightLeft";
+							tempEnemy2 = new Enemy(gameEngine, AM.getAsset("./img/enemy.png"), -50, 100, hp);
+							tempEnemy2.enemyType = "StraightRight";
+							tempEnemy2.attackType = "SecondaryStar";
+							gameEngine.addEntity(tempEnemy);
+							gameEngine.addEntity(tempEnemy2);
+						}, i); intervalIDs.push(tempID);
+					}
+				}
+				
+		 }gameEngine.gameScore = 7400;
+		
+>>>>>>> restart
 }
 
 //function finishedLoading(bufferList)
@@ -1589,7 +2523,107 @@ function spawnEnemies(gameEngine)
 //	source1.start(0);
 //}
 
+function stopSpawns()
+{
+	//stop all spawns
+	intervalIDs.forEach(function(element)
+	{
+		clearTimeout(element);
+	});
+}
 
+function starter() {
+	
+	
+	
+	var canvas = document.getElementById("gameWorld");
+    var ctx = canvas.getContext("2d");
+	gameEngine = new GameEngine();
+	gameEngine.play = false;
+	gameEngine.lives = 5;
+	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
+	gameEngine.addEntity(menu);
+	
+	bufferLoader = new BufferLoader(
+			audioCtx,
+			[
+				'./audio/sennen.ogg',
+				'./audio/attack3.ogg',
+				'./audio/dead.ogg',
+				'./audio/spellcard.ogg',
+			],
+			function(buffer) {
+				console.log("Callback");
+				soundBuffer = buffer;
+			}
+			);
+	bufferLoader.load();
+    
+    gameEngine.init(ctx);
+    gameEngine.start();
+    
+    gameEngine.gameScore = 0;
+    //gameEngine.showOutlines = true;
+    gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 10, 100));
+    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+}
+function restart(gameEngine, ctx) {
+	stopSpawns();
+	
+	intervalIDs = [];
+	
+	gameEngine.play = false;
+	
+	if(gainNode != null)
+	{
+		gainNode.gain.value = 0;
+	}
+	if(gainNode1 != null)
+	{
+		gainNode1.gain.value = 0;
+	}
+	if(gainNode2 != null)
+	{
+		gainNode2.gain.value = 0;
+	}
+	if(gainNode3 != null)
+	{
+		gainNode3.gain.value = 0;
+	}
+	
+	gainNode = null
+	gainNode1 = null;
+	gainNode2 = null;
+	
+	stopSpawn = true;
+	
+	gameEngine.lives = 5;
+	
+	temp = new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500);
+	temp.spawned = false;
+	
+	gameEngine.addEntity(temp);
+	gameEngine.gameScore = 0;
+	
+	var menu = new Menu(gameEngine, AM.getAsset("./img/menu.png"));
+	gameEngine.addEntity(menu);
+	
+}
+
+function spawnReimu(gameEngine, ctx) {
+	gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+	
+	
+}
+
+function timeStop()
+{
+	//This code actually causes timestop for the bullets!!!!!!!!! good to know
+    
+    b = [];
+    bEnemy = [];
+	}
+	
 function Menu(game, sprite) {
 	this.sprite = sprite;
 	Entity.call(this, game, 0, 0);
@@ -1636,6 +2670,8 @@ AM.queueDownload("./img/hud.png")
 
 AM.downloadAll(function () {
     var canvas = document.getElementById("gameWorld");
+	starter();
+    /*var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
 	var gameEngine = new GameEngine();
 	gameEngine.play = false;
@@ -1662,7 +2698,7 @@ AM.downloadAll(function () {
     gameEngine.gameScore = gameScore;
     //gameEngine.showOutlines = true;
     
-    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
+    gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));*/
 
     //gameEngine.addEntity(new Enemy2(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 50));
 	//gameEngine.addEntity(new Enemy3(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, 350));
