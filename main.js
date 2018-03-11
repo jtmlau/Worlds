@@ -1070,16 +1070,16 @@ Enemy2.prototype.draw = function() {
 };
 function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
 	this.hp = difficulty * 200;
-	this.phasehealth = hp/6;
+	this.phasehealth = this.hp/6;
 	this.phase = 6;
-	
+	this.spritesheet = spritesheet;
 	this.x = x;
 	this.y = y;
 	this.floatnum = 6;
 
 	this.animation = new Animation(spritesheet, 40, 85, 1350, 1, 6, true, 1.5)
 	this.fanimation = new Animation(spritesheet, 510, 260, 1350, 1, 1, true, 1.5) //x=710-1220 y = 640-900
-	this.fanout = false;
+	this.fanout = true;
 	this.state = "Down";
 	this.timer = 0;
 	this.speed = 80;
@@ -1098,8 +1098,13 @@ function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
 Yuyuko.prototype = new Entity();
 Yuyuko.prototype.constructor = Yuyuko;
 Yuyuko.prototype.update = function () {
-	if(this.hp % this.phasehealth = 0 && this.hp/this.phasehealth > this.phase) {
+	if(this.hp % this.phasehealth === 0 && this.hp/this.phasehealth > this.phase) {
 		this.phase --;
+		if(this.phase%3 ===0) {
+			this.fanout = true;
+		} else {
+			this.fanout = false;
+		}
 		for (var i = 0; i < this.game.entities.length; i++) 
         	{
 				if(!this.game.entities[i]===this) {
@@ -1225,7 +1230,13 @@ Yuyuko.prototype.update = function () {
 Yuyuko.prototype.draw = function () {
 
 	if(this.fanout) {
-		this.fanimation.drawFan(this.ctx, this.x, this.y);
+		//x=710-1220 y = 640-900
+		var xindex = 710;
+		var yindex = 640;
+		this.ctx.drawImage(this.spritesheet, xindex,
+		yindex, 510, 260,
+		this.x-220, this.y -60	, 510, 260);	
+		//this.fanimation.drawFan(this.ctx, this.x, this.y);
 	}
 	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y);
 	
