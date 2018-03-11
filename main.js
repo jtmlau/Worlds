@@ -2164,6 +2164,7 @@ function restart(gameEngine, ctx) {
 function spawnReimu(gameEngine, ctx) {
 	
 	tempReimu = new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500);
+	tempReimu.spawned = true;
 	
 	tempReimu.bombs = bombCount;
 	gameEngine.addEntity(tempReimu);
