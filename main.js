@@ -2127,6 +2127,7 @@ function restart(gameEngine, ctx) {
 	stopSpawns();
 	
 	bombCount = 3;
+	gameEngine.bombs = 3;
 	
 	intervalIDs = [];
 	
@@ -2160,6 +2161,7 @@ function restart(gameEngine, ctx) {
 	temp = new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500);
 	temp.spawned = false;
 	
+	
 	gameEngine.addEntity(temp);
 	gameEngine.gameScore = 0;
 	
@@ -2171,8 +2173,10 @@ function restart(gameEngine, ctx) {
 function spawnReimu(gameEngine, ctx) {
 	
 	tempReimu = new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500);
+	tempReimu.spawned = true;
+	tempReimu.music = true;
 	
-	tempReimu.bombs = bombCount;
+	tempReimu.bombs = gameEngine.bombs;
 	gameEngine.addEntity(tempReimu);
 }
 
