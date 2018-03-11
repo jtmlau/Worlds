@@ -1068,12 +1068,18 @@ Enemy2.prototype.draw = function() {
 	
     Entity.prototype.draw.call(this);
 };
-function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
-	this.hp = hp;
+function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
+	this.hp = difficulty * 200;
+	this.phasehealth = hp/6;
+	this.phase = 6;
+	
 	this.x = x;
 	this.y = y;
+	this.floatnum = 6;
 
 	this.animation = new Animation(spritesheet, 40, 85, 1350, 1, 6, true, 1.5)
+	this.fanimation = new Animation(spritesheet, 510, 260, 1350, 1, 1, true, 1.5) //x=710-1220 y = 640-900
+	this.fanout = false;
 	this.state = "Down";
 	this.timer = 0;
 	this.speed = 80;
@@ -1092,13 +1098,76 @@ function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
 Yuyuko.prototype = new Entity();
 Yuyuko.prototype.constructor = Yuyuko;
 Yuyuko.prototype.update = function () {
+	if(this.hp % this.phasehealth = 0 && this.hp/this.phasehealth > this.phase) {
+		this.phase --;
+		for (var i = 0; i < this.game.entities.length; i++) 
+        	{
+				if(!this.game.entities[i]===this) {
+					if(this.game.entities[i].isEnemy)
+					{
+						this.game.entities[i].removeFromWorld = true;
+					}
+				}
+        	}
+	}
 	Entity.prototype.update.call(this);
 	if(this.state === "Down") {
 		this.y += 1
 		if (this.y > 100) {
-			this.state = "Stay";
+			this.state = "Move";
+			
+		}
 	}
+	if(this.state === "Move") {
+		if(this.x < 300) {
+			this.x = 400;
+			}
+		if(this.y > 200) {
+			this.y = 500;
+		}	this.state = "Center"
 	}
+	if(this.state === "Center") {
+		if(this.x > 250) {
+			this.x--;
+		}
+		if(this.x < 250) {
+			this.x ++;
+		}
+		if(this.y > 100) {
+			this.y--;
+		}
+		if(this.y < 100) {
+			this.y++;
+		}
+		if(this.x === 250 && this.y ===100) {
+			this.state = "Float";
+		}
+	} 
+	if(this.state === "Float") {
+		
+		if(this.floatnum % 2 === 1 && this.floatnum >= 0) {
+			if(this.y <= 90) {
+				this.floatnum--;
+			}this.y-=.3;
+		} 
+		if (this.floatnum % 2 === 0 && this.floatnum >= 0) {
+			if(this.y >= 110) {
+				this.floatnum--;
+			}this.y +=.3;
+		}
+			
+		
+		if(this.floatnum < 0) {
+			this.floatnum = 13;
+			this.state = "Move"
+			this.fanout = true;
+		}
+		
+	}
+		
+		
+	
+
 	
 	var gameEngine = this.game;
 	var ctx = this.ctx;
@@ -1155,7 +1224,9 @@ Yuyuko.prototype.update = function () {
 
 Yuyuko.prototype.draw = function () {
 
-
+	if(this.fanout) {
+		this.fanimation.drawFan(this.ctx, this.x, this.y);
+	}
 	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y);
 	
 
