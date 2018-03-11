@@ -10,6 +10,7 @@ var gameEngine = null;
 var mute = false;
 var stopSpawn = false;
 var AM = new AssetManager();
+var bombCount = 0;
 
 gameScore = 0;
 intervalIDs = [];
@@ -648,6 +649,7 @@ Reimu.prototype.update = function () {
 		this.game.x = false;
 		if(this.bombs > 0) {
 			this.bombs--;
+			bombCount--;
 			//DO BOMB STUFF
 			
 			playBomb(soundBuffer[3]);
@@ -2117,6 +2119,8 @@ function starter() {
 function restart(gameEngine, ctx) {
 	stopSpawns();
 	
+	bombCount = 3;
+	
 	intervalIDs = [];
 	
 	gameEngine.play = false;
@@ -2158,9 +2162,11 @@ function restart(gameEngine, ctx) {
 }
 
 function spawnReimu(gameEngine, ctx) {
-	gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 	
+	tempReimu = new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500);
 	
+	tempReimu.bombs = bombCount;
+	gameEngine.addEntity(tempReimu);
 }
 
 function timeStop()
