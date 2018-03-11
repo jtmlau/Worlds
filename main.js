@@ -480,7 +480,60 @@ function updateBullet(bullet)
 			bullet.removeFromWorld = true;
 		}
 		break;
+	case "ClockwiseCircle":
+		angle = 0.1 * bullet.currentState;
+		bullet.x = bullet.startX + 100 * (bullet.game.clockTick * ((3+ 3 * angle)*Math.cos(angle)));
+		bullet.y = bullet.startY + 100 * (bullet.game.clockTick * ((3+ 3 * angle)*Math.sin(angle)));
+		bullet.currentState++;
+		break;
+	case "Spray":
+		bullet.x += bullet.xSpeed;
+		bullet.y += bullet.ySpeed;
+		if(bullet.y < -100 || bullet.y > 750 || bullet.x > 700 || bullet.x < -100){
+			bullet.removeFromWorld = true;
+		}
+		break
+	case "SpellLeft":
+		bullet.x += bullet.xSpeed;
+		bullet.y += bullet.ySpeed;
+		bullet.xSpeed = bullet.xSpeed * .95;
+		bullet.ySpeed = bullet.ySpeed * .95;
+		
+		//console.log(bullet.xSpeed);
+		if(bullet.xSpeed < .1 && bullet.xSpeed> -.1)
+		{
+			bullet.xSpeed = 2 * Math.sin((bullet.bulletDirection + bullet.changeDirection - 7) * 12 * Math.PI / 180); // i * interval?
+			bullet.ySpeed = 2 * Math.cos((bullet.bulletDirection + bullet.changeDirection - 7) * 12 * Math.PI / 180); // i * interval?
+			//bullet.xSpeed = bullet.xSpeed * -1;
+			
+			bullet.bulletType = "Spray";
+		}
+		if(bullet.y < -100 || bullet.y > 750 || bullet.x > 700 || bullet.x < -100){
+			bullet.removeFromWorld = true;
+		}
+		
+		break
+	case "SpellRight":
+		bullet.x += bullet.xSpeed;
+		bullet.y += bullet.ySpeed;
+		bullet.xSpeed = bullet.xSpeed * .95;
+		bullet.ySpeed = bullet.ySpeed * .95;
+		
+		//console.log(bullet.xSpeed);
+		if(bullet.xSpeed < .1 && bullet.xSpeed> -.1)
+		{
+			bullet.xSpeed = 2 * Math.sin((bullet.bulletDirection + bullet.changeDirection + 7) * 12 * Math.PI / 180); // i * interval?
+			bullet.ySpeed = 2 * Math.cos((bullet.bulletDirection + bullet.changeDirection + 7) * 12 * Math.PI / 180); // i * interval?
+			//bullet.xSpeed = bullet.xSpeed * -1;
+			
+			bullet.bulletType = "Spray";
+		}
+		if(bullet.y < -100 || bullet.y > 750 || bullet.x > 700 || bullet.x < -100){
+			bullet.removeFromWorld = true;
+		}
+		break
 	}
+	
 	
 }
 
@@ -630,12 +683,21 @@ EnemyBullet.prototype.constructor = EnemyBullet;
 function EnemyBullet(game, spritesheet, x, y) {
 	this.animation = new Animation(spritesheet, 15, 12, 261, .5, 4, false, 1.5); // Create's the Bullet animation for Reimu.
 	this.speed = Math.floor((Math.random() * 12) * 3);//	 + 55;
+	this.xSpeed = this.speed;
+	this.ySpeed = this.speed;
+	this.startSpeedX = this.xSpeed;
+	this.startSpeedY = this.ySpeed;
+	this.changeDirection = 0;
 	this.x = x;
 	this.y = y;
+	this.bulletDirection = 0;
+	this.startX = x;
+	this.startY = y;
 	this.centerX = 11;
 	this.centerY = 11;
 	this.bulletType = "EnemyDown"
 	this.radius = 11;
+	this.currentState = 0;
 	this.isEnemy = true;
 	this.ctx = game.ctx;
 	this.removeOnDeath = true;
@@ -720,7 +782,7 @@ Reimu.prototype.update = function () {
 			
 			spawnEnemies(this.game, 2);
 			//spawnBoss(this.game);
-			console.log("Calling spawn enemies");
+			//console.log("Calling spawn enemies");
 			this.spawned = true;
 			
 		}
@@ -1107,9 +1169,9 @@ Enemy2.prototype.draw = function() {
     Entity.prototype.draw.call(this);
 };
 function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
-	this.hp = difficulty * 40;
-	this.phasehealth = this.hp/6;
-	this.phase = 6;
+	this.hp = difficulty * 30;
+	this.phasehealth = this.hp/3;
+	this.phase = 1;
 	this.spritesheet = spritesheet;
 	this.x = x;
 	this.y = y;
@@ -1117,7 +1179,7 @@ function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
 	this.fanAlpha = 0.0;
 	this.animation = new Animation(spritesheet, 40, 85, 1350, .1, 6, true, 1.5)
 	this.fanimation = new Animation(spritesheet, 510, 260, 1350, 1, 1, true, 3) //x=710-1220 y = 640-900
-	this.fanout = true;
+	this.fanout = false;
 	this.state = "Down";
 	this.timer = 0;
 	this.invul = true;
@@ -1133,9 +1195,10 @@ function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
 	this.startMove = false;
 	this.isMoving = false;
 	this.currentSpell = false;
-	this.bulletInterval = 7;
+	this.bulletInterval = 0;
 	this.canCollide = true;
-	this.totalInterval = 15;
+	this.totalInterval = 20;
+	this.bulletDirection = 0;
 	this.bulletInterval = this.totalInterval;
 	this.isEnemy = true;
 	this.shoot = false;
@@ -1146,7 +1209,7 @@ function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
 Yuyuko.prototype = new Entity();
 Yuyuko.prototype.constructor = Yuyuko;
 Yuyuko.prototype.update = function () {
-	if(this.hp % this.phasehealth === 0 && this.hp/this.phasehealth > this.phase) {
+	/*if(this.hp % this.phasehealth === 0 && this.hp/this.phasehealth > this.phase) {
 		this.phase --;
 		if(this.phase%3 ===0) {
 			this.fanout = true;
@@ -1163,8 +1226,18 @@ Yuyuko.prototype.update = function () {
 					}
 				}
         	}
-	}
+	}*/
 	Entity.prototype.update.call(this);
+	
+	if(this.hp < this.phasehealth && this.phase == 1)
+	{
+		console.log("phase 2");
+		this.phase = 2;
+		this.state = "MoveCenter";
+		this.fanout = true;
+		this.totalInterval = 7;
+		this.currentSpell = true;
+	}
 	
 	//SHOOTING STUFF
 	if(this.shoot){
@@ -1461,11 +1534,11 @@ Yuyuko.prototype.draw = function () {
 	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y, this);
 	this.ctx.fillStyle = "pink";
 	//hp * 20 = 30 here, hp*30 = 20, *40 = 15
-	this.ctx.fillRect(0,0,(this.hp/100)*15,10); //change the 3rd argument to change lifebar length
+	this.ctx.fillRect(0,0,(this.hp/100)*20,10); //change the 3rd argument to change lifebar length
 	
 
 	//draw attacks
-	if(this.shoot) {
+	if(this.shoot && this.currentSpell) {
 //		if(this.attackType === "Star")
 //		{
 //			drawSpreads(this, "Star");
@@ -1479,7 +1552,12 @@ Yuyuko.prototype.draw = function () {
 //			drawSpreads(this, "Star");
 //			drawSpreads(this, "SecondaryStar");
 //		}
-		drawSpreads(this, "Star");
+		drawSpreads(this, "Spell");
+		this.bulletDirection++;
+		this.shoot = false;
+	}else if(this.shoot)
+	{
+		drawSpreads(this, "Circle");
 		this.shoot = false;
 	}
 	
@@ -1658,6 +1736,7 @@ Enemy.prototype.draw = function () {
 function drawSpreads(enemy, attackPattern)
 {
 	var xoffset = 15;
+	var tempID = 0;
 	if(enemy.bombImmune) //check if its yuyuko, change if theres other stuff
 	{
 		xoffset = 30
@@ -1746,8 +1825,156 @@ function drawSpreads(enemy, attackPattern)
 		bEnemy.push(tempEnemy4);
 		bEnemy.push(tempEnemy5);
 	}
-	
-	
+	if(attackPattern === "Circle")
+	{
+		var interval = 360/16;
+		
+		for(var z = 0; z<60; z++)
+		{
+			tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepink.png"), enemy.x, enemy.y + enemy.bulletY);
+			tempEnemy.x = enemy.x+xoffset;
+			tempEnemy.startX = enemy.x+xoffset;
+			tempEnemy.y = enemy.y+enemy.bulletY;
+			tempEnemy.startY = enemy.y+enemy.bulletY;
+			tempEnemy.speed = 4;
+			tempEnemy.xSpeed = tempEnemy.speed * Math.sin(z * interval * Math.PI / 180); // i * interval?
+			tempEnemy.ySpeed = tempEnemy.speed * Math.cos(z * interval * Math.PI / 180);
+			//console.log(z);
+			//console.log(tempEnemy.xSpeed);
+			
+			tempEnemy.bulletType = "Spray";
+			gameEngine.addEntity(tempEnemy);
+			
+			bEnemy.push(tempEnemy);
+		}
+		
+		if(soundBuffer != null)
+		{
+			playSound(soundBuffer[1]);
+		}
+	}
+	if(attackPattern === "Spell")
+	{
+		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepink.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy.x = enemy.x+xoffset;
+		tempEnemy.startX = enemy.x+xoffset;
+		tempEnemy.y = enemy.y+enemy.bulletY;
+		tempEnemy.startY = enemy.y+enemy.bulletY;
+		tempEnemy.speed = 2;
+		tempEnemy.changeDirection = 0;
+		tempEnemy.bulletDirection = enemy.bulletDirection;
+		tempEnemy.xSpeed = tempEnemy.speed * Math.sin(enemy.bulletDirection * 12 * Math.PI / 180); // i * interval?
+		tempEnemy.ySpeed = tempEnemy.speed * Math.cos(enemy.bulletDirection * 12 * Math.PI / 180);
+		//console.log(tempEnemy.xSpeed);
+		tempEnemy.bulletType = "Spray";
+		
+		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy2.x = enemy.x+xoffset;
+		tempEnemy2.startX = enemy.x+xoffset;
+		tempEnemy2.y = enemy.y+enemy.bulletY;
+		tempEnemy2.startY = enemy.y+enemy.bulletY;
+		tempEnemy2.speed = 12;
+		tempEnemy2.changeDirection = 7;
+		tempEnemy2.bulletDirection = enemy.bulletDirection;
+		tempEnemy2.xSpeed = tempEnemy2.speed * Math.sin((enemy.bulletDirection + 7) * 12 * Math.PI / 180); // i * interval?
+		tempEnemy2.ySpeed = tempEnemy2.speed * Math.cos((enemy.bulletDirection + 7) * 12 * Math.PI / 180);
+		//console.log(tempEnemy.xSpeed);
+		tempEnemy2.bulletType = "SpellRight";
+		
+		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepink.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy3.x = enemy.x+xoffset;
+		tempEnemy3.startX = enemy.x+xoffset;
+		tempEnemy3.y = enemy.y+enemy.bulletY;
+		tempEnemy3.startY = enemy.y+enemy.bulletY;
+		tempEnemy3.speed = 2;
+		tempEnemy3.changeDirection = 14;
+		tempEnemy3.bulletDirection = enemy.bulletDirection;
+		tempEnemy3.xSpeed = tempEnemy3.speed * Math.sin((enemy.bulletDirection + 14) * 12 * Math.PI / 180); // i * interval?
+		tempEnemy3.ySpeed = tempEnemy3.speed * Math.cos((enemy.bulletDirection + 14) * 12 * Math.PI / 180);
+		tempEnemy3.bulletType = "Spray";
+		
+		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy4.x = enemy.x+xoffset;
+		tempEnemy4.startX = enemy.x+xoffset;
+		tempEnemy4.y = enemy.y+enemy.bulletY;
+		tempEnemy4.startY = enemy.y+enemy.bulletY;
+		tempEnemy4.speed = 12;
+		tempEnemy4.changeDirection = 21;
+		tempEnemy4.bulletDirection = enemy.bulletDirection;
+		tempEnemy4.xSpeed = tempEnemy4.speed * Math.sin((enemy.bulletDirection + 21) * 12 * Math.PI / 180); // i * interval?
+		tempEnemy4.ySpeed = tempEnemy4.speed * Math.cos((enemy.bulletDirection + 21) * 12 * Math.PI / 180);
+		tempEnemy4.bulletType = "SpellLeft";
+		
+		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepink.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy5.x = enemy.x+xoffset;
+		tempEnemy5.startX = enemy.x+xoffset;
+		tempEnemy5.y = enemy.y+enemy.bulletY;
+		tempEnemy5.startY = enemy.y+enemy.bulletY;
+		tempEnemy5.speed = 2;
+		tempEnemy5.changeDirection = 21;
+		tempEnemy5.bulletDirection = enemy.bulletDirection;
+		tempEnemy5.xSpeed = tempEnemy5.speed * Math.sin((enemy.bulletDirection + 7) * 12 * Math.PI / 180); // i * interval?
+		tempEnemy5.ySpeed = tempEnemy5.speed * Math.cos((enemy.bulletDirection + 7) * 12 * Math.PI / 180);
+		tempEnemy5.bulletType = "Spray";
+		
+		tempEnemy6 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepink.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy6.x = enemy.x+xoffset;
+		tempEnemy6.startX = enemy.x+xoffset;
+		tempEnemy6.y = enemy.y+enemy.bulletY;
+		tempEnemy6.startY = enemy.y+enemy.bulletY;
+		tempEnemy6.speed = 2;
+		tempEnemy6.changeDirection = 21;
+		tempEnemy6.bulletDirection = enemy.bulletDirection;
+		tempEnemy6.xSpeed = tempEnemy6.speed * Math.sin((enemy.bulletDirection + 21) * 12 * Math.PI / 180); // i * interval?
+		tempEnemy6.ySpeed = tempEnemy6.speed * Math.cos((enemy.bulletDirection + 21) * 12 * Math.PI / 180);
+		tempEnemy6.bulletType = "Spray";
+		
+		tempEnemy7 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy7.x = enemy.x+xoffset;
+		tempEnemy7.startX = enemy.x+xoffset;
+		tempEnemy7.y = enemy.y+enemy.bulletY;
+		tempEnemy7.startY = enemy.y+enemy.bulletY;
+		tempEnemy7.speed = 12;
+		tempEnemy7.changeDirection = 8;
+		tempEnemy7.bulletDirection = enemy.bulletDirection;
+		tempEnemy7.xSpeed = tempEnemy7.speed * Math.sin((enemy.bulletDirection + 8 )* 12 * Math.PI / 180); // i * interval?
+		tempEnemy7.ySpeed = tempEnemy7.speed * Math.cos((enemy.bulletDirection + 8 )* 12 * Math.PI / 180);
+		tempEnemy7.bulletType = "SpellLeft";
+		
+		tempEnemy8 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
+		tempEnemy8.x = enemy.x+xoffset;
+		tempEnemy8.startX = enemy.x+xoffset;
+		tempEnemy8.y = enemy.y+enemy.bulletY;
+		tempEnemy8.startY = enemy.y+enemy.bulletY;
+		tempEnemy8.speed = 12;
+		tempEnemy8.changeDirection = 22;
+		tempEnemy8.bulletDirection = enemy.bulletDirection;
+		tempEnemy8.xSpeed = tempEnemy8.speed * Math.sin((enemy.bulletDirection + 22 )* 12 * Math.PI / 180); // i * interval?
+		tempEnemy8.ySpeed = tempEnemy8.speed * Math.cos((enemy.bulletDirection + 22 )* 12 * Math.PI / 180);
+		tempEnemy8.bulletType = "SpellRight";
+		
+		gameEngine.addEntity(tempEnemy);
+		gameEngine.addEntity(tempEnemy2);
+		gameEngine.addEntity(tempEnemy3);
+		gameEngine.addEntity(tempEnemy4);
+		gameEngine.addEntity(tempEnemy5);
+		gameEngine.addEntity(tempEnemy6);
+		gameEngine.addEntity(tempEnemy7);
+		gameEngine.addEntity(tempEnemy8);
+		
+		if(soundBuffer != null)
+		{
+			playSound(soundBuffer[1]);
+		}
+		bEnemy.push(tempEnemy);
+		bEnemy.push(tempEnemy2);
+		bEnemy.push(tempEnemy3);
+		bEnemy.push(tempEnemy4);
+		bEnemy.push(tempEnemy5);
+		bEnemy.push(tempEnemy6);
+		bEnemy.push(tempEnemy7);
+		bEnemy.push(tempEnemy8);
+	}
 }
 
 
@@ -2435,6 +2662,9 @@ function stopSpawns()
 
 function spawnBoss(gameEngine)
 {
+	b = [];
+	bEnemy = [];
+	
 	gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 260, -200, 100));
 }
 
@@ -2484,6 +2714,8 @@ function restart(gameEngine, ctx) {
 	
 	//this removes all previous setinterval calls
 	stopSpawns();
+	b = [];
+	bEnemy = [];
 	intervalIDs = [];
 	
 	if(gainNode != null)
@@ -2579,6 +2811,7 @@ AM.queueDownload("./img/enemy.png")
 AM.queueDownload("./img/mini.png")
 AM.queueDownload("./img/battle.png")
 AM.queueDownload("./img/battlepurple.png")
+AM.queueDownload("./img/battlepink.png")
 AM.queueDownload("./img/menu.png")
 AM.queueDownload("./img/hud.png")
 
