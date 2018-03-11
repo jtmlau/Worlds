@@ -688,9 +688,9 @@ Reimu.prototype.update = function () {
 			this.game.bombs = this.bombs;
 			//DO BOMB STUFF
 			if(soundBuffer != null)
-		{
-			playBomb(soundBuffer[3]);
-		}
+			{
+				playBomb(soundBuffer[3]);
+			}
 			
 			
 			for (var i = 0; i < this.game.entities.length; i++) 
@@ -1103,7 +1103,7 @@ Enemy2.prototype.draw = function() {
     Entity.prototype.draw.call(this);
 };
 function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
-	this.hp = difficulty * 20;
+	this.hp = difficulty * 30;
 	this.phasehealth = this.hp/6;
 	this.phase = 6;
 	this.spritesheet = spritesheet;
@@ -1116,6 +1116,7 @@ function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
 	this.fanout = true;
 	this.state = "Down";
 	this.timer = 0;
+	this.invul = true;;
 	this.speed = 80;
 	this.bulletSpeed = 10;
 	this.bulletY = 10;
@@ -1162,8 +1163,8 @@ Yuyuko.prototype.update = function () {
 		
 		this.y += 1
 		if (this.y > 100) {
+			this.invul = false;
 			this.state = "Float";
-			
 		}
 	}
 	if(this.state === "MoveRight") {
@@ -1242,7 +1243,7 @@ Yuyuko.prototype.update = function () {
 		
 		this.timer++;
 		
-		console.log(this.timer);
+		//console.log(this.timer);
 		
 		if(this.timer == 130)
 		{
@@ -1260,10 +1261,10 @@ Yuyuko.prototype.update = function () {
 					this.state = "MoveRight";
 					this.startMove = true;
 				}
-				console.log(random);
+				//console.log(random);
 			}
 			
-			console.log(this.state);
+			//console.log(this.state);
 			
 			this.timer = 0;
 		}
@@ -1286,15 +1287,23 @@ Yuyuko.prototype.update = function () {
         var ent = this.game.entities[i];
         if (this != ent && this.collide(ent) && !ent.isEnemy && !ent.canCollide) {
 			if(this.hp > 0) {
-				this.hp--;
-				console.log(this.hp);
+				if(!this.invul)
+				{
+					this.hp--;
+				}
+				//console.log(this.hp);
 				if(!ent.isHero) {
 					ent.removeFromWorld = true;
 				}
-			} else {
-            this.removeFromWorld = true;
-            ent.removeFromWorld = true;
-            this.game.gameScore += this.killScore;
+			} else if(this.hp <= 0){
+				if(soundBuffer != null)
+				{
+					playBomb(soundBuffer[3]);
+				}
+	            this.removeFromWorld = true;
+	            ent.removeFromWorld = true;
+	            this.game.gameScore += this.killScore;
+	            gameEngine.gameEnd = true;
             }
             //i dont think we need this anymore?
             if(ent.isHero) 
@@ -1370,7 +1379,8 @@ Yuyuko.prototype.draw = function () {
 	}
 	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y, this);
 	this.ctx.fillStyle = "pink";
-	this.ctx.fillRect(0,0,(this.hp/100)*30,10);
+	//hp * 20 = 30 here, hp*30 = 20
+	this.ctx.fillRect(0,0,(this.hp/100)*20,10); //change the 3rd argument to change lifebar length
 	
 
     Entity.prototype.draw.call(this);

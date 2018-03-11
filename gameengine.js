@@ -250,7 +250,7 @@ GameEngine.prototype.update = function () {
 	    
 	    //console.log(this.endGameScore);
 	    
-	    if(this.endGameScore > 7400) this.gameEnd = true;
+	    //if(this.endGameScore > 7400) this.gameEnd = true;
 		
 	    
 	    if (this.gameEnd){
