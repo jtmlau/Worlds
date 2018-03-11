@@ -718,8 +718,8 @@ Reimu.prototype.update = function () {
 			}
 			//stopSpawn = false;
 			
-			//spawnEnemies(this.game, 2);
-			spawnBoss(this.game);
+			spawnEnemies(this.game, 2);
+			//spawnBoss(this.game);
 			console.log("Calling spawn enemies");
 			this.spawned = true;
 			
@@ -886,6 +886,10 @@ Reimu.prototype.update = function () {
             
 			if(this.game.lives < 1)
 			{
+				for (var i = 0; i < this.game.entities.length; i++) 
+	        	{
+	                	this.game.entities[i].removeFromWorld = true;
+	        	}
 				restart(gameEngine, ctx);
 				//this.game.gameEnd = true;
 			}
@@ -1103,7 +1107,7 @@ Enemy2.prototype.draw = function() {
     Entity.prototype.draw.call(this);
 };
 function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
-	this.hp = difficulty * 30;
+	this.hp = difficulty * 40;
 	this.phasehealth = this.hp/6;
 	this.phase = 6;
 	this.spritesheet = spritesheet;
@@ -1116,10 +1120,11 @@ function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
 	this.fanout = true;
 	this.state = "Down";
 	this.timer = 0;
-	this.invul = true;;
+	this.invul = true;
+	this.shoot = false;
 	this.speed = 80;
 	this.bulletSpeed = 10;
-	this.bulletY = 10;
+	this.bulletY = 30;
 	this.radius = 50;
 	this.centerX = 37;
     this.centerY = 70;
@@ -1130,6 +1135,8 @@ function Yuyuko(game, spritesheet, x, y, difficulty) {//set hp to like 100
 	this.currentSpell = false;
 	this.bulletInterval = 7;
 	this.canCollide = true;
+	this.totalInterval = 15;
+	this.bulletInterval = this.totalInterval;
 	this.isEnemy = true;
 	this.shoot = false;
 	this.killScore = 10000;
@@ -1158,6 +1165,28 @@ Yuyuko.prototype.update = function () {
         	}
 	}
 	Entity.prototype.update.call(this);
+	
+	//SHOOTING STUFF
+	if(this.shoot){
+		this.bulletY += this.game.clockTick * this.bulletSpeed;
+	}
+	
+	if(this.state === "Float" || this.state === "SideFloat")
+	{
+		if(this.bulletInterval === 0)
+		{
+			this.shoot = true;
+			this.count++;
+			this.bulletInterval = this.totalInterval;
+			
+		}
+		else
+		{
+			this.shoot = false;
+		}
+		this.bulletInterval--;
+	}
+	
 	if(this.state === "Down") {
 		this.startMove = true;
 		
@@ -1176,7 +1205,7 @@ Yuyuko.prototype.update = function () {
 		}
 		if(this.x > 346 && this.y < 60)
 		{
-			this.state = "MoveCenter"
+			this.state = "SideFloat"
 		}
 		
 	}
@@ -1189,9 +1218,60 @@ Yuyuko.prototype.update = function () {
 		}
 		if(this.x < 158 && this.y < 60)
 		{
-			this.state = "MoveCenter"
+			this.state = "SideFloat"
 		}
 	}
+	if(this.state === "SideFloat")
+	{
+		this.startMove = false;
+		this.isMoving = false;
+		
+		//console.log(this.state);
+//		if(this.floatnum % 2 === 1 && this.floatnum >= 0) {
+//			if(this.y <= 90) {
+//				this.floatnum--;
+//			}this.y-=.3;
+//		} 
+//		if (this.floatnum % 2 === 0 && this.floatnum >= 0) {
+//			if(this.y >= 110) {
+//				this.floatnum--;
+//			}this.y +=.3;
+//		}
+		
+		if(this.floatnum % 2 === 1) {
+			if(this.y <= 50) {
+				this.floatnum--;
+			}this.y-=.3;
+		} 
+		if (this.floatnum % 2 === 0) {
+			if(this.y >= 70) {
+				this.floatnum--;
+			}this.y +=.3;
+		}
+		if (this.floatnum === 0)
+		{
+			this.floatnum = 6;
+		}
+		
+		this.timer++;
+		
+		//console.log(this.timer);
+		
+		if(this.timer == 90)
+		{
+			if(this.currentSpell == false)
+			{
+				this. timer = 0;
+				this.state = "MoveCenter";
+				this.startMove = true;
+			}
+			
+			//console.log(this.state);
+			
+			this.timer = 0;
+		}
+	}
+	
 	if(this.state === "MoveCenter") {
 		if(this.x > 250) {
 			this.x--;
@@ -1207,14 +1287,14 @@ Yuyuko.prototype.update = function () {
 		}
 		if(this.x < 252 && this.x > 248 && this.y >98 && this.y < 102) {
 			this.state = "Float";
-			console.log("Center to float");
+			//console.log("Center to float");
 		}
 	} 
 	if(this.state === "Float") {
 		this.startMove = false;
 		this.isMoving = false;
 		
-		console.log(this.state);
+		//console.log(this.state);
 //		if(this.floatnum % 2 === 1 && this.floatnum >= 0) {
 //			if(this.y <= 90) {
 //				this.floatnum--;
@@ -1303,6 +1383,7 @@ Yuyuko.prototype.update = function () {
 	            this.removeFromWorld = true;
 	            ent.removeFromWorld = true;
 	            this.game.gameScore += this.killScore;
+	            gameEngine.win = true;
 	            gameEngine.gameEnd = true;
             }
             //i dont think we need this anymore?
@@ -1379,10 +1460,29 @@ Yuyuko.prototype.draw = function () {
 	}
 	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y, this);
 	this.ctx.fillStyle = "pink";
-	//hp * 20 = 30 here, hp*30 = 20
-	this.ctx.fillRect(0,0,(this.hp/100)*20,10); //change the 3rd argument to change lifebar length
+	//hp * 20 = 30 here, hp*30 = 20, *40 = 15
+	this.ctx.fillRect(0,0,(this.hp/100)*15,10); //change the 3rd argument to change lifebar length
 	
 
+	//draw attacks
+	if(this.shoot) {
+//		if(this.attackType === "Star")
+//		{
+//			drawSpreads(this, "Star");
+//		}
+//		if(this.attackType === "SecondaryStar")
+//		{
+//			drawSpreads(this, "SecondaryStar");
+//		}
+//		if(this.attackType === "FullSpread")
+//		{
+//			drawSpreads(this, "Star");
+//			drawSpreads(this, "SecondaryStar");
+//		}
+		drawSpreads(this, "Star");
+		this.shoot = false;
+	}
+	
     Entity.prototype.draw.call(this);
 };
 function Enemy(game, spritesheet, x, y, hp){
@@ -1557,10 +1657,16 @@ Enemy.prototype.draw = function () {
 
 function drawSpreads(enemy, attackPattern)
 {
+	var xoffset = 15;
+	if(enemy.bombImmune) //check if its yuyuko, change if theres other stuff
+	{
+		xoffset = 30
+	}
+	
 	if(attackPattern === "Star")
 	{
 		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy.x = enemy.x+15;
+		tempEnemy.x = enemy.x+xoffset;
 		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDownLeft";
 		enemy.game.addEntity(tempEnemy);
@@ -1568,26 +1674,26 @@ function drawSpreads(enemy, attackPattern)
 		
 		//trying 2 bullet
 		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy2.x = enemy.x+15;
+		tempEnemy2.x = enemy.x+xoffset;
 		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyDownRight";
 		enemy.game.addEntity(tempEnemy2);
 		
 		//trying all bullet
 		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy3.x = enemy.x+15;
+		tempEnemy3.x = enemy.x+xoffset;
 		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyRightUp";
 		enemy.game.addEntity(tempEnemy3);
 		
 		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy4.x = enemy.x+15;
+		tempEnemy4.x = enemy.x+xoffset;
 		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftUp";
 		enemy.game.addEntity(tempEnemy4);
 		
 		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battle.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy5.x = enemy.x+15;
+		tempEnemy5.x = enemy.x+xoffset;
 		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyUp";
 		enemy.game.addEntity(tempEnemy5);
@@ -1605,27 +1711,27 @@ function drawSpreads(enemy, attackPattern)
 	if(attackPattern === "SecondaryStar")
 	{
 		tempEnemy = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy.x = enemy.x+15;
+		tempEnemy.x = enemy.x+xoffset;
 		tempEnemy.y = enemy.y+enemy.bulletY;
 		tempEnemy.bulletType = "EnemyDown";
 		enemy.game.addEntity(tempEnemy);
 		tempEnemy2 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy2.x = enemy.x+15;
+		tempEnemy2.x = enemy.x+xoffset;
 		tempEnemy2.y = enemy.y+enemy.bulletY;
 		tempEnemy2.bulletType = "EnemyUpLeft";
 		enemy.game.addEntity(tempEnemy2);
 		tempEnemy3 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy3.x = enemy.x+15;
+		tempEnemy3.x = enemy.x+xoffset;
 		tempEnemy3.y = enemy.y+enemy.bulletY;
 		tempEnemy3.bulletType = "EnemyUpRight";
 		enemy.game.addEntity(tempEnemy3);
 		tempEnemy4 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy4.x = enemy.x+15;
+		tempEnemy4.x = enemy.x+xoffset;
 		tempEnemy4.y = enemy.y+enemy.bulletY;
 		tempEnemy4.bulletType = "EnemyLeftDown";
 		enemy.game.addEntity(tempEnemy4);
 		tempEnemy5 = new EnemyBullet(enemy.game, AM.getAsset("./img/battlepurple.png"), enemy.x, enemy.y + enemy.bulletY);
-		tempEnemy5.x = enemy.x+15;
+		tempEnemy5.x = enemy.x+xoffset;
 		tempEnemy5.y = enemy.y+enemy.bulletY;
 		tempEnemy5.bulletType = "EnemyRightDown";
 		enemy.game.addEntity(tempEnemy5);
@@ -1814,7 +1920,7 @@ Enemy3.prototype.draw = function () {
 
 function spawnEnemies(gameEngine, difficulty)
 {	
-	console.log("Starting Spawn enemies function");
+	//console.log("Starting Spawn enemies function");
 	
 	//while(!gameEngine.gamEnd) {
 		if (difficulty < 1) {
@@ -2301,7 +2407,12 @@ function spawnEnemies(gameEngine, difficulty)
 					}
 				}
 				
-		 }gameEngine.gameScore = 7400;
+				tempID = setTimeout(function()
+				{
+					spawnBoss(gameEngine);
+				},116000); intervalIDs.push(tempID);
+				
+		 }
 		
 }
 
@@ -2366,14 +2477,14 @@ function starter()
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
 function restart(gameEngine, ctx) {
-	stopSpawns();
+	
 	
 	bombCount = 3;
 	gameEngine.bombs = 3;
 	
+	//this removes all previous setinterval calls
+	stopSpawns();
 	intervalIDs = [];
-	
-	
 	
 	if(gainNode != null)
 	{

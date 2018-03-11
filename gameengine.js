@@ -27,6 +27,7 @@ function GameEngine() {
     this.surfaceWidth = null;
     this.surfaceHeight = null;
     this.gameEnd = false;
+    this.win = false;
     this.gameScore = 0;
 };
 
@@ -261,7 +262,7 @@ GameEngine.prototype.update = function () {
 	    	
 			ctx.font = "24pt Times New Roman";
 			
-			if(this.endGameScore< 7400) {
+			if(!this.win) {
 					
 				ctx.fillStyle = "white";
 				ctx.fillText("GAME OVER", 100, 460);
