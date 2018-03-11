@@ -1336,6 +1336,10 @@ Yuyuko.prototype.update = function () {
 
 Yuyuko.prototype.draw = function () {
 
+	//display hp?
+	
+	
+	
 	if(this.fanout) {
 		//x=710-1220 y = 640-900
 //		var xindex = 710;
@@ -1365,6 +1369,8 @@ Yuyuko.prototype.draw = function () {
 		}
 	}
 	this.animation.drawYuyukoFrame(this.game.clockTick, this.ctx, this.x, this.y, this);
+	this.ctx.fillStyle = "pink";
+	this.ctx.fillRect(0,0,(this.hp/100)*30,10);
 	
 
     Entity.prototype.draw.call(this);
@@ -2340,7 +2346,7 @@ function starter()
     gameEngine.init(ctx);
     
     //show bounding boxes
-    gameEngine.showOutlines = true;
+    //gameEngine.showOutlines = true;
     
     gameEngine.start();
     
