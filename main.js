@@ -12,6 +12,7 @@ var stopSpawn = false;
 var AM = new AssetManager();
 
 gameScore = 0;
+intervalIDs = [];
 
 function Animation(spriteSheet, frameWidth, frameHeight, sheetWidth, frameDuration, frames, loop, scale) {
     this.spriteSheet = spriteSheet;
@@ -843,8 +844,8 @@ Reimu.prototype.update = function () {
             
 			if(this.game.lives < 1)
 			{
-				//restart(gameEngine, ctx);
-				this.game.gameEnd = true;
+				restart(gameEngine, ctx);
+				//this.game.gameEnd = true;
 			}
 			else
 			{
@@ -1008,8 +1009,8 @@ Entity.prototype.update.call(this);
             	
             	if(this.game.lives < 1)
     			{
-            		//restart(gameEngine, ctx);
-            		this.game.gameEnd = true;
+            		restart(gameEngine, ctx);
+            		//this.game.gameEnd = true;
             		
     			}
     			else
@@ -1020,12 +1021,12 @@ Entity.prototype.update.call(this);
 			
         };
     };
-	if(this.game.gameEnd) {
-		this.game.lives --;
-		if(this.game.lives > 0) {
-			spawnReimu(gameEngine, ctx);
-		}
-	}
+//	if(this.game.gameEnd) {
+//		this.game.lives --;
+//		if(this.game.lives > 0) {
+//			spawnReimu(gameEngine, ctx);
+//		}
+//	}
 }
 
 Enemy2.prototype.draw = function() {
@@ -1112,8 +1113,8 @@ Yuyuko.prototype.update = function () {
             	
             	if(this.game.lives < 1)
     			{
-            		//restart(gameEngine, ctx);
-            		this.game.gameEnd = true;
+            		restart(gameEngine, ctx);
+            		//this.game.gameEnd = true;
     			}
     			else
     			{
@@ -1123,12 +1124,12 @@ Yuyuko.prototype.update = function () {
 			
         };
     };
-	if(this.game.gameEnd) {
-		this.game.lives --;
-		if(this.game.lives > 0) {
-			spawnReimu(gameEngine, ctx);
-		}
-	}
+//	if(this.game.gameEnd) {
+//		this.game.lives --;
+//		if(this.game.lives > 0) {
+//			spawnReimu(gameEngine, ctx);
+//		}
+//	}
 }
 
 
@@ -1261,8 +1262,8 @@ Enemy.prototype.update = function () {
             	
             	if(this.game.lives < 1)
     			{
-            		//restart(gameEngine, ctx);
-            		this.game.gameEnd = true;
+            		restart(gameEngine, ctx);
+            		//this.game.gameEnd = true;
     			}
     			else
     			{
@@ -1272,12 +1273,12 @@ Enemy.prototype.update = function () {
 			
         };
     };
-	if(this.game.gameEnd) {
-		this.game.lives --;
-		if(this.game.lives > 0) {
-			spawnReimu(gameEngine, ctx);
-		}
-	}
+//	if(this.game.gameEnd) {
+//		this.game.lives --;
+//		if(this.game.lives > 0) {
+//			spawnReimu(gameEngine, ctx);
+//		}
+//	}
 }
 
 
@@ -1518,8 +1519,8 @@ Enemy3.prototype.update = function () {
             	
             	if(this.game.lives < 1)
     			{
-            		//restart(gameEngine, ctx);
-            		this.game.gameEnd = true;
+            		restart(gameEngine, ctx);
+            		//this.game.gameEnd = true;
     			}
     			else
     			{
@@ -1529,12 +1530,12 @@ Enemy3.prototype.update = function () {
 			
         };
     };
-	if(this.game.gameEnd) {
-		this.game.lives --;
-		if(this.game.lives > 0) {
-			spawnReimu(gameEngine, ctx);
-		}
-	}
+//	if(this.game.gameEnd) {
+//		this.game.lives --;
+//		if(this.game.lives > 0) {
+//			spawnReimu(gameEngine, ctx);
+//		}
+//	}
 }
 
 Enemy3.prototype.draw = function () {
@@ -2066,7 +2067,18 @@ function spawnEnemies(gameEngine, difficulty)
 //	source1.start(0);
 //}
 
+function stopSpawns()
+{
+	//stop all spawns
+	intervalIDs.forEach(function(element)
+	{
+		clearTimeout(element);
+	});
+}
+
 function starter() {
+	
+	
 	
 	var canvas = document.getElementById("gameWorld");
     var ctx = canvas.getContext("2d");
@@ -2100,6 +2112,10 @@ function starter() {
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
 function restart(gameEngine, ctx) {
+	stopSpawns();
+	
+	intervalIDs = [];
+	
 	gameEngine.play = false;
 	
 	if(gainNode != null)
