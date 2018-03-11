@@ -55,6 +55,8 @@ GameEngine.prototype.start = function () {
 GameEngine.prototype.startInput = function () {
     console.log('Starting input');
     
+    var muteFired = false;
+    
     var that = this;
     
     this.ctx.canvas.addEventListener("keydown", function (e)
@@ -67,6 +69,8 @@ GameEngine.prototype.startInput = function () {
     	
     	switch(e.code)
     	{
+		case "KeyZ":
+			that.z = true;
     	case "Space":
     		that.space = true;
     		break;
@@ -98,7 +102,18 @@ GameEngine.prototype.startInput = function () {
 		case "KeyR":
 			that.r = true;
 			break;
+		case "KeyX":
+			that.x = true;
+			break;
+		case "KeyM":
+			if(!muteFired)
+			{
+				that.m = true;
+				muted = true;
+			}
+			break;
     	}
+    	
     	
     	e.preventDefault();
     	
@@ -109,6 +124,7 @@ GameEngine.prototype.startInput = function () {
 	{
     	switch(e.code)
     	{
+		
     	case "Space":
     		that.space = false;
     		break;
@@ -136,8 +152,18 @@ GameEngine.prototype.startInput = function () {
     	/*case "KeyG":
     		that.god = false;
     		break;*/
+		case "KeyZ":
+			that.z = false;
+			break;
+		case "KeyX":
+			that.x = false;
+			break;
 		case "KeyR":
 			that.r = false;
+			break;
+		case "KeyM":
+			that.m = false;
+			muteFired = false;
 			break;
     	}
     	
