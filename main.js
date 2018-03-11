@@ -1073,7 +1073,7 @@ function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
 	this.x = x;
 	this.y = y;
 
-	this.animation = new Animation(spritesheet, 40, 85, 1350, 1, 6, true, 1)
+	this.animation = new Animation(spritesheet, 40, 85, 1350, 1, 6, true, 1.5)
 	this.state = "Down";
 	this.timer = 0;
 	this.speed = 80;
@@ -2129,7 +2129,7 @@ function starter() {
     
     gameEngine.gameScore = 0;
     //gameEngine.showOutlines = true;
-    gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, -100, 100));
+    gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 250, -200, 100));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
 function restart(gameEngine, ctx) {
