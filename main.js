@@ -1074,6 +1074,7 @@ function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
 	this.y = y;
 
 	this.animation = new Animation(spritesheet, 40, 85, 1350, 1, 6, true, 1)
+	this.state = "Down";
 	this.timer = 0;
 	this.speed = 80;
 	this.bulletSpeed = 10;
@@ -1081,6 +1082,7 @@ function Yuyuko(game, spritesheet, x, y, hp) {//set hp to like 100
 	this.radius = 15;
 	this.count = 0;
 	this.bulletInterval = 7;
+	this.canCollide = true;
 	this.isEnemy = true;
 	this.shoot = false;
 	this.killScore = 10000;
@@ -1091,7 +1093,12 @@ Yuyuko.prototype = new Entity();
 Yuyuko.prototype.constructor = Yuyuko;
 Yuyuko.prototype.update = function () {
 	Entity.prototype.update.call(this);
-	
+	if(this.state === "Down") {
+		this.y += 1
+		if (this.y > 100) {
+			this.state = "Stay";
+	}
+	}
 	
 	var gameEngine = this.game;
 	var ctx = this.ctx;
@@ -2122,7 +2129,7 @@ function starter() {
     
     gameEngine.gameScore = 0;
     //gameEngine.showOutlines = true;
-    //gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 10, 100));
+    gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 300, -100, 100));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
 function restart(gameEngine, ctx) {
