@@ -2113,7 +2113,7 @@ function starter() {
     
     gameEngine.gameScore = 0;
     //gameEngine.showOutlines = true;
-    gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 10, 100));
+    //gameEngine.addEntity(new Yuyuko(gameEngine, AM.getAsset("./img/Touhou_pfb_sprites.png"), 10, 100));
     gameEngine.addEntity(new Reimu(gameEngine, AM.getAsset("./img/reimu_hakurei.png"), 400, 500));
 }
 function restart(gameEngine, ctx) {
