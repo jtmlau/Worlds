@@ -2661,7 +2661,7 @@ function spawnEnemies(gameEngine, difficulty)
 					bEnemy = [];
 					
 					spawnBoss(gameEngine);
-				},116000); intervalIDs.push(tempID);
+				},120000); intervalIDs.push(tempID);
 				
 		 }
 		
