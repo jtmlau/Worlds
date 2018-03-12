@@ -398,7 +398,39 @@ $(document).ready(function() {
 });
 
 
-Background.prototype.draw = function () {
+Background2.prototype.draw = function () {
+};
+function Background2(game, spritesheet) {
+	this.x = 0;
+	this.y = 0;
+	this.centerX = 0;
+	this.centerY = 0;
+	this.spritesheet = spritesheet;
+	this.game = game;
+	this.speed = 2;
+    this.ctx = game.ctx;
+    Entity.call(this, game, 0, 0);
+};
+
+Background2.prototype = new Entity();
+Background2.prototype.constructor = Background2;
+
+Background2.prototype.update = function () {	
+	
+};
+
+$(document).ready(function() {
+	var x = 0;
+    setInterval(function(){
+        x+=1;
+        $('canvas').css('background-position','0 ' + x + 'px');
+        
+    }, 1);
+    
+});
+
+
+Background2.prototype.draw = function () {
 };
 
 function updateBullet(bullet)
@@ -2580,6 +2612,17 @@ function spawnEnemies(gameEngine, difficulty)
 							gameEngine.addEntity(tempEnemy2);
 						}, i); intervalIDs.push(tempID);
 					}
+					setTimeout(function()
+					{for (var i = 0; i < this.game.entities.length; i++) 
+							{
+								if(this.game.entities[i].isEnemy && !this.game.entities[i].bombImmune)
+								{
+									this.game.entities[i].removeFromWorld = true;
+								}
+							}
+							b = [];
+							bEnemy = [];
+					}, 106800);
 				
 				 if (difficulty > 1) {
 					 tempID = setTimeout(function()
@@ -2614,6 +2657,17 @@ function spawnEnemies(gameEngine, difficulty)
 						}, i); intervalIDs.push(tempID);
 					}
 				}
+				setTimeout(function()
+					{for (var i = 0; i < this.game.entities.length; i++) 
+							{
+								if(this.game.entities[i].isEnemy && !this.game.entities[i].bombImmune)
+								{
+									this.game.entities[i].removeFromWorld = true;
+								}
+							}
+							b = [];
+							bEnemy = [];
+					}, 111199);
 				
 				tempID = setTimeout(function()
 				{
@@ -2832,6 +2886,7 @@ Menu.prototype.draw = function(ctx) {
 
 
 AM.queueDownload("./img/blue_background.jpg");
+AM.queueDownload("./img/desert_background.jpg");
 AM.queueDownload("./img/Touhou_pfb_sprites.png");
 AM.queueDownload("./img/reimu_hakurei.png");
 AM.queueDownload("./img/enemy.png")
